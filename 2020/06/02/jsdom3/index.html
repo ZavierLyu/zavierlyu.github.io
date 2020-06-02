@@ -28,7 +28,7 @@
 <meta property="og:description" content="DOM解释  D: 网页文档 O：对象，自足的数据集合。JS里的对象可以分为三种类型  用户定义对象(user-defined object): 由程序员自行创建的对象 内建对象(native object): 内建的js对象，如Array，Math 宿主对象(host object): 由浏览器提供的对象  M： (X)HTML所代表的节点树模型">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-06-02T14:09:50.000Z">
-<meta property="article:modified_time" content="2020-06-02T15:15:21.489Z">
+<meta property="article:modified_time" content="2020-06-02T15:35:07.852Z">
 <meta property="article:author" content="Zhewen Lyu">
 <meta property="article:tag" content="DOM">
 <meta property="article:tag" content="DOM Scripting Notes">
@@ -222,7 +222,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-06-02 22:09:50 / Modified: 23:15:21" itemprop="dateCreated datePublished" datetime="2020-06-02T22:09:50+08:00">2020-06-02</time>
+              <time title="Created: 2020-06-02 22:09:50 / Modified: 23:35:07" itemprop="dateCreated datePublished" datetime="2020-06-02T22:09:50+08:00">2020-06-02</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -271,7 +271,8 @@
 <li>getAttribute 该方法不属于<code>document</code>对象，所以不能通过其调用，它只能通过元素节点对象吊桶。 <code>object.get.Attribute(attribute);</code></li>
 <li>setAttribute <code>object.setAttribute(attribute, value);</code></li>
 </ol>
-<p><strong>通过setAttribute()方法对文档作出的改变，但这张改变并未反映到源代码中，也就是说，源代码中属性值仍旧是原来的属性值。这种“表里不一”的现象缘于DOM的工作模式：先加载文档的静态内容，再以动态方式对它们进行刷新，动态刷新不改变文档的静态内容，而对页面内容的刷新，不需要用户在他们的浏览器里执行刷新操作就可以实现。</strong> 个人对这句话的理解时，你在console中运行setAttribute的DOM操作不会影响静态的html源代码，但是浏览器已经将你的修改运行到了渲染中。比如你在console中修改attribute <code>href</code>, 源代码不会改变，但是你点击的那个超链接已经发生了改变。</p>
+<p><strong>通过setAttribute()方法对文档作出的改变，但这张改变并未反映到源代码中，也就是说，源代码中属性值仍旧是原来的属性值。这种“表里不一”的现象缘于DOM的工作模式：先加载文档的静态内容，再以动态方式对它们进行刷新，动态刷新不改变文档的静态内容，而对页面内容的刷新，不需要用户在他们的浏览器里执行刷新操作就可以实现。</strong></p>
+<p>个人对这句话的理解时，你在console中运行setAttribute的DOM操作不会影响静态的html源代码，但是浏览器已经将你的修改运行到了渲染中。比如你在console中修改attribute <code>href</code>, 源代码不会改变，但是你点击的那个超链接已经发生了改变。</p>
 
     </div>
 

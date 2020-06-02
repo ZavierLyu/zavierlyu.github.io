@@ -28,7 +28,7 @@
 <meta property="og:description" content="JavaScript平稳退化，兼容和性能问题(tips)。">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-06-02T14:09:05.000Z">
-<meta property="article:modified_time" content="2020-06-02T15:15:28.978Z">
+<meta property="article:modified_time" content="2020-06-02T15:38:19.126Z">
 <meta property="article:author" content="Zhewen Lyu">
 <meta property="article:tag" content="DOM">
 <meta property="article:tag" content="DOM Scripting Notes">
@@ -222,7 +222,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-06-02 22:09:05 / Modified: 23:15:28" itemprop="dateCreated datePublished" datetime="2020-06-02T22:09:05+08:00">2020-06-02</time>
+              <time title="Created: 2020-06-02 22:09:05 / Modified: 23:38:19" itemprop="dateCreated datePublished" datetime="2020-06-02T22:09:05+08:00">2020-06-02</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,7 +249,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>JavaScript平稳退化，兼容和性能问题(tips)。 <a id="more"></a> # JS平稳退化</p>
+        <p>JavaScript平稳退化，兼容和性能问题(tips)。 <a id="more"></a></p>
+<h1 id="js平稳退化">JS平稳退化</h1>
 <p>Javascript作为一种前端脚本语言，主要功能是用于改善前端的用户体验。我们看见一些网页的显示效果，比方说菜单显示隐藏，图标移动和文字滚动大多是基于JS来实现的。作为改善用户体验的存在，通俗的讲就是起个锦上添花的表现效果，而不能影响正常的后台逻辑和最基本功能的实现。</p>
 <p>通俗地讲，javascript平稳退化就是如果一个浏览器完全不支持js或者禁用js的时候，它的正常功能不会受到任何影响。</p>
 <h3 id="打开新窗口">打开新窗口</h3>
@@ -264,12 +265,28 @@
 <p>如果用户是一个<strong>搜索机器人</strong>，一种自动化程序，它们浏览Web的目的是为了把各种网页添加到搜索引擎的数据库里。各大搜索引擎都有类似的程序。目前。只有极少数搜索机器人能够理解js代码。所以，如果js网页不能平稳退化，它们在搜索引擎上的排名就可能受到损害。</p>
 <p>所以我们最好修改成如下 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.example.com/"</span> <span class="attr">onclick</span>=<span class="string">"popUp(this.href);return false;"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
 <h3 id="分离javascript">分离JavaScript</h3>
-<p>HTML Document: <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.example.com/"</span> <span class="attr">class</span>=<span class="string">"popup"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure> 我们可以在外部把一个事件添加到html文档中的某个元素上： <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">element.event = action...</span><br></pre></td></tr></table></figure> 比如： <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getElementById(id).event = action;</span><br></pre></td></tr></table></figure> 如果事件涉及多个元素，我们可以用getElementsByTagName和getAttribute把事件添加到有着特定属性的一组元素上。 具体步骤： 1. 把文档里所有的链接全放入一个数组里 2. 遍历数组 3. 如果某个链接的class属性等于popup，就表示这个链接在被点击时应该调用popUp()函数。</p>
+<p>HTML Document: <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.example.com/"</span> <span class="attr">class</span>=<span class="string">"popup"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure> 我们可以在外部把一个事件添加到html文档中的某个元素上： <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">element.event = action...</span><br></pre></td></tr></table></figure> 比如： <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getElementById(id).event = action;</span><br></pre></td></tr></table></figure> 如果事件涉及多个元素，我们可以用getElementsByTagName和getAttribute把事件添加到有着特定属性的一组元素上。 具体步骤：</p>
+<ol type="1">
+<li>把文档里所有的链接全放入一个数组里</li>
+<li>遍历数组</li>
+<li>如果某个链接的class属性等于popup，就表示这个链接在被点击时应该调用popUp()函数。</li>
+</ol>
 <p>还有一个问题是必须让这种连接的代码在html文档全部加载到浏览器后再开始执行。文档将被加载到一个浏览器窗口里，document对象又是window对象的一个属性。当window对象触发onload事件时，document对象已经存在。 所以我们在外部的js文件里这样写 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = preparelinks;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">prepareLinks</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> links = <span class="built_in">document</span>.getElementsByTagName(<span class="string">"a"</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;links.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (links[i].getAttribute(<span class="string">"class"</span>) == <span class="string">"popup"</span>) &#123;</span><br><span class="line">            links[i].onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                popUp(<span class="keyword">this</span>.getAttribute(<span class="string">"href));</span></span><br><span class="line"><span class="string">                return false;</span></span><br><span class="line"><span class="string">            &#125;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">function popUp(winURL) &#123;</span></span><br><span class="line"><span class="string">    window.open(winURL, "</span>popup<span class="string">", "</span>width=<span class="number">800</span>,height=<span class="number">600</span><span class="string">");</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></p>
 <h3 id="向后兼容">向后兼容</h3>
 <h4 id="对象检测">对象检测</h4>
-<p>检测浏览器对js的支持程度 比如 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure> ### 性能考虑 1. 介绍不必要的DOM访问 2. 合并多个js文件到一个文件里 3. 压缩脚本，去掉不必要的字节如空格和注释 多数情况下，你应该有两个版本，一个是工作副本，可以修改代码并添加注释；另一个时精简副本，用于放在站点上。通常，为了与非精简版本区分开，最好在精简副本的文件名中加上min字样： <code>&lt;script src="scripts/scriptName.min.js"&gt;&lt;/script&gt;</code></p>
-<p>可以通过以下几个有代表性的代码压缩工具完成： - <a href="http://lisperator.net/uglifyjs/" target="_blank" rel="noopener">Uglify</a> - <a href="http://developer.yahoo.com/yui/compressor/" target="_blank" rel="noopener">YUI Compressor</a> - <a href="https://developers.google.com/closure/compiler/" target="_blank" rel="noopener">Google Closure Compiler</a> - <a href="https://tool.oschina.net/jscompress/" target="_blank" rel="noopener">oschina 在线js压缩</a></p>
+<p>检测浏览器对js的支持程度 比如 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure> ### 性能考虑</p>
+<ol type="1">
+<li>介绍不必要的DOM访问</li>
+<li>合并多个js文件到一个文件里</li>
+<li>压缩脚本，去掉不必要的字节如空格和注释 多数情况下，你应该有两个版本，一个是工作副本，可以修改代码并添加注释；另一个时精简副本，用于放在站点上。通常，为了与非精简版本区分开，最好在精简副本的文件名中加上min字样： <code>&lt;script src="scripts/scriptName.min.js"&gt;&lt;/script&gt;</code></li>
+</ol>
+<p>可以通过以下几个有代表性的代码压缩工具完成：</p>
+<ul>
+<li><a href="http://lisperator.net/uglifyjs/" target="_blank" rel="noopener">Uglify</a></li>
+<li><a href="http://developer.yahoo.com/yui/compressor/" target="_blank" rel="noopener">YUI Compressor</a></li>
+<li><a href="https://developers.google.com/closure/compiler/" target="_blank" rel="noopener">Google Closure Compiler</a></li>
+<li><a href="https://tool.oschina.net/jscompress/" target="_blank" rel="noopener">oschina 在线js压缩</a></li>
+</ul>
 
     </div>
 
@@ -290,8 +307,8 @@
     <div class="post-nav">
       <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2020/06/02/jsdom4/" rel="next" title="《JavaScript DOM编程艺术》第四章读书笔记">
-      《JavaScript DOM编程艺术》第四章读书笔记 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/06/02/Tree/" rel="next" title="树相关问题集">
+      树相关问题集 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -351,7 +368,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#打开新窗口"><span class="nav-number">1.</span> <span class="nav-text">打开新窗口</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#javascript-伪协议"><span class="nav-number">1.1.</span> <span class="nav-text">Javascript 伪协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#内嵌事件处理函数"><span class="nav-number">1.2.</span> <span class="nav-text">内嵌事件处理函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#需要平稳退化的原因"><span class="nav-number">1.3.</span> <span class="nav-text">需要平稳退化的原因</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分离javascript"><span class="nav-number">2.</span> <span class="nav-text">分离JavaScript</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#向后兼容"><span class="nav-number">3.</span> <span class="nav-text">向后兼容</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#对象检测"><span class="nav-number">3.1.</span> <span class="nav-text">对象检测</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#js平稳退化"><span class="nav-number">1.</span> <span class="nav-text">JS平稳退化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#打开新窗口"><span class="nav-number">1.0.1.</span> <span class="nav-text">打开新窗口</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#javascript-伪协议"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">Javascript 伪协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#内嵌事件处理函数"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">内嵌事件处理函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#需要平稳退化的原因"><span class="nav-number">1.0.1.3.</span> <span class="nav-text">需要平稳退化的原因</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分离javascript"><span class="nav-number">1.0.2.</span> <span class="nav-text">分离JavaScript</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#向后兼容"><span class="nav-number">1.0.3.</span> <span class="nav-text">向后兼容</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#对象检测"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">对象检测</span></a></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
