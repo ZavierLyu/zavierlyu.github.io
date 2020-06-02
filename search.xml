@@ -205,6 +205,27 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
       </tags>
   </entry>
   <entry>
+    <title>树相关问题集</title>
+    <url>/2020/06/02/Tree/</url>
+    <content><![CDATA[<h4 id="从前序与中序遍历序列构造二叉树"><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/" target="_blank" rel="noopener">105. 从前序与中序遍历序列构造二叉树</a></h4>
+<a id="more"></a>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">buildTree</span><span class="params">(self, preorder: List[int], inorder: List[int])</span> -&gt; TreeNode:</span></span><br><span class="line">        <span class="keyword">if</span> len(preorder) == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">        root = TreeNode(preorder[<span class="number">0</span>])</span><br><span class="line">        root_index = inorder.index(root.val)</span><br><span class="line">        left_inorder = inorder[:root_index]</span><br><span class="line">        right_inorder = inorder[root_index+<span class="number">1</span>:]</span><br><span class="line">        left_preorder = preorder[<span class="number">1</span>:<span class="number">1</span>+len(left_inorder)]</span><br><span class="line">        right_preorder = preorder[<span class="number">1</span>+len(left_inorder):]</span><br><span class="line">        root.left = self.buildTree(left_preorder, left_inorder)</span><br><span class="line">        root.right = self.buildTree(right_preorder, right_inorder)</span><br><span class="line">        <span class="keyword">return</span> root</span><br></pre></td></tr></table></figure>
+<p>序列化和反序列化二叉树步骤之一，通过前序遍历和中序遍历构造二叉树。要点在于通过前序序列知道根节点，通过中序序列知道左子树和右子树是哪些。</p>
+<p>边界点：递归约束，叶节点的子节点None停止递归，通过判断preorder是否为空判断该节点是否为None。</p>
+<h4 id="对称二叉树"><a href="https://leetcode-cn.com/problems/symmetric-tree/" target="_blank" rel="noopener">101. 对称二叉树</a></h4>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSymmetric</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">return</span> check(root.left, root.right);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">check</span><span class="params">(TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> &amp;&amp; q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> || q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (p.val == q.val) &amp;&amp; check(p.left, q.right) &amp;&amp; check(p.right, q.left);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>时间复杂度：<span class="math inline">\(O(N)\)</span></p>
+<p>空间复杂度：<span class="math inline">\(O(N)\)</span> 原因在于虽然我们只需要递归<span class="math inline">\(O(\log N)\)</span>层但是我们每层都要创建2个栈空间，所以我们的空间复杂度为<span class="math inline">\(O(2^{\log N})=O(N)\)</span></p>
+<p>难点：注意镜像，所以我们需要 <code>check(p.left, q.right) &amp;&amp; check(p.right, q.left);</code></p>
+]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>tree</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>《JavaScript DOM编程艺术》第三章读书笔记</title>
     <url>/2020/06/02/jsdom3/</url>
     <content><![CDATA[<h2 id="dom解释">DOM解释</h2>
@@ -242,65 +263,6 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
       </tags>
   </entry>
   <entry>
-    <title>《JavaScript DOM编程艺术》第四章读书笔记</title>
-    <url>/2020/06/02/jsdom4/</url>
-    <content><![CDATA[<p>这里我们主要谈的是html上对用户事件的处理。</p>
-<h2 id="事件处理函数">事件处理函数</h2>
-<p>时间处理函数的作用是，在特定时间发生时调用特定的JavaScript代码。 <a id="more"></a> <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"images/fireworks.jpg"</span> <span class="attr">title</span>=<span class="string">"A fireworks display"</span> <span class="attr">onclick</span>=<span class="string">"showPic(this); return false;"</span>&gt;</span></span><br><span class="line">Fireworks<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">pic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> source = pic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">let</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>, source);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>this</code>表示这个<code>&lt;a&gt;</code>元素节点</li>
-<li><code>event = "JS statements"</code>来添加事件处理函数的语法</li>
-<li>如果仅仅把使劲按处理函数放到图片列表的一个链接中，我们会遇到一个问题：点击这个链接时，不仅<code>showPic</code>函数被调用，链接被点击的默认行为也会被调用。这意味着用户还是会被带到图片查看窗口。我们需要组织这个默认行为被调用。</li>
-</ul>
-<p>一旦事件发生，相应的js代码就会得到执行。被调哦那个的js代码可以返回一个值，这个值将被传递给那个时间处理函数，并让这个处理函数出发的js代码返回布尔值true或false。如果返回的时true，onclick时间处理函数九认为"这个链接被点击了"；反之，如果返回的值时false，onclick时间处理函数就认为"这个链接没有被点击"。因此，<code>return false;</code>可以防止用户被带到目标链接窗口。</p>
-<h3 id="nodetype属性">nodeType属性</h3>
-<p><code>node.nodeType</code>获取节点的nodeType属性。 nodeType属性总共有12种，期中仅有3种具有实用价值：</p>
-<ul>
-<li>元素节点：1</li>
-<li>属性节点：2</li>
-<li>文本节点：3</li>
-</ul>
-<h3 id="替代文本节点">替代文本节点</h3>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">whichpic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> source = whichpic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">var</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>,source);</span><br><span class="line">  <span class="keyword">var</span> text = whichpic.getAttribute(<span class="string">"title"</span>);</span><br><span class="line">  <span class="keyword">var</span> description = <span class="built_in">document</span>.getElementById(<span class="string">"description"</span>);</span><br><span class="line">  description.firstChild.nodeValue = text;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里我们通过firstChild来渠道<code>&lt;p&gt;</code>元素节点的文本节点。如果该元素节点有包含文本的话，那么该元素的firstChild就为文本节点，否则时其他（元素）节点。</p>
-<ul>
-<li><code>node.nodeValue</code>: 取文本节点的值</li>
-<li><code>node.firstChild</code>: 等价于<code>node.childNodes[0]</code></li>
-<li><code>node.lastChild</code>: 等价于<code>node.childNodes[node.childNodes.length-1]</code></li>
-</ul>
-]]></content>
-      <categories>
-        <category>Frontend</category>
-        <category>JavaScript</category>
-      </categories>
-      <tags>
-        <tag>DOM</tag>
-        <tag>DOM Scripting Notes</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>树相关问题集</title>
-    <url>/2020/06/02/Tree/</url>
-    <content><![CDATA[<h4 id="从前序与中序遍历序列构造二叉树"><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/" target="_blank" rel="noopener">105. 从前序与中序遍历序列构造二叉树</a></h4>
-<a id="more"></a>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">buildTree</span><span class="params">(self, preorder: List[int], inorder: List[int])</span> -&gt; TreeNode:</span></span><br><span class="line">        <span class="keyword">if</span> len(preorder) == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">        root = TreeNode(preorder[<span class="number">0</span>])</span><br><span class="line">        root_index = inorder.index(root.val)</span><br><span class="line">        left_inorder = inorder[:root_index]</span><br><span class="line">        right_inorder = inorder[root_index+<span class="number">1</span>:]</span><br><span class="line">        left_preorder = preorder[<span class="number">1</span>:<span class="number">1</span>+len(left_inorder)]</span><br><span class="line">        right_preorder = preorder[<span class="number">1</span>+len(left_inorder):]</span><br><span class="line">        root.left = self.buildTree(left_preorder, left_inorder)</span><br><span class="line">        root.right = self.buildTree(right_preorder, right_inorder)</span><br><span class="line">        <span class="keyword">return</span> root</span><br></pre></td></tr></table></figure>
-<p>序列化和反序列化二叉树步骤之一，通过前序遍历和中序遍历构造二叉树。要点在于通过前序序列知道根节点，通过中序序列知道左子树和右子树是哪些。</p>
-<p>边界点：递归约束，叶节点的子节点None停止递归，通过判断preorder是否为空判断该节点是否为None。</p>
-<h4 id="对称二叉树"><a href="https://leetcode-cn.com/problems/symmetric-tree/" target="_blank" rel="noopener">101. 对称二叉树</a></h4>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSymmetric</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">return</span> check(root.left, root.right);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">check</span><span class="params">(TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> &amp;&amp; q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> || q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (p.val == q.val) &amp;&amp; check(p.left, q.right) &amp;&amp; check(p.right, q.left);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>时间复杂度：<span class="math inline">\(O(N)\)</span></p>
-<p>空间复杂度：<span class="math inline">\(O(N)\)</span> 原因在于虽然我们只需要递归<span class="math inline">\(O(\log N)\)</span>层但是我们每层都要创建2个栈空间，所以我们的空间复杂度为<span class="math inline">\(O(2^{\log N})=O(N)\)</span></p>
-<p>难点：注意镜像，所以我们需要 <code>check(p.left, q.right) &amp;&amp; check(p.right, q.left);</code></p>
-]]></content>
-      <categories>
-        <category>Algorithm</category>
-      </categories>
-      <tags>
-        <tag>tree</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>《JavaScript DOM编程艺术》第五章读书笔记</title>
     <url>/2020/06/02/jsdom5/</url>
     <content><![CDATA[<p>JavaScript平稳退化，兼容和性能问题(tips)。 <a id="more"></a></p>
@@ -328,7 +290,8 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
 <p>还有一个问题是必须让这种连接的代码在html文档全部加载到浏览器后再开始执行。文档将被加载到一个浏览器窗口里，document对象又是window对象的一个属性。当window对象触发onload事件时，document对象已经存在。 所以我们在外部的js文件里这样写 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = preparelinks;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">prepareLinks</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> links = <span class="built_in">document</span>.getElementsByTagName(<span class="string">"a"</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;links.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (links[i].getAttribute(<span class="string">"class"</span>) == <span class="string">"popup"</span>) &#123;</span><br><span class="line">            links[i].onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                popUp(<span class="keyword">this</span>.getAttribute(<span class="string">"href));</span></span><br><span class="line"><span class="string">                return false;</span></span><br><span class="line"><span class="string">            &#125;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">function popUp(winURL) &#123;</span></span><br><span class="line"><span class="string">    window.open(winURL, "</span>popup<span class="string">", "</span>width=<span class="number">800</span>,height=<span class="number">600</span><span class="string">");</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></p>
 <h3 id="向后兼容">向后兼容</h3>
 <h4 id="对象检测">对象检测</h4>
-<p>检测浏览器对js的支持程度 比如 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure> ### 性能考虑</p>
+<p>检测浏览器对js的支持程度 比如 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure></p>
+<h3 id="性能考虑">性能考虑</h3>
 <ol type="1">
 <li>介绍不必要的DOM访问</li>
 <li>合并多个js文件到一个文件里</li>
@@ -340,6 +303,44 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
 <li><a href="http://developer.yahoo.com/yui/compressor/" target="_blank" rel="noopener">YUI Compressor</a></li>
 <li><a href="https://developers.google.com/closure/compiler/" target="_blank" rel="noopener">Google Closure Compiler</a></li>
 <li><a href="https://tool.oschina.net/jscompress/" target="_blank" rel="noopener">oschina 在线js压缩</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Frontend</category>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>DOM</tag>
+        <tag>DOM Scripting Notes</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《JavaScript DOM编程艺术》第四章读书笔记</title>
+    <url>/2020/06/02/jsdom4/</url>
+    <content><![CDATA[<p>这里我们主要谈的是html上对用户事件的处理。</p>
+<h2 id="事件处理函数">事件处理函数</h2>
+<p>时间处理函数的作用是，在特定时间发生时调用特定的JavaScript代码。 <a id="more"></a> <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"images/fireworks.jpg"</span> <span class="attr">title</span>=<span class="string">"A fireworks display"</span> <span class="attr">onclick</span>=<span class="string">"showPic(this); return false;"</span>&gt;</span></span><br><span class="line">Fireworks<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">pic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> source = pic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">let</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>, source);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>this</code>表示这个<code>&lt;a&gt;</code>元素节点</li>
+<li><code>event = "JS statements"</code>来添加事件处理函数的语法</li>
+<li>如果仅仅把使劲按处理函数放到图片列表的一个链接中，我们会遇到一个问题：点击这个链接时，不仅<code>showPic</code>函数被调用，链接被点击的默认行为也会被调用。这意味着用户还是会被带到图片查看窗口。我们需要组织这个默认行为被调用。</li>
+</ul>
+<p>一旦事件发生，相应的js代码就会得到执行。被调哦那个的js代码可以返回一个值，这个值将被传递给那个时间处理函数，并让这个处理函数出发的js代码返回布尔值true或false。如果返回的时true，onclick时间处理函数九认为"这个链接被点击了"；反之，如果返回的值时false，onclick时间处理函数就认为"这个链接没有被点击"。因此，<code>return false;</code>可以防止用户被带到目标链接窗口。</p>
+<h3 id="nodetype属性">nodeType属性</h3>
+<p><code>node.nodeType</code>获取节点的nodeType属性。 nodeType属性总共有12种，期中仅有3种具有实用价值：</p>
+<ul>
+<li>元素节点：1</li>
+<li>属性节点：2</li>
+<li>文本节点：3</li>
+</ul>
+<h3 id="替代文本节点">替代文本节点</h3>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">whichpic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> source = whichpic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">var</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>,source);</span><br><span class="line">  <span class="keyword">var</span> text = whichpic.getAttribute(<span class="string">"title"</span>);</span><br><span class="line">  <span class="keyword">var</span> description = <span class="built_in">document</span>.getElementById(<span class="string">"description"</span>);</span><br><span class="line">  description.firstChild.nodeValue = text;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里我们通过firstChild来渠道<code>&lt;p&gt;</code>元素节点的文本节点。如果该元素节点有包含文本的话，那么该元素的firstChild就为文本节点，否则时其他（元素）节点。</p>
+<ul>
+<li><code>node.nodeValue</code>: 取文本节点的值</li>
+<li><code>node.firstChild</code>: 等价于<code>node.childNodes[0]</code></li>
+<li><code>node.lastChild</code>: 等价于<code>node.childNodes[node.childNodes.length-1]</code></li>
 </ul>
 ]]></content>
       <categories>
