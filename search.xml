@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>C++ 问题集</title>
+    <url>/2020/06/21/Cpp-Problems-Collection/</url>
+    <content><![CDATA[<h3 id="n-与-stdendl-的区别"><code>'\n\'</code> 与 <code>std::endl</code> 的区别</h3>
+<ul>
+<li>''表示内容为一个回车符的字符。</li>
+<li>std::endl 是流操纵符(manipulator)，输出的作用和输出''类似，其效果是结束当前行，并将与设备关联的缓冲区(buffer)中的内容冲刷(flush)到设备中。缓冲刷新操作可以保证到目前为止程序所产生的所有输出都真正写入输出流中，而不是仅停留在内存中等待写入流。 <a id="more"></a></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br></pre></td></tr></table></figure>
+<p>等价于 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">'\n'</span> &lt;&lt; <span class="built_in">std</span>::flush;</span><br></pre></td></tr></table></figure> 对于有输出缓冲的流(例如cout、clog)，如果不手动进行缓冲区刷新操作，将在缓冲区满后自动刷新输出。不过对于cout来说(相对于文件输出流等)，缓冲一般体现得并不明显。但是必要情况下使用endl代替''一般是个好习惯。 对于无缓冲的流(例如标准错误输出流cerr)，刷新是不必要的，可以直接使用 ''，过多的endl会影响程序的执行效率。</p>
+<h3 id="说明指针和引用的区别">说明指针和引用的区别</h3>
+<ul>
+<li>引用是另一个对象的别名，而指针本身就是一个对象。</li>
+<li>引用必须初始化，并且一旦定义了引用就无法再绑定到其他对象。而指针无须在定义时赋初值，也可以重新赋值让其指向其他对象。</li>
+</ul>
+<h3 id="常量指针和常量引用有什么不同">常量指针和常量引用有什么不同？</h3>
+<p>常量指针（const pointer）是常量化的指针是正规翻译，常量引用（reference to const）是对常量的引用是坊间俗称。</p>
+<h3 id="说明decltype和auto的区别">说明decltype和auto的区别</h3>
+<ol type="1">
+<li><p><code>decltype</code>处理顶层<code>const</code>和引用的方式与<code>auto</code>不同，<code>decltype</code>会将顶层<code>const</code>和引用保留起来。 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> ci = <span class="number">0</span>, &amp;cj = ci;</span><br><span class="line"><span class="keyword">decltype</span>(ci) x1 = <span class="number">0</span>;   <span class="comment">// x1的类型是const int</span></span><br><span class="line"><span class="keyword">auto</span> x2 = ci;          <span class="comment">// x2的类型是int</span></span><br><span class="line"><span class="keyword">decltype</span>(cj) y1 = x1;  <span class="comment">// y1的类型是const int &amp;</span></span><br><span class="line"><span class="keyword">auto</span> y2 = cj;          <span class="comment">// y2的类型是int</span></span><br></pre></td></tr></table></figure></p></li>
+<li><p><code>decltype</code>处理解应用操作得到引用类型，而<code>auto</code>得到指针所指对象的类型 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> i = <span class="number">1</span>, *p = &amp;i;		</span><br><span class="line"><span class="keyword">decltype</span>(*p) pr = i;	<span class="comment">// pr的类型是int &amp;</span></span><br><span class="line"><span class="keyword">auto</span> pa = *p;			<span class="comment">// pa的类型是int</span></span><br></pre></td></tr></table></figure></p></li>
+<li><p><code>decltype</code>结果类型与表达式形式密切相关</p></li>
+</ol>
+<p>如果<code>decltype</code>使用的是一个不加括号的变量，则得到的结果就是该变量的类型；如果给变量加上了一层或多层括号，编译器就会将把它当成一个表达式。变量是一种可以作为赋值语句左值的特殊表达式，所以这样的<code>decltype</code>就会的得到引用类型:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">1</span>, b = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">decltype</span>((a)) d=a; <span class="comment">// d的类型为int &amp;</span></span><br><span class="line"><span class="keyword">decltype</span>(a)   d2;  <span class="comment">// d2的类型为int &amp;</span></span><br><span class="line"><span class="keyword">decltype</span>(a=b) d3=b; <span class="comment">// d3的类型为int &amp;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Cpp</category>
+      </categories>
+      <tags>
+        <tag>language</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>动态规划问题集</title>
     <url>/2020/06/02/DP/</url>
     <content><![CDATA[<!-- # 动态规划 -->
@@ -32,6 +65,481 @@ dp[i][j]=
       </categories>
       <tags>
         <tag>dynamic programming</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前缀和问题集</title>
+    <url>/2020/06/02/PrefixSum/</url>
+    <content><![CDATA[<h4 id="每个元音包含偶数次的最长子字符串"><a href="https://leetcode-cn.com/problems/find-the-longest-substring-containing-vowels-in-even-counts/" target="_blank" rel="noopener">1371. 每个元音包含偶数次的最长子字符串</a></h4>
+<a id="more"></a>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">findTheLongestSubstring</span><span class="params">(self, s: str)</span> -&gt; int:</span></span><br><span class="line">        n = len(s)</span><br><span class="line">        status = <span class="number">0</span></span><br><span class="line">        pos = [<span class="number">-1</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">1</span> &lt;&lt; <span class="number">5</span>)]</span><br><span class="line">        pos[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">        ret = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">            <span class="keyword">if</span> s[i] == <span class="string">'a'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">4</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'e'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">3</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'i'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">2</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'o'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">1</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'u'</span>:</span><br><span class="line">                status ^= <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> pos[status] == <span class="number">-1</span>:</span><br><span class="line">                pos[status] = i+<span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                ret = max(ret, i+<span class="number">1</span>-pos[status])</span><br><span class="line">        <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure>
+<p>这个问题的关键在于利用前缀和来确定子串的状态。这里的前缀和定义为前<span class="math inline">\(i\)</span>个字符中，每个元音字符出现的奇偶性，用来代替出现的次数。我们用二进制编码来代替状态的哈希结构，比如前<span class="math inline">\(i\)</span>个字符a, e, i, o, u出现的次数的奇偶性分别为奇，奇，偶，偶，偶，则其编码为<code>11000</code>。只要我们知道前<span class="math inline">\(i\)</span>个字符的状态和前<span class="math inline">\(j\)</span>个字符的状态，我们就可以知道从第<span class="math inline">\(i+1\)</span>个字符到第<span class="math inline">\(j\)</span>个字符的元音出现次数奇偶性状态，也就是只要前<span class="math inline">\(i\)</span>个字符的二进制编码和前<span class="math inline">\(j\)</span>个字符的二进制编码相同，我们就可以确定<span class="math inline">\(i+1\)</span>到<span class="math inline">\(j\)</span>元音出现次数为偶数。原因在于差为偶则被减数和减数奇偶性相同。</p>
+<p>难点1：前缀和由出现次数转换为奇偶性</p>
+<p>优化点1：二进制编码</p>
+<p>优化点2：抛弃哈希记录每个字符的前缀和，反而用编码作为key来记录该前缀和出现的index，将时间复杂度从<span class="math inline">\(O(n^2)\)</span>降至<span class="math inline">\(O(n)\)</span></p>
+<p>边界点1：<code>pos[0]=0</code>，原因在于非原因字符最早出现的index一定是空字符串</p>
+]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>prefix sum</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《JavaScript DOM编程艺术》第三章读书笔记</title>
+    <url>/2020/06/02/jsdom3/</url>
+    <content><![CDATA[<h2 id="dom解释">DOM解释</h2>
+<ul>
+<li>D: 网页文档</li>
+<li>O：对象，自足的数据集合。JS里的对象可以分为三种类型
+<ol type="1">
+<li>用户定义对象(user-defined object): 由程序员自行创建的对象</li>
+<li>内建对象(native object): 内建的js对象，如Array，Math</li>
+<li>宿主对象(host object): 由浏览器提供的对象</li>
+</ol></li>
+<li>M： (X)HTML所代表的节点树模型 <a id="more"></a> ## 元素节点 元素节点时DOM中的原子，其包含文本节点和属性节点。<code>&lt;P&gt;</code>为元素节点，<code>&lt;p&gt;xxx&lt;/p&gt;</code>包含的xxx为文本节点，<code>&lt;p title='x'&gt;&lt;/p&gt;</code>中的title为属性节点</li>
+</ul>
+<h2 id="获取元素节点">获取元素节点</h2>
+<ol type="1">
+<li>getElementById <code>document.getElementById("&lt;id&gt;")</code></li>
+<li>getElementsByTagName 返回一个<code>对象数组</code>，每个对象分别对应这文档里给定标签的一个元素。 <code>document.getElementsByTagName("li")</code> 如果你想知道某份文档里共有多少个元素节点，可以使用通配符 <code>document.getElementsByTagName("*").length</code> 话可以将<code>getElementById</code>和<code>getElementsByTagName</code>结合起来， <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> shopping = <span class="built_in">document</span>.getElementById(<span class="string">"purchases"</span>);</span><br><span class="line"><span class="keyword">var</span> items = shopping.getElementsByTagName(<span class="string">"*"</span>);</span><br></pre></td></tr></table></figure></li>
+<li>getElementsByClassName 返回一个具有相同类名的元素的数组。 <code>document.getElementsByClassName("sale);</code></li>
+</ol>
+<h2 id="获取和设置属性">获取和设置属性</h2>
+<ol type="1">
+<li>getAttribute 该方法不属于<code>document</code>对象，所以不能通过其调用，它只能通过元素节点对象吊桶。 <code>object.get.Attribute(attribute);</code></li>
+<li>setAttribute <code>object.setAttribute(attribute, value);</code></li>
+</ol>
+<p><strong>通过setAttribute()方法对文档作出的改变，但这张改变并未反映到源代码中，也就是说，源代码中属性值仍旧是原来的属性值。这种“表里不一”的现象缘于DOM的工作模式：先加载文档的静态内容，再以动态方式对它们进行刷新，动态刷新不改变文档的静态内容，而对页面内容的刷新，不需要用户在他们的浏览器里执行刷新操作就可以实现。</strong></p>
+<p>个人对这句话的理解时，你在console中运行setAttribute的DOM操作不会影响静态的html源代码，但是浏览器已经将你的修改运行到了渲染中。比如你在console中修改attribute <code>href</code>, 源代码不会改变，但是你点击的那个超链接已经发生了改变。</p>
+]]></content>
+      <categories>
+        <category>Frontend</category>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>DOM</tag>
+        <tag>DOM Scripting Notes</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树相关问题集</title>
+    <url>/2020/06/02/Tree/</url>
+    <content><![CDATA[<h4 id="从前序与中序遍历序列构造二叉树"><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/" target="_blank" rel="noopener">105. 从前序与中序遍历序列构造二叉树</a></h4>
+<a id="more"></a>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">buildTree</span><span class="params">(self, preorder: List[int], inorder: List[int])</span> -&gt; TreeNode:</span></span><br><span class="line">        <span class="keyword">if</span> len(preorder) == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">        root = TreeNode(preorder[<span class="number">0</span>])</span><br><span class="line">        root_index = inorder.index(root.val)</span><br><span class="line">        left_inorder = inorder[:root_index]</span><br><span class="line">        right_inorder = inorder[root_index+<span class="number">1</span>:]</span><br><span class="line">        left_preorder = preorder[<span class="number">1</span>:<span class="number">1</span>+len(left_inorder)]</span><br><span class="line">        right_preorder = preorder[<span class="number">1</span>+len(left_inorder):]</span><br><span class="line">        root.left = self.buildTree(left_preorder, left_inorder)</span><br><span class="line">        root.right = self.buildTree(right_preorder, right_inorder)</span><br><span class="line">        <span class="keyword">return</span> root</span><br></pre></td></tr></table></figure>
+<p>序列化和反序列化二叉树步骤之一，通过前序遍历和中序遍历构造二叉树。要点在于通过前序序列知道根节点，通过中序序列知道左子树和右子树是哪些。</p>
+<p>边界点：递归约束，叶节点的子节点None停止递归，通过判断preorder是否为空判断该节点是否为None。</p>
+<h4 id="对称二叉树"><a href="https://leetcode-cn.com/problems/symmetric-tree/" target="_blank" rel="noopener">101. 对称二叉树</a></h4>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSymmetric</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">return</span> check(root.left, root.right);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">check</span><span class="params">(TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> &amp;&amp; q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> || q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (p.val == q.val) &amp;&amp; check(p.left, q.right) &amp;&amp; check(p.right, q.left);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>时间复杂度：<span class="math inline">\(O(N)\)</span></p>
+<p>空间复杂度：<span class="math inline">\(O(N)\)</span> 原因在于虽然我们只需要递归<span class="math inline">\(O(\log N)\)</span>层但是我们每层都要创建2个栈空间，所以我们的空间复杂度为<span class="math inline">\(O(2^{\log N})=O(N)\)</span></p>
+<p>难点：注意镜像，所以我们需要 <code>check(p.left, q.right) &amp;&amp; check(p.right, q.left);</code></p>
+]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>tree</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SQL 入门</title>
+    <url>/2020/06/21/SQL-Intro/</url>
+    <content><![CDATA[<p>学习笔记 of <a href="https://www.liaoxuefeng.com/wiki/1177760294764384" target="_blank" rel="noopener">廖雪峰SQL教程</a></p>
+<a id="more"></a>
+<h2 id="关系模型">关系模型</h2>
+<p><code>Record</code>: 每一行称为记录</p>
+<p><code>Column</code>: 每一列称为字段</p>
+<p><code>NULL</code>: 表示数据不存在。一个整型字段如果为<code>NULL</code>不表示它的值为<code>0</code>，同样的，一个字符串型字段为<code>NULL</code>也不表示它的值为空串<code>''</code>。</p>
+<p><code>主键</code>: 通过某个字段唯一区分出不同的记录，这个字段被称为<em>主键</em>。</p>
+<blockquote>
+<p>对主键的要求，最关键的一点是：记录一旦插入到表中，主键最好不要再修改，因为主键是用来唯一定位记录的，修改了主键，会造成一系列的影响。由于主键的作用十分重要，如何选取主键会对业务开发产生重要影响。如果我们以学生的身份证号作为主键，似乎能唯一定位记录。然而，身份证号也是一种业务场景，如果身份证号升位了，或者需要变更，作为主键，不得不修改的时候，就会对业务产生严重影响。身份证号、手机号、邮箱地址这些看上去可以唯一的字段，均<strong><em>不可</em></strong>用作主键。</p>
+</blockquote>
+<p><code>id</code>字段：</p>
+<ol type="1">
+<li><p>自增整数类型：数据库会在插入数据时自动为每一条记录分配一个自增整数，这样我们就完全不用担心主键重复，也不用自己预先生成主键；</p></li>
+<li><p>全局唯一GUID类型：使用一种全局唯一的字符串作为主键，类似<code>8f55d96b-8acc-4636-8cb8-76bf8abc2f57</code>。GUID算法通过网卡MAC地址、时间戳和随机数保证任意计算机在任意时间生成的字符串都是不同的，大部分编程语言都内置了GUID算法，可以自己预算出主键。</p>
+<blockquote>
+<p>如果使用INT自增类型，那么当一张表的记录数超过2147483647（约21亿）时，会达到上限而出错。使用BIGINT自增类型则可以最多约922亿亿条记录。</p>
+</blockquote></li>
+</ol>
+<p><code>联合主键</code>:关系数据库实际上还允许通过多个字段唯一标识记录，即两个或更多的字段都设置为主键，这种主键被称为联合主键。</p>
+<blockquote>
+<p>如无必要，勿用联合主键，复杂度上升</p>
+</blockquote>
+<p><code>外键</code>: 在<code>students</code>表中，通过<code>class_id</code>的字段，可以把数据与另一张表关联起来，这种列称为<code>外键</code>。</p>
+<p>定义外键约束：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ALTER TABLE students</span><br><span class="line">ADD CONSTRAINT fk_class_id</span><br><span class="line">FOREIGN KEY (class_id)</span><br><span class="line">REFERENCES classes (id);</span><br></pre></td></tr></table></figure>
+<p>其中，外键约束的名称<code>fk_class_id</code>可以任意，<code>FOREIGN KEY (class_id)</code>指定了<code>class_id</code>作为外键，<code>REFERENCES classes (id)</code>指定了这个外键将关联到<code>classes</code>表的<code>id</code>列（即<code>classes</code>表的主键）。</p>
+<blockquote>
+<p>由于外键约束会降低数据库的性能，大部分互联网应用程序为了追求速度，并不设置外键约束，而是仅靠应用程序自身来保证逻辑的正确性。这种情况下，<code>class_id</code>仅仅是一个普通的列，只是它起到了外键的作用而已。</p>
+</blockquote>
+<h2 id="基本操作">基本操作</h2>
+<h3 id="查询">查询</h3>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> &lt;table_name&gt;</span><br></pre></td></tr></table></figure>
+<p>判断当前到数据库的链接是否有效</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h4 id="条件查询">条件查询</h4>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> &lt;表名&gt; <span class="keyword">WHERE</span> &lt;条件表达式&gt;</span><br></pre></td></tr></table></figure>
+<ol type="1">
+<li>查询分数在80分以上的学生记录</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> students <span class="keyword">WHERE</span> score &gt;= <span class="number">80</span>;</span><br></pre></td></tr></table></figure>
+<ol start="2" type="1">
+<li>查询分数在80分及以上的男生</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> students <span class="keyword">WHERE</span> score &gt;= <span class="number">80</span> <span class="keyword">AND</span> gender = <span class="string">'M'</span>;</span><br></pre></td></tr></table></figure>
+<ol start="3" type="1">
+<li>查询分数在80分及以上的学生或者男生</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> students <span class="keyword">WHERE</span> score &gt;= <span class="number">80</span> <span class="keyword">OR</span> gender = <span class="string">'M'</span>;</span><br></pre></td></tr></table></figure>
+<ol start="4" type="1">
+<li>查询不是2班的学生</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> students <span class="keyword">WHERE</span> <span class="keyword">NOT</span> class_id = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<ol start="5" type="1">
+<li>分数在80以下或者90以上，并且是男生</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> students <span class="keyword">WHERE</span> (score &lt; <span class="number">80</span> <span class="keyword">OR</span> score &gt; <span class="number">90</span>) <span class="keyword">AND</span> gender = <span class="string">'M'</span>;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如果不加括号，条件运算按照<code>NOT</code>、<code>AND</code>、<code>OR</code>的优先级进行，即<code>NOT</code>优先级最高，其次是<code>AND</code>，最后是<code>OR</code>。加上括号可以改变优先级。</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 15%" />
+<col style="width: 16%" />
+<col style="width: 49%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">条件</th>
+<th style="text-align: left;">表达式举例1</th>
+<th style="text-align: left;">表达式举例2</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">使用=判断相等</td>
+<td style="text-align: left;">score = 80</td>
+<td style="text-align: left;">name = 'abc'</td>
+<td style="text-align: left;">字符串需要用单引号括起来</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">使用&gt;判断大于</td>
+<td style="text-align: left;">score &gt; 80</td>
+<td style="text-align: left;">name &gt; 'abc'</td>
+<td style="text-align: left;">字符串比较根据ASCII码，中文字符比较根据数据库设置</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">使用&gt;=判断大于或相等</td>
+<td style="text-align: left;">score &gt;= 80</td>
+<td style="text-align: left;">name &gt;= 'abc'</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">使用&lt;判断小于</td>
+<td style="text-align: left;">score &lt; 80</td>
+<td style="text-align: left;">name &lt;= 'abc'</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">使用&lt;=判断小于或相等</td>
+<td style="text-align: left;">score &lt;= 80</td>
+<td style="text-align: left;">name &lt;= 'abc'</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">使用&lt;&gt;判断不相等</td>
+<td style="text-align: left;">score &lt;&gt; 80</td>
+<td style="text-align: left;">name &lt;&gt; 'abc'</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">使用LIKE判断相似</td>
+<td style="text-align: left;">name LIKE 'ab%'</td>
+<td style="text-align: left;">name LIKE '%bc%'</td>
+<td style="text-align: left;">%表示任意字符，例如'ab%'将匹配'ab'，'abc'，'abcd'</td>
+</tr>
+</tbody>
+</table>
+<h4 id="投影查询">投影查询</h4>
+<ol type="1">
+<li><p>从<code>students</code>表中返回id, score 和name这三列：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, score, <span class="keyword">name</span> <span class="keyword">FROM</span> students;</span><br></pre></td></tr></table></figure></li>
+<li><p>取列同时给每一列起个别名<code>SELECT 列1 别名1, 列2 别名2, 列3 别名3 FROM ...</code>：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, score pints, <span class="keyword">name</span> <span class="keyword">FROM</span> students;</span><br></pre></td></tr></table></figure></li>
+<li><p>加上<code>WHERE</code>实现复杂查询：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, score points, <span class="keyword">name</span> <span class="keyword">FROM</span> students <span class="keyword">WHERE</span> gender = <span class="string">'M'</span>;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="排序">排序</h4>
+<p>关键字：<code>ORDER BY</code></p>
+<ol type="1">
+<li><p>按成绩祷告进行排序（从低到高）</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, <span class="keyword">name</span>, gender, score <span class="keyword">FROM</span> students ORRDER <span class="keyword">BY</span> score;</span><br></pre></td></tr></table></figure></li>
+<li><p>加上<code>DESC</code>表示倒序：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, <span class="keyword">name</span>, gender, score <span class="keyword">FROM</span> students <span class="keyword">ORDER</span> <span class="keyword">BY</span> score <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>按多列排序：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, <span class="keyword">name</span>, gender, score <span class="keyword">FROM</span> students <span class="keyword">ORDER</span> <span class="keyword">BY</span> score <span class="keyword">DESC</span>, gender;</span><br></pre></td></tr></table></figure></li>
+<li><p>带WHERE条件的ORDER BY：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, <span class="keyword">name</span>, gender, score</span><br><span class="line"><span class="keyword">FROM</span> students</span><br><span class="line"><span class="keyword">WHERE</span> class_id = <span class="number">1</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> score <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="分页查询">分页查询</h4>
+<p>使用SELECT查询时，如果结果集数据量很大，比如几万行数据，放在一个页面显示的话数据量太大，不如分页显示，每次显示100条。</p>
+<ol type="1">
+<li><p>给students排序并把结果而烦恼页，每页3条记录，获取第1页记录：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, <span class="keyword">name</span>, gender, score</span><br><span class="line"><span class="keyword">FROM</span> students</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> score <span class="keyword">DESC</span> </span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">3</span> <span class="keyword">OFFSET</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<p><code>LIMIT 3 OFFSET 0</code>表示对结果从0记录开始，最多取3条</p></li>
+<li><p>查询第2页就是跳过头三条记录，从3好记录开始查询：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, <span class="keyword">name</span>, gender, score</span><br><span class="line"><span class="keyword">FROM</span> students</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> score <span class="keyword">DESC</span></span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">3</span> <span class="keyword">OFFSET</span> <span class="number">3</span>;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<blockquote>
+<p>如果<code>OFFSET</code>超过了查询的最大数量并不会报错。而是得到一个空的结果集。</p>
+</blockquote>
+<h4 id="聚合查询">聚合查询</h4>
+<h5 id="统计数量">统计数量</h5>
+<ol type="1">
+<li><p>查询students表一共有多少记录</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">COUNT</span>(*) <span class="keyword">FROM</span> students;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">COUNT</span>(*) <span class="keyword">num</span> <span class="keyword">FROM</span> students;</span><br></pre></td></tr></table></figure>
+<p><code>COUNT(*)</code>表示查询所有列的行数，要注意聚合的计算结果虽然是一个数字，但查询的结果仍然是一个二维表，只是这个二维表只有一行一列，并且列名是<code>COUNT(*)</code>。</p></li>
+<li><p>查询有多少男生：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">COUNT</span>(*) boys <span class="keyword">FROM</span> students <span class="keyword">WHERE</span> gender = <span class="string">'M'</span>;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h5 id="平均值">平均值</h5>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">AVG</span>(score) average <span class="keyword">FROM</span> students <span class="keyword">WHERE</span> gender = <span class="string">'M'</span>;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">函数</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">SUM</td>
+<td style="text-align: left;">计算某一列的合计值，该列必须为数值类型</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AVG</td>
+<td style="text-align: left;">计算某一列的平均值，该列必须为数值类型</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MAX</td>
+<td style="text-align: left;">计算某一列的最大值</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MIN</td>
+<td style="text-align: left;">计算某一列的最小值</td>
+</tr>
+</tbody>
+</table>
+<h5 id="分组聚合">分组聚合</h5>
+<p>分组统计各个班男生和女生的人数：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> class_id, <span class="keyword">COUNT</span>(*) <span class="keyword">num</span> <span class="keyword">FROM</span> students <span class="keyword">GROUP</span> <span class="keyword">BY</span> class_id, gender;</span><br></pre></td></tr></table></figure>
+<h4 id="多表查询">多表查询</h4>
+<p>从多张表同时查询数据：<code>SELECT * FROM &lt;表1&gt; &lt;表2&gt;</code></p>
+<ol type="1">
+<li><p>得到students表和classes表的 乘积:</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> students, classes;</span><br></pre></td></tr></table></figure></li>
+<li><p>实用表名来给列名做区分：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	s.id <span class="keyword">sid</span>,</span><br><span class="line">	s.name,</span><br><span class="line">	s.gender,</span><br><span class="line">	s.score,</span><br><span class="line">	c.id cid,</span><br><span class="line">	c.name cname</span><br><span class="line"><span class="keyword">FROM</span> students s, classes c;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="连接查询">连接查询</h4>
+<p>通过INNER JOIN将两张表连接起来</p>
+<p>INNER JOIN写法：</p>
+<ol type="1">
+<li>先确定主表，仍然使用<code>FROM &lt;表1&gt;</code>的语法；</li>
+<li>再确定需要连接的表，使用<code>INNER JOIN &lt;表2&gt;</code>的语法；</li>
+<li>然后确定连接条件，使用<code>ON &lt;条件...&gt;</code>，这里的条件是<code>s.class_id = c.id</code>，表示<code>students</code>表的<code>class_id</code>列与<code>classes</code>表的<code>id</code>列相同的行需要连接；</li>
+<li>可选：加上<code>WHERE</code>子句、<code>ORDER BY</code>等子句。</li>
+</ol>
+<p>选出所有学生，同时返回班级的名称:</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> s.id, s.name, s.class_id, c.name class_name, s.gender, s.score</span><br><span class="line"><span class="keyword">FROM</span> students s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> classes c</span><br><span class="line"><span class="keyword">ON</span> s.class_id = c.id;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr class="header">
+<th>JOIN type</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>INNER JOIN</td>
+<td>只返回同时存在于两张表里的行数据</td>
+</tr>
+<tr class="even">
+<td>RIGHT OUTER JOIN</td>
+<td>只返回右表存在的行</td>
+</tr>
+<tr class="odd">
+<td>LEFT OUTER JOIN</td>
+<td>只返回左表存在的行</td>
+</tr>
+<tr class="even">
+<td>FULL OUTER JOIN</td>
+<td>把两张表的所有记录全部选择出来，并且自动在缺失的列填充为NULL</td>
+</tr>
+</tbody>
+</table>
+<h3 id="插入">插入</h3>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> &lt;表名&gt; (字段<span class="number">1</span>, 字段<span class="number">2</span>, ...) <span class="keyword">VALUES</span> (值<span class="number">1</span>, 值<span class="number">2</span>, ...);</span><br></pre></td></tr></table></figure>
+<p>一次性增加多条新纪录：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (class_id, <span class="keyword">name</span>, gender, score) <span class="keyword">VALUES</span></span><br><span class="line">  (<span class="number">1</span>, <span class="string">'大宝'</span>, <span class="string">'M'</span>, <span class="number">87</span>),</span><br><span class="line">  (<span class="number">2</span>, <span class="string">'二宝'</span>, <span class="string">'M'</span>, <span class="number">81</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="更新">更新</h3>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> &lt;form_name&gt; <span class="keyword">SET</span> column1=value1, column2=value2, ... <span class="keyword">WHERE</span> ...;</span><br></pre></td></tr></table></figure>
+<ol type="1">
+<li><p>更新<code>students</code>表<code>id=1</code>的记录的<code>name</code>和<code>score</code>这两个字段:</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> students <span class="keyword">SET</span> <span class="keyword">name</span>=<span class="string">'大牛'</span>, score=<span class="number">66</span> <span class="keyword">WHERE</span> <span class="keyword">id</span>=<span class="number">1</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>把所有80分以下的同学的成绩加10分:</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> students <span class="keyword">SET</span> score=score+<span class="number">10</span> <span class="keyword">WHERE</span> score&lt;<span class="number">80</span>;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<blockquote>
+<p>如果<code>UPDATE</code>语句没有<code>WHERE</code>条件，整个表的所有记录都会被更新。所以，在执行<code>UPDATE</code>语句时要非常小心，最好先用<code>SELECT</code>语句来测试<code>WHERE</code>条件是否筛选出期望的记录集，然后再用<code>UPDATE</code>更新。</p>
+</blockquote>
+<p><a href="https://blog.csdn.net/yang_guang3/article/details/103232941" target="_blank" rel="noopener">避免生产环境执行更新删除语句忘记加where条件的解决方案</a></p>
+<h3 id="删除">删除</h3>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> &lt;表名&gt; <span class="keyword">WHERE</span> ...;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>要特别小心的是，和<code>UPDATE</code>类似，不带<code>WHERE</code>条件的<code>DELETE</code>语句会删除整个表的数据。</p>
+</blockquote>
+<h2 id="mysql">MySQL</h2>
+<p>安装完MySQL后，除了MySQL Server，即真正的MySQL服务器外，还附赠一个MySQL Client程序。MySQL Client是一个命令行客户端，可以通过MySQL Client登录MySQL，然后，输入SQL语句并执行。</p>
+<p>打开命令提示符，输入命令<code>mysql -u root -p</code>，提示输入口令。填入MySQL的root口令，如果正确，就连上了MySQL Server，同时提示符变为<code>mysql&gt;</code>：输入<code>exit</code>断开与MySQL Server的连接并返回到命令提示符。</p>
+<blockquote>
+<p>在MySQL Client中输入的SQL语句通过TCP连接发送到MySQL Server。默认端口号是3306，即如果发送到本机MySQL Server，地址就是<code>127.0.0.1:3306</code>。</p>
+</blockquote>
+<p>也可以只安装MySQL Client，然后连接到远程MySQL Server。假设远程MySQL Server的IP地址是<code>10.0.1.99</code>，那么就使用<code>-h</code>指定IP或域名：</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">mysql <span class="literal">-h</span> <span class="number">10.0</span>.<span class="number">1.99</span> <span class="literal">-u</span> root <span class="literal">-p</span></span><br></pre></td></tr></table></figure>
+<h3 id="数据库">数据库</h3>
+<p>在一个运行MySQL的服务器上，实际上可以创建多个数据库（Database）。要列出所有数据库，使用命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql&gt; SHOW DATABASES;</span><br><span class="line">+--------------------+</span><br><span class="line">| Database           |</span><br><span class="line">+--------------------+</span><br><span class="line">| information_schema |</span><br><span class="line">| mysql              |</span><br><span class="line">| performance_schema |</span><br><span class="line">| shici              |</span><br><span class="line">| sys                |</span><br><span class="line">| test               |</span><br><span class="line">| school             |</span><br><span class="line">+--------------------+</span><br></pre></td></tr></table></figure>
+<p>其中，<code>information_schema</code>、<code>mysql</code>、<code>performance_schema</code>和<code>sys</code>是系统库，不要去改动它们。其他的是用户创建的数据库。</p>
+<p>要创建一个新数据库，使用命令：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> CREATE DATABASE <span class="built_in">test</span>;</span></span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br></pre></td></tr></table></figure>
+<p>要删除一个数据库，使用命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql&gt; DROP DATABASE test;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br></pre></td></tr></table></figure>
+<p>注意：删除一个数据库将导致该数据库的所有表全部被删除。</p>
+<p>对一个数据库进行操作时，要首先将其切换为当前数据库：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql&gt; USE test;</span><br><span class="line">Database changed</span><br></pre></td></tr></table></figure>
+<h3 id="表">表</h3>
+<p>列出当前数据库的所有表，使用命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql&gt; SHOW TABLES;</span><br><span class="line">+---------------------+</span><br><span class="line">| Tables_in_test      |</span><br><span class="line">+---------------------+</span><br><span class="line">| classes             |</span><br><span class="line">| statistics          |</span><br><span class="line">| students            |</span><br><span class="line">| students_of_class1  |</span><br><span class="line">+---------------------+</span><br></pre></td></tr></table></figure>
+<p>要查看一个表的结构，使用命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql&gt; DESC students;</span><br><span class="line">+----------+--------------+------+-----+---------+----------------+</span><br><span class="line">| Field    | Type         | Null | Key | Default | Extra          |</span><br><span class="line">+----------+--------------+------+-----+---------+----------------+</span><br><span class="line">| id       | bigint(20)   | NO   | PRI | NULL    | auto_increment |</span><br><span class="line">| class_id | bigint(20)   | NO   |     | NULL    |                |</span><br><span class="line">| name     | varchar(100) | NO   |     | NULL    |                |</span><br><span class="line">| gender   | varchar(1)   | NO   |     | NULL    |                |</span><br><span class="line">| score    | int(11)      | NO   |     | NULL    |                |</span><br><span class="line">+----------+--------------+------+-----+---------+----------------+</span><br><span class="line">5 rows in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>还可以使用以下命令查看创建表的SQL语句：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql&gt; SHOW CREATE TABLE students;</span><br><span class="line">+----------+-------------------------------------------------------+</span><br><span class="line">| students | CREATE TABLE &#96;students&#96; (                             |</span><br><span class="line">|          |   &#96;id&#96; bigint(20) NOT NULL AUTO_INCREMENT,            |</span><br><span class="line">|          |   &#96;class_id&#96; bigint(20) NOT NULL,                     |</span><br><span class="line">|          |   &#96;name&#96; varchar(100) NOT NULL,                       |</span><br><span class="line">|          |   &#96;gender&#96; varchar(1) NOT NULL,                       |</span><br><span class="line">|          |   &#96;score&#96; int(11) NOT NULL,                           |</span><br><span class="line">|          |   PRIMARY KEY (&#96;id&#96;)                                  |</span><br><span class="line">|          | ) ENGINE&#x3D;InnoDB AUTO_INCREMENT&#x3D;1 DEFAULT CHARSET&#x3D;utf8 |</span><br><span class="line">+----------+-------------------------------------------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>创建表使用<code>CREATE TABLE</code>语句，而删除表使用<code>DROP TABLE</code>语句：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql&gt; DROP TABLE students;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br></pre></td></tr></table></figure>
+<p>修改表就比较复杂。如果要给<code>students</code>表新增一列<code>birth</code>，使用：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ALTER TABLE students ADD COLUMN birth VARCHAR(10) NOT NULL;</span><br></pre></td></tr></table></figure>
+<p>要修改<code>birth</code>列，例如把列名改为<code>birthday</code>，类型改为<code>VARCHAR(20)</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ALTER TABLE students CHANGE COLUMN birth birthday VARCHAR(20) NOT NULL;</span><br></pre></td></tr></table></figure>
+<p>要删除列，使用：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ALTER TABLE students DROP COLUMN birthday;</span><br></pre></td></tr></table></figure>
+<h3 id="退出mysql">退出MySQL</h3>
+<p>使用<code>EXIT</code>命令退出MySQL：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql&gt; EXIT</span><br><span class="line">Bye</span><br></pre></td></tr></table></figure>
+<p>注意<code>EXIT</code>仅仅断开了客户端和服务器的连接，MySQL服务器仍然继续运行。</p>
+<h3 id="实用sql语句">实用SQL语句</h3>
+<h4 id="插入或替换">插入或替换</h4>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">REPLACE</span> <span class="keyword">INTO</span> students (<span class="keyword">id</span>, class_id, <span class="keyword">name</span>, gender, score) <span class="keyword">VALUES</span> (<span class="number">1</span>,<span class="number">1</span>,<span class="string">'小明'</span>,<span class="string">'F'</span>,<span class="number">99</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="插入或更新">插入或更新</h4>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> students (<span class="keyword">id</span>, class_id, <span class="keyword">name</span>, gender, score) <span class="keyword">VALUES</span> (<span class="number">1</span>, <span class="number">1</span>, <span class="string">'小明'</span>, <span class="string">'F'</span>, <span class="number">99</span>) <span class="keyword">ON</span> <span class="keyword">DUPLICATE</span> <span class="keyword">KEY</span> <span class="keyword">UPDATE</span> <span class="keyword">name</span>=<span class="string">'小明'</span>, gender=<span class="string">'F'</span>, score=<span class="number">99</span>;</span><br></pre></td></tr></table></figure>
+<h4 id="插入或忽略">插入或忽略</h4>
+<p>如果我们希望插入一条新记录（INSERT），但如果记录已经存在，就啥事也不干直接忽略，此时，可以使用<code>INSERT IGNORE INTO ...</code>语句：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">IGNORE</span> <span class="keyword">INTO</span> students (<span class="keyword">id</span>, class_id, <span class="keyword">name</span>, gender, score) <span class="keyword">VALUES</span> (<span class="number">1</span>,<span class="number">1</span>,<span class="string">'小明'</span>,<span class="string">'F'</span>,<span class="number">99</span>)</span><br></pre></td></tr></table></figure>
+<h4 id="快照">快照</h4>
+<p>如果想要对一个表进行快照，即复制一份当前表的数据到一个新表，可以结合<code>CREATE</code>和<code>SELECT</code>：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 对class_id=1的记录进行快照，并存储为新表students_of_class1:</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> students_of_class1 <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> students <span class="keyword">WHERE</span> class_id=<span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<h4 id="查询结果写入表">查询结果写入表</h4>
+<p>创建一个统计成绩的表<code>statistics</code>，记录各班的平均成绩:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">CREATE TABLE statistics (</span><br><span class="line">	id BIGINT NOT NULL AUTO_INCREMENT,</span><br><span class="line">    class_id BIGINT NOT NULL,</span><br><span class="line">    average DOUBLE NOT NULL,</span><br><span class="line">    PRIMARY KEY (id)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>然后写插入平均成绩的语句：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">statistics</span> (class_id, average) <span class="keyword">SELECT</span> class_id, <span class="keyword">AVG</span>(score) <span class="keyword">FROM</span> students <span class="keyword">GROUP</span> <span class="keyword">BY</span> class_id;</span><br></pre></td></tr></table></figure>
+<h4 id="强制使用指定索引">强制使用指定索引</h4>
+<p>在查询的时候，数据库系统会自动分析查询语句，并选择一个最合适的索引。但是很多时候，数据库系统的查询优化器并不一定总是能使用最优索引。如果我们知道如何选择索引，可以使用<code>FORCE INDEX</code>强制查询使用指定的索引。例如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SELECT * FROM students FORCE INDEX (idx_class_id) WHERE class_id &#x3D; 1 ORDER BY id DESC;</span><br></pre></td></tr></table></figure>
+<p>指定索引的前提是索引<code>idx_class_id</code>必须存在。</p>
+<h2 id="事务">事务</h2>
+<p>在执行SQL语句的时候，某些业务要求，一系列操作必须全部执行，而不能仅执行一部分。例如，一个转账操作：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- 从id&#x3D;1的账户给id&#x3D;2的账户转账100元</span><br><span class="line">-- 第一步：将id&#x3D;1的A账户余额减去100</span><br><span class="line">UPDATE accounts SET balance &#x3D; balance - 100 WHERE id &#x3D; 1;</span><br><span class="line">-- 第二步：将id&#x3D;2的B账户余额加上100</span><br><span class="line">UPDATE accounts SET balance &#x3D; balance + 100 WHERE id &#x3D; 2;</span><br></pre></td></tr></table></figure>
+<p>这两条SQL语句必须全部执行，或者，由于某些原因，如果第一条语句成功，第二条语句失败，就必须全部撤销。</p>
+<p>这种把多条语句作为一个整体进行操作的功能，被称为数据库<em>事务</em>。数据库事务可以确保该事务范围内的所有操作都可以全部成功或者全部失败。如果事务失败，那么效果就和没有执行这些SQL一样，不会对数据库数据有任何改动。</p>
+<p><strong>事务的ACID特性</strong></p>
+<ul>
+<li>A：Atomic，原子性，将所有SQL作为原子工作单元执行，要么全部执行，要么全部不执行；</li>
+<li>C：Consistent，一致性，事务完成后，所有数据的状态都是一致的，即A账户只要减去了100，B账户则必定加上了100；</li>
+<li>I：Isolation，隔离性，如果有多个事务并发执行，每个事务作出的修改必须与其他事务隔离；</li>
+<li>D：Duration，持久性，即事务完成后，对数据库数据的修改被持久化存储。</li>
+</ul>
+<blockquote>
+<p>对于单条SQL语句，数据库系统自动将其作为一个事务执行，这种事务被称为<em>隐式事务</em>。</p>
+</blockquote>
+<p>使用<code>BEGIN</code>开启一个事务，使用<code>COMMIT</code>提交一个事务，这种事务被称为<em>显式事务</em>，例如，把转账操作作为一个显式事务：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">BEGIN;</span><br><span class="line">UPDATE accounts SET balance &#x3D; balance - 100 WHERE id &#x3D; 1;</span><br><span class="line">UPDATE accounts SET balance &#x3D; balance + 100 WHERE id &#x3D; 2;</span><br><span class="line">COMMIT;</span><br></pre></td></tr></table></figure>
+<p>SQL标准定义了4种隔离级别，分别对应可能出现的数据不一致的情况：</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Isolation Level</th>
+<th style="text-align: left;">脏读（Dirty Read）</th>
+<th style="text-align: left;">不可重复读（Non Repeatable Read）</th>
+<th style="text-align: center;">幻读（Phantom Read）</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Read Uncommitted</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Read Committed</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Repeatable Read</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Serializable</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: center;">-</td>
+</tr>
+</tbody>
+</table>
+<h4 id="read-uncommitted">Read Uncommitted</h4>
+<p>Read Uncommitted是隔离级别最低的一种事务级别。</p>
+<ol type="1">
+<li>脏读（Dirty Read）</li>
+</ol>
+<p>在这种隔离级别下，一个事务会读到另一个事务更新后但未提交的数据，如果另一个事务回滚，那么当前事务读到的数据就是脏数据，这就是脏读。</p>
+<ol start="2" type="1">
+<li>不可重复读（Non Repeatable Read）</li>
+</ol>
+<p>不可重复读是指，在一个事务内，多次读同一数据，在这个事务还没有结束时，如果另一个事务恰好修改了这个数据，那么，在第一个事务中，两次读取的数据就可能不一致。</p>
+<h4 id="repeatable-read">Repeatable Read</h4>
+<ol type="1">
+<li><p>幻读（Phantom Read）：</p>
+<p>幻读是指，在一个事务中，第一次查询某条记录，发现没有，但是，当试图更新这条不存在的记录时，竟然能成功，并且，再次读取同一条记录，它就神奇地出现了。</p></li>
+</ol>
+<h4 id="serializable">Serializable</h4>
+<p>Serializable是最严格的隔离级别。在Serializable隔离级别下，所有事务按照次序依次执行，因此，脏读、不可重复读、幻读都不会出现。</p>
+]]></content>
+      <categories>
+        <category>Database</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
       </tags>
   </entry>
   <entry>
@@ -186,72 +694,123 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
       </tags>
   </entry>
   <entry>
-    <title>前缀和问题集</title>
-    <url>/2020/06/02/PrefixSum/</url>
-    <content><![CDATA[<h4 id="每个元音包含偶数次的最长子字符串"><a href="https://leetcode-cn.com/problems/find-the-longest-substring-containing-vowels-in-even-counts/" target="_blank" rel="noopener">1371. 每个元音包含偶数次的最长子字符串</a></h4>
-<a id="more"></a>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">findTheLongestSubstring</span><span class="params">(self, s: str)</span> -&gt; int:</span></span><br><span class="line">        n = len(s)</span><br><span class="line">        status = <span class="number">0</span></span><br><span class="line">        pos = [<span class="number">-1</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">1</span> &lt;&lt; <span class="number">5</span>)]</span><br><span class="line">        pos[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">        ret = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">            <span class="keyword">if</span> s[i] == <span class="string">'a'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">4</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'e'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">3</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'i'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">2</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'o'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">1</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'u'</span>:</span><br><span class="line">                status ^= <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> pos[status] == <span class="number">-1</span>:</span><br><span class="line">                pos[status] = i+<span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                ret = max(ret, i+<span class="number">1</span>-pos[status])</span><br><span class="line">        <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure>
-<p>这个问题的关键在于利用前缀和来确定子串的状态。这里的前缀和定义为前<span class="math inline">\(i\)</span>个字符中，每个元音字符出现的奇偶性，用来代替出现的次数。我们用二进制编码来代替状态的哈希结构，比如前<span class="math inline">\(i\)</span>个字符a, e, i, o, u出现的次数的奇偶性分别为奇，奇，偶，偶，偶，则其编码为<code>11000</code>。只要我们知道前<span class="math inline">\(i\)</span>个字符的状态和前<span class="math inline">\(j\)</span>个字符的状态，我们就可以知道从第<span class="math inline">\(i+1\)</span>个字符到第<span class="math inline">\(j\)</span>个字符的元音出现次数奇偶性状态，也就是只要前<span class="math inline">\(i\)</span>个字符的二进制编码和前<span class="math inline">\(j\)</span>个字符的二进制编码相同，我们就可以确定<span class="math inline">\(i+1\)</span>到<span class="math inline">\(j\)</span>元音出现次数为偶数。原因在于差为偶则被减数和减数奇偶性相同。</p>
-<p>难点1：前缀和由出现次数转换为奇偶性</p>
-<p>优化点1：二进制编码</p>
-<p>优化点2：抛弃哈希记录每个字符的前缀和，反而用编码作为key来记录该前缀和出现的index，将时间复杂度从<span class="math inline">\(O(n^2)\)</span>降至<span class="math inline">\(O(n)\)</span></p>
-<p>边界点1：<code>pos[0]=0</code>，原因在于非原因字符最早出现的index一定是空字符串</p>
-]]></content>
-      <categories>
-        <category>Algorithm</category>
-      </categories>
-      <tags>
-        <tag>prefix sum</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>树相关问题集</title>
-    <url>/2020/06/02/Tree/</url>
-    <content><![CDATA[<h4 id="从前序与中序遍历序列构造二叉树"><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/" target="_blank" rel="noopener">105. 从前序与中序遍历序列构造二叉树</a></h4>
-<a id="more"></a>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">buildTree</span><span class="params">(self, preorder: List[int], inorder: List[int])</span> -&gt; TreeNode:</span></span><br><span class="line">        <span class="keyword">if</span> len(preorder) == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">        root = TreeNode(preorder[<span class="number">0</span>])</span><br><span class="line">        root_index = inorder.index(root.val)</span><br><span class="line">        left_inorder = inorder[:root_index]</span><br><span class="line">        right_inorder = inorder[root_index+<span class="number">1</span>:]</span><br><span class="line">        left_preorder = preorder[<span class="number">1</span>:<span class="number">1</span>+len(left_inorder)]</span><br><span class="line">        right_preorder = preorder[<span class="number">1</span>+len(left_inorder):]</span><br><span class="line">        root.left = self.buildTree(left_preorder, left_inorder)</span><br><span class="line">        root.right = self.buildTree(right_preorder, right_inorder)</span><br><span class="line">        <span class="keyword">return</span> root</span><br></pre></td></tr></table></figure>
-<p>序列化和反序列化二叉树步骤之一，通过前序遍历和中序遍历构造二叉树。要点在于通过前序序列知道根节点，通过中序序列知道左子树和右子树是哪些。</p>
-<p>边界点：递归约束，叶节点的子节点None停止递归，通过判断preorder是否为空判断该节点是否为None。</p>
-<h4 id="对称二叉树"><a href="https://leetcode-cn.com/problems/symmetric-tree/" target="_blank" rel="noopener">101. 对称二叉树</a></h4>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSymmetric</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">return</span> check(root.left, root.right);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">check</span><span class="params">(TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> &amp;&amp; q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> || q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (p.val == q.val) &amp;&amp; check(p.left, q.right) &amp;&amp; check(p.right, q.left);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>时间复杂度：<span class="math inline">\(O(N)\)</span></p>
-<p>空间复杂度：<span class="math inline">\(O(N)\)</span> 原因在于虽然我们只需要递归<span class="math inline">\(O(\log N)\)</span>层但是我们每层都要创建2个栈空间，所以我们的空间复杂度为<span class="math inline">\(O(2^{\log N})=O(N)\)</span></p>
-<p>难点：注意镜像，所以我们需要 <code>check(p.left, q.right) &amp;&amp; check(p.right, q.left);</code></p>
-]]></content>
-      <categories>
-        <category>Algorithm</category>
-      </categories>
-      <tags>
-        <tag>tree</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>《JavaScript DOM编程艺术》第三章读书笔记</title>
-    <url>/2020/06/02/jsdom3/</url>
-    <content><![CDATA[<h2 id="dom解释">DOM解释</h2>
+    <title>《JavaScript DOM编程艺术》第四章读书笔记</title>
+    <url>/2020/06/02/jsdom4/</url>
+    <content><![CDATA[<p>这里我们主要谈的是html上对用户事件的处理。</p>
+<h2 id="事件处理函数">事件处理函数</h2>
+<p>时间处理函数的作用是，在特定时间发生时调用特定的JavaScript代码。 <a id="more"></a> <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"images/fireworks.jpg"</span> <span class="attr">title</span>=<span class="string">"A fireworks display"</span> <span class="attr">onclick</span>=<span class="string">"showPic(this); return false;"</span>&gt;</span></span><br><span class="line">Fireworks<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">pic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> source = pic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">let</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>, source);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
-<li>D: 网页文档</li>
-<li>O：对象，自足的数据集合。JS里的对象可以分为三种类型
-<ol type="1">
-<li>用户定义对象(user-defined object): 由程序员自行创建的对象</li>
-<li>内建对象(native object): 内建的js对象，如Array，Math</li>
-<li>宿主对象(host object): 由浏览器提供的对象</li>
-</ol></li>
-<li>M： (X)HTML所代表的节点树模型 <a id="more"></a> ## 元素节点 元素节点时DOM中的原子，其包含文本节点和属性节点。<code>&lt;P&gt;</code>为元素节点，<code>&lt;p&gt;xxx&lt;/p&gt;</code>包含的xxx为文本节点，<code>&lt;p title='x'&gt;&lt;/p&gt;</code>中的title为属性节点</li>
+<li><code>this</code>表示这个<code>&lt;a&gt;</code>元素节点</li>
+<li><code>event = "JS statements"</code>来添加事件处理函数的语法</li>
+<li>如果仅仅把使劲按处理函数放到图片列表的一个链接中，我们会遇到一个问题：点击这个链接时，不仅<code>showPic</code>函数被调用，链接被点击的默认行为也会被调用。这意味着用户还是会被带到图片查看窗口。我们需要组织这个默认行为被调用。</li>
 </ul>
-<h2 id="获取元素节点">获取元素节点</h2>
+<p>一旦事件发生，相应的js代码就会得到执行。被调哦那个的js代码可以返回一个值，这个值将被传递给那个时间处理函数，并让这个处理函数出发的js代码返回布尔值true或false。如果返回的时true，onclick时间处理函数九认为"这个链接被点击了"；反之，如果返回的值时false，onclick时间处理函数就认为"这个链接没有被点击"。因此，<code>return false;</code>可以防止用户被带到目标链接窗口。</p>
+<h3 id="nodetype属性">nodeType属性</h3>
+<p><code>node.nodeType</code>获取节点的nodeType属性。 nodeType属性总共有12种，期中仅有3种具有实用价值：</p>
+<ul>
+<li>元素节点：1</li>
+<li>属性节点：2</li>
+<li>文本节点：3</li>
+</ul>
+<h3 id="替代文本节点">替代文本节点</h3>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">whichpic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> source = whichpic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">var</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>,source);</span><br><span class="line">  <span class="keyword">var</span> text = whichpic.getAttribute(<span class="string">"title"</span>);</span><br><span class="line">  <span class="keyword">var</span> description = <span class="built_in">document</span>.getElementById(<span class="string">"description"</span>);</span><br><span class="line">  description.firstChild.nodeValue = text;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里我们通过firstChild来渠道<code>&lt;p&gt;</code>元素节点的文本节点。如果该元素节点有包含文本的话，那么该元素的firstChild就为文本节点，否则时其他（元素）节点。</p>
+<ul>
+<li><code>node.nodeValue</code>: 取文本节点的值</li>
+<li><code>node.firstChild</code>: 等价于<code>node.childNodes[0]</code></li>
+<li><code>node.lastChild</code>: 等价于<code>node.childNodes[node.childNodes.length-1]</code></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Frontend</category>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>DOM</tag>
+        <tag>DOM Scripting Notes</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《JavaScript DOM编程艺术》第六章读书笔记</title>
+    <url>/2020/06/21/jsdom6/</url>
+    <content><![CDATA[<h3 id="分离js和html">分离JS和HTML</h3>
+<p>作为一条原则，如果想用JavaScript给某哥网页添加一些行为，就不应该让JavaScript代码对这个网页的结构有任何依赖。</p>
+<a id="more"></a>
+<p>比如加上如下的检测，来探测浏览器是否支持这些DOM。 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementById) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementById(<span class="string">"imagegallery"</span>)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure></p>
+<h3 id="共享onload事件">共享onload事件</h3>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addLoadEvent</span>(<span class="params">func</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oldonload = <span class="built_in">window</span>.onload;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="built_in">window</span>.onload != <span class="string">'function'</span>) &#123;</span><br><span class="line">    <span class="built_in">window</span>.onload = func;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      oldonload();</span><br><span class="line">      func();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">addLoadEvent(firstFunction);</span><br><span class="line">addLoadEvent(secondFunction);</span><br></pre></td></tr></table></figure> 取代</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = firstFunction;</span><br><span class="line"><span class="built_in">window</span>.onload = secondFunction;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Frontend</category>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>DOM</tag>
+        <tag>DOM Scripting Notes</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《JavaScript DOM编程艺术》第七章读书笔记</title>
+    <url>/2020/06/21/jsdom7/</url>
+    <content><![CDATA[<p>动态创建标记 <a id="more"></a></p>
+<h2 id="dom方法">DOM方法</h2>
+<h3 id="createelement">createElement</h3>
+<p>目标：将一段文本插入如下testdiv元素 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"testdiv"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
 <ol type="1">
-<li>getElementById <code>document.getElementById("&lt;id&gt;")</code></li>
-<li>getElementsByTagName 返回一个<code>对象数组</code>，每个对象分别对应这文档里给定标签的一个元素。 <code>document.getElementsByTagName("li")</code> 如果你想知道某份文档里共有多少个元素节点，可以使用通配符 <code>document.getElementsByTagName("*").length</code> 话可以将<code>getElementById</code>和<code>getElementsByTagName</code>结合起来， <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> shopping = <span class="built_in">document</span>.getElementById(<span class="string">"purchases"</span>);</span><br><span class="line"><span class="keyword">var</span> items = shopping.getElementsByTagName(<span class="string">"*"</span>);</span><br></pre></td></tr></table></figure></li>
-<li>getElementsByClassName 返回一个具有相同类名的元素的数组。 <code>document.getElementsByClassName("sale);</code></li>
+<li>创建一个新的元素；</li>
+<li>把这个新元素插入节点树。</li>
 </ol>
-<h2 id="获取和设置属性">获取和设置属性</h2>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> para = <span class="built_in">document</span>.createElement(<span class="string">'p'</span>); <span class="comment">// 文档碎片</span></span><br><span class="line"><span class="keyword">var</span> testdiv = <span class="built_in">document</span>.getElementById(<span class="string">"testdiv"</span>);</span><br><span class="line">testdiv.appendChild(para);</span><br></pre></td></tr></table></figure>
+<h3 id="createtextnode">createTextNode</h3>
+<p>注意<code>createElement</code>和<code>createTextNode</code>的区别。</p>
+<p>创建文本节点：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">document</span>.createTextNode(<span class="string">"Hello World"</span>);</span><br><span class="line"><span class="keyword">var</span> txt = <span class="built_in">document</span>.createTextNode(<span class="string">"Hello World"</span>);</span><br><span class="line">para.appendChild(txt);</span><br></pre></td></tr></table></figure>
+<h4 id="例子">例子</h4>
+<p>插入一个简单的元素 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>This is <span class="tag">&lt;<span class="name">em</span>&gt;</span>my<span class="tag">&lt;/<span class="name">em</span>&gt;</span> content.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure> 节点树：</p>
+<p><img src="D:\CUHKSZ\OneDrive - CUHK-ShenZhen\SharedDocuments\Hexo_blogs\Frontend\notes\jsdom7.assets\image-20200607171033679.png" alt="image-20200607171033679" style="zoom:50%;" /></p>
+<p>代码： <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> para = <span class="built_in">document</span>.createElement(<span class="string">'p'</span>);</span><br><span class="line"><span class="keyword">var</span> txt1 = <span class="built_in">document</span>.createTextNode(<span class="string">"This is "</span>);</span><br><span class="line"><span class="keyword">var</span> em = <span class="built_in">document</span>.createElement(<span class="string">'em'</span>);</span><br><span class="line"><span class="keyword">var</span> em_txt = <span class="built_in">document</span>.createTextNode(<span class="string">"my"</span>);</span><br><span class="line"><span class="keyword">var</span> txt2 = <span class="built_in">document</span>.createTextNode(<span class="string">" content."</span>);</span><br><span class="line">para.appendChild(txt1);</span><br><span class="line">em.appendChild(em_txt);</span><br><span class="line">para.appendChild(txt3);</span><br><span class="line"><span class="keyword">var</span> testdiv = <span class="built_in">document</span>.getElementById(<span class="string">"testdiv"</span>);</span><br><span class="line">testdiv.appendChild(para);</span><br></pre></td></tr></table></figure></p>
+<h3 id="在已有元素前插入一个新元素">在已有元素前插入一个新元素</h3>
+<p>DOM提供了名为insertBefore()方法，这个方法将把一个新元素插入到一个现有元素的前面。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">parentElement.insertBefore(newElement,targetElement);</span><br></pre></td></tr></table></figure>
 <ol type="1">
-<li>getAttribute 该方法不属于<code>document</code>对象，所以不能通过其调用，它只能通过元素节点对象吊桶。 <code>object.get.Attribute(attribute);</code></li>
-<li>setAttribute <code>object.setAttribute(attribute, value);</code></li>
+<li>新元素：你想插入的元素(newElement)</li>
+<li>目标元素：你想把这个新元素插入到哪个元素(targetElement)之前</li>
+<li>父元素：目标元素的父元素(parentElement)</li>
 </ol>
-<p><strong>通过setAttribute()方法对文档作出的改变，但这张改变并未反映到源代码中，也就是说，源代码中属性值仍旧是原来的属性值。这种“表里不一”的现象缘于DOM的工作模式：先加载文档的静态内容，再以动态方式对它们进行刷新，动态刷新不改变文档的静态内容，而对页面内容的刷新，不需要用户在他们的浏览器里执行刷新操作就可以实现。</strong></p>
-<p>个人对这句话的理解时，你在console中运行setAttribute的DOM操作不会影响静态的html源代码，但是浏览器已经将你的修改运行到了渲染中。比如你在console中修改attribute <code>href</code>, 源代码不会改变，但是你点击的那个超链接已经发生了改变。</p>
+<p>我们可以通过targetEleent元素的parentNode来找到parentElement</p>
+<h3 id="在现有方法后插入一个新元素">在现有方法后插入一个新元素</h3>
+<h4 id="编写insertafter函数">编写insertAfter函数</h4>
+<p>实用已知的方法来编写一个insertAfter函数：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">insertAfter</span>(<span class="params">newElement, targetElement</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> parent = targetElement.parentNode;</span><br><span class="line">    <span class="keyword">if</span> (parent.lastChild == targetElement) &#123;</span><br><span class="line">        parent.appendChild(newElement);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       parent.insertBefore(newElement,targetElement.nextSibling);</span><br><span class="line">    &#125;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="ajax">Ajax</h2>
+<p>实用Ajax可以做到只更新页面中的一小部分。其他内容——标志、导航、头部、脚部，都不用重新加载。用户仍然像往常一样点击链接，但这一次，已经加载的页面中只有一小部分区域会更新，而不必再次加载整个页面了。</p>
+<p>Ajax的主要优势就是对页面的请求以异步方式发送到服务器。而服务器不会用整个页面来响应请求，它会在后台处理请求，与此同时用户还能继续浏览页面并与页面交互。你的脚本则可以按需加载和创建页面内容，而不会打断用户的浏览体验。</p>
+<p>Ajax的核心是XMLHttpRequest对象。JS可以通过这个对象发送请求，然后自己处理响应。<strong>不同浏览器实现XMLHttpRequest</strong>的方式不太一样，为了保证跨浏览器，不得不为同样的事情写不同的分支。</p>
+<p>这是我们的html页面：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"utf-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Ajax<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"new"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"scripts/addLoadEvent.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"scripts/getHttpObject.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"scripts/getNewContent.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>为了兼容所有浏览器（包括IE），<code>getHttpObject.js</code>中的<code>getHTTPObject</code>需要这么写：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getHTTPObject</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> XMLHttpRequest == <span class="string">"undefined"</span>) &#123;</span><br><span class="line">        XMLHttpRequest = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123; <span class="keyword">return</span> <span class="keyword">new</span> ActiveXObject(<span class="string">"Msxml2.XMLHTTP.6.0"</span>); &#125;</span><br><span class="line">                <span class="keyword">catch</span> (e) &#123;&#125;</span><br><span class="line">            <span class="keyword">try</span> &#123; <span class="keyword">return</span> <span class="keyword">new</span> ActiveXObject(<span class="string">"Msxml2.XMLHTTP.3.0"</span>); &#125;</span><br><span class="line">                <span class="keyword">catch</span> (e) &#123;&#125;</span><br><span class="line">            <span class="keyword">try</span> &#123; <span class="keyword">return</span> <span class="keyword">new</span> ActiveXObject(<span class="string">"Msxml2.XMLHTTP"</span>); &#125;</span><br><span class="line">                <span class="keyword">catch</span> (e) &#123;&#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>现在我们来写一个Ajax的HTTP请求。XMLHttpReuqest的open方法可以用来指定服务器上将要访问的文件，指定请求类型：GET，POST或SEND。这个方法的第三个参数用于指定亲贵是否以异步的方式就发送和处理：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getNewContent</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> request = getHTTPObject();</span><br><span class="line">    <span class="keyword">if</span> (request) &#123;</span><br><span class="line">        request.open(<span class="string">"GET"</span>, <span class="string">"example.txt"</span>, <span class="literal">true</span>);</span><br><span class="line">        request.onreadystatechange = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (request.readyState == <span class="number">4</span>) &#123;</span><br><span class="line">                <span class="keyword">var</span> para = <span class="built_in">document</span>.createElement(<span class="string">"p"</span>);</span><br><span class="line">                <span class="keyword">var</span> txt = <span class="built_in">document</span>.createTextNode(request.responseText);</span><br><span class="line">                para.appendChild(txt);</span><br><span class="line">                <span class="built_in">document</span>.getElementById(<span class="string">'new'</span>).appendChild(para);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        request.send(<span class="literal">null</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        alert(<span class="string">"Sorry, your browser does not support XMLHttpRequest"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">addLoadEvent(getNewContent);</span><br></pre></td></tr></table></figure>
+<p><code>onreadystatechange</code>是一个事件处理函数，它会在服务器给XMLHttpRequest对象送回响应的时候被触发执行。在这个处理函数中，可以更具服务区的具体响应做出相应处理。</p>
+<p>在指定了请求的目标，也明确了如何处理响应后，就可以用send方法来发送请求了：<code>request.send(null);</code></p>
+<p>服务器在像XMLHttpRequest对象时，该对象有许多属性可用，浏览器会在不同阶段更新readyState属性的值，它有5个可能的值：</p>
+<ul>
+<li>0表示未初始化</li>
+<li>1表示正在加载</li>
+<li>2表示加载完毕</li>
+<li>3表示正在交互</li>
+<li>4表示完成</li>
+</ul>
+<p>只要readState属性的值编程了4，就可以访问服务器发送回来的数据了。返回的数据主要有两个属性。一个是<code>responseText</code>，用于保存文本字符串形式的数据；另一个是<code>responseXML</code>用于保存Content-Type头部中指定为"text/xml"的数据，其实是一个DocumentFragment（文档碎片）对象。</p>
+<blockquote>
+<p>异步请求有一个容易被忽略的问题就是异步性，就是脚本在发送XMLHttpRequest亲求后，仍然会继续执行，不会等待响应返回。</p>
+</blockquote>
+<h4 id="hijax">Hijax</h4>
+<p>拦截用户操作触发的默认请求，然后使用Ajax操作。在做到平稳退化的基础之上利用Ajax渐进增强。</p>
 ]]></content>
       <categories>
         <category>Frontend</category>
@@ -303,44 +862,6 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
 <li><a href="http://developer.yahoo.com/yui/compressor/" target="_blank" rel="noopener">YUI Compressor</a></li>
 <li><a href="https://developers.google.com/closure/compiler/" target="_blank" rel="noopener">Google Closure Compiler</a></li>
 <li><a href="https://tool.oschina.net/jscompress/" target="_blank" rel="noopener">oschina 在线js压缩</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>Frontend</category>
-        <category>JavaScript</category>
-      </categories>
-      <tags>
-        <tag>DOM</tag>
-        <tag>DOM Scripting Notes</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>《JavaScript DOM编程艺术》第四章读书笔记</title>
-    <url>/2020/06/02/jsdom4/</url>
-    <content><![CDATA[<p>这里我们主要谈的是html上对用户事件的处理。</p>
-<h2 id="事件处理函数">事件处理函数</h2>
-<p>时间处理函数的作用是，在特定时间发生时调用特定的JavaScript代码。 <a id="more"></a> <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"images/fireworks.jpg"</span> <span class="attr">title</span>=<span class="string">"A fireworks display"</span> <span class="attr">onclick</span>=<span class="string">"showPic(this); return false;"</span>&gt;</span></span><br><span class="line">Fireworks<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">pic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> source = pic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">let</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>, source);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>this</code>表示这个<code>&lt;a&gt;</code>元素节点</li>
-<li><code>event = "JS statements"</code>来添加事件处理函数的语法</li>
-<li>如果仅仅把使劲按处理函数放到图片列表的一个链接中，我们会遇到一个问题：点击这个链接时，不仅<code>showPic</code>函数被调用，链接被点击的默认行为也会被调用。这意味着用户还是会被带到图片查看窗口。我们需要组织这个默认行为被调用。</li>
-</ul>
-<p>一旦事件发生，相应的js代码就会得到执行。被调哦那个的js代码可以返回一个值，这个值将被传递给那个时间处理函数，并让这个处理函数出发的js代码返回布尔值true或false。如果返回的时true，onclick时间处理函数九认为"这个链接被点击了"；反之，如果返回的值时false，onclick时间处理函数就认为"这个链接没有被点击"。因此，<code>return false;</code>可以防止用户被带到目标链接窗口。</p>
-<h3 id="nodetype属性">nodeType属性</h3>
-<p><code>node.nodeType</code>获取节点的nodeType属性。 nodeType属性总共有12种，期中仅有3种具有实用价值：</p>
-<ul>
-<li>元素节点：1</li>
-<li>属性节点：2</li>
-<li>文本节点：3</li>
-</ul>
-<h3 id="替代文本节点">替代文本节点</h3>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">whichpic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> source = whichpic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">var</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>,source);</span><br><span class="line">  <span class="keyword">var</span> text = whichpic.getAttribute(<span class="string">"title"</span>);</span><br><span class="line">  <span class="keyword">var</span> description = <span class="built_in">document</span>.getElementById(<span class="string">"description"</span>);</span><br><span class="line">  description.firstChild.nodeValue = text;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里我们通过firstChild来渠道<code>&lt;p&gt;</code>元素节点的文本节点。如果该元素节点有包含文本的话，那么该元素的firstChild就为文本节点，否则时其他（元素）节点。</p>
-<ul>
-<li><code>node.nodeValue</code>: 取文本节点的值</li>
-<li><code>node.firstChild</code>: 等价于<code>node.childNodes[0]</code></li>
-<li><code>node.lastChild</code>: 等价于<code>node.childNodes[node.childNodes.length-1]</code></li>
 </ul>
 ]]></content>
       <categories>

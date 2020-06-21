@@ -20,20 +20,15 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":2,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="1371. 每个元音包含偶数次的最长子字符串">
-<meta property="og:type" content="article">
-<meta property="og:title" content="前缀和问题集">
-<meta property="og:url" content="http://yoursite.com/2020/06/02/PrefixSum/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Garden of Sinners">
+<meta property="og:url" content="http://yoursite.com/archives/2020/06/page/2/index.html">
 <meta property="og:site_name" content="Garden of Sinners">
-<meta property="og:description" content="1371. 每个元音包含偶数次的最长子字符串">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-06-02T14:09:50.000Z">
-<meta property="article:modified_time" content="2020-06-02T14:26:24.887Z">
 <meta property="article:author" content="Zhewen Lyu">
-<meta property="article:tag" content="prefix sum">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/2020/06/02/PrefixSum/">
+<link rel="canonical" href="http://yoursite.com/archives/2020/06/page/2/">
 
 
 <script id="page-configurations">
@@ -41,12 +36,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : true,
+    isPost : false,
     lang   : 'en'
   };
 </script>
 
-  <title>前缀和问题集 | Garden of Sinners</title>
+  <title>Archive | Garden of Sinners</title>
   
 
 
@@ -190,100 +185,54 @@
         <div class="content-wrap">
           
 
-          <div class="content post posts-expand">
+          <div class="content archive">
             
 
-    
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/02/PrefixSum/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Zhewen Lyu">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Garden of Sinners">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          前缀和问题集
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2020-06-02 22:09:50 / Modified: 22:26:24" itemprop="dateCreated datePublished" datetime="2020-06-02T22:09:50+08:00">2020-06-02</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+  
+  <div class="post-block">
+    <div class="posts-collapse">
+      <div class="collection-title">
+        <span class="collection-header">Um..! 11 posts in total. Keep on posting.</span>
+      </div>
 
       
-        <h4 id="每个元音包含偶数次的最长子字符串"><a href="https://leetcode-cn.com/problems/find-the-longest-substring-containing-vowels-in-even-counts/" target="_blank" rel="noopener">1371. 每个元音包含偶数次的最长子字符串</a></h4>
-<a id="more"></a>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">findTheLongestSubstring</span><span class="params">(self, s: str)</span> -&gt; int:</span></span><br><span class="line">        n = len(s)</span><br><span class="line">        status = <span class="number">0</span></span><br><span class="line">        pos = [<span class="number">-1</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">1</span> &lt;&lt; <span class="number">5</span>)]</span><br><span class="line">        pos[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">        ret = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">            <span class="keyword">if</span> s[i] == <span class="string">'a'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">4</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'e'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">3</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'i'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">2</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'o'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">1</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'u'</span>:</span><br><span class="line">                status ^= <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> pos[status] == <span class="number">-1</span>:</span><br><span class="line">                pos[status] = i+<span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                ret = max(ret, i+<span class="number">1</span>-pos[status])</span><br><span class="line">        <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure>
-<p>这个问题的关键在于利用前缀和来确定子串的状态。这里的前缀和定义为前<span class="math inline">\(i\)</span>个字符中，每个元音字符出现的奇偶性，用来代替出现的次数。我们用二进制编码来代替状态的哈希结构，比如前<span class="math inline">\(i\)</span>个字符a, e, i, o, u出现的次数的奇偶性分别为奇，奇，偶，偶，偶，则其编码为<code>11000</code>。只要我们知道前<span class="math inline">\(i\)</span>个字符的状态和前<span class="math inline">\(j\)</span>个字符的状态，我们就可以知道从第<span class="math inline">\(i+1\)</span>个字符到第<span class="math inline">\(j\)</span>个字符的元音出现次数奇偶性状态，也就是只要前<span class="math inline">\(i\)</span>个字符的二进制编码和前<span class="math inline">\(j\)</span>个字符的二进制编码相同，我们就可以确定<span class="math inline">\(i+1\)</span>到<span class="math inline">\(j\)</span>元音出现次数为偶数。原因在于差为偶则被减数和减数奇偶性相同。</p>
-<p>难点1：前缀和由出现次数转换为奇偶性</p>
-<p>优化点1：二进制编码</p>
-<p>优化点2：抛弃哈希记录每个字符的前缀和，反而用编码作为key来记录该前缀和出现的index，将时间复杂度从<span class="math inline">\(O(n^2)\)</span>降至<span class="math inline">\(O(n)\)</span></p>
-<p>边界点1：<code>pos[0]=0</code>，原因在于非原因字符最早出现的index一定是空字符串</p>
-
+    <div class="collection-year">
+      <span class="collection-header">2020</span>
     </div>
 
-    
-    
-    
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/prefix-sum/" rel="tag"># prefix sum</a>
-          </div>
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2020-06-02T22:09:09+08:00"
+              content="2020-06-02">
+          06-02
+        </time>
+      </div>
 
-        
+      <div class="post-title">
+          <a class="post-title-link" href="/2020/06/02/jsdom5/" itemprop="url">
+            <span itemprop="name">《JavaScript DOM编程艺术》第五章读书笔记</span>
+          </a>
+      </div>
 
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2020/06/02/jsdom3/" rel="prev" title="《JavaScript DOM编程艺术》第三章读书笔记">
-      <i class="fa fa-chevron-left"></i> 《JavaScript DOM编程艺术》第三章读书笔记
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/06/02/DP/" rel="next" title="动态规划问题集">
-      动态规划问题集 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
+    </header>
   </article>
+
+
+    </div>
+  </div>
   
   
   
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/archives/2020/06/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/archives/2020/06/">1</a><span class="page-number current">2</span>
+  </nav>
 
 
 
@@ -335,7 +284,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#每个元音包含偶数次的最长子字符串"><span class="nav-number">1.</span> <span class="nav-text">1371. 每个元音包含偶数次的最长子字符串</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
