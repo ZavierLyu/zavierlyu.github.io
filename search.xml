@@ -34,6 +34,276 @@
       </tags>
   </entry>
   <entry>
+    <title>C++ 变量与基本类型</title>
+    <url>/2020/06/28/C++%20%E5%8F%98%E9%87%8F%E4%B8%8E%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B/</url>
+    <content><![CDATA[<p>《C++ Primer（第五版）》第二章笔记</p>
+<h2 id="基本内置类型">基本内置类型</h2>
+<table>
+<thead>
+<tr class="header">
+<th>类型</th>
+<th>含义</th>
+<th>最小尺寸</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>bool</td>
+<td>布尔类型</td>
+<td>未定义</td>
+</tr>
+<tr class="even">
+<td>char</td>
+<td>字符</td>
+<td>8位</td>
+</tr>
+<tr class="odd">
+<td>wchar_t</td>
+<td>宽字符</td>
+<td>16位</td>
+</tr>
+<tr class="even">
+<td>char16_t</td>
+<td>Unicode 字符</td>
+<td>16位</td>
+</tr>
+<tr class="odd">
+<td>char32_t</td>
+<td>Unicode 字符</td>
+<td>32位</td>
+</tr>
+<tr class="even">
+<td>short</td>
+<td>短整型</td>
+<td>16位</td>
+</tr>
+<tr class="odd">
+<td>int</td>
+<td>整型</td>
+<td>16位</td>
+</tr>
+<tr class="even">
+<td>long</td>
+<td>长整型</td>
+<td>32位</td>
+</tr>
+<tr class="odd">
+<td>long long</td>
+<td>长整型</td>
+<td>64位</td>
+</tr>
+<tr class="even">
+<td>float</td>
+<td>单精度浮点数</td>
+<td>6位有效数字</td>
+</tr>
+<tr class="odd">
+<td>double</td>
+<td>双精度浮点数</td>
+<td>10位有效数字</td>
+</tr>
+<tr class="even">
+<td>long double</td>
+<td>扩展精度浮点数</td>
+<td>10位有效数字</td>
+</tr>
+</tbody>
+</table>
+<p>可寻址最小内存块称为字节(Byte)，存储的基本单元称为字(Word)。在一台32位的计算机上，32位即字长。 <a id="more"></a></p>
+<ul>
+<li>一个int至少和一个short一样大，一个long至少和一个int一样大，一个long long之上和一个long一样大</li>
+<li>float 以1个字来表示，double用2个字来表示，long double以3或4个字来表示</li>
+</ul>
+<blockquote>
+<p>如何选择类型：</p>
+<ol type="1">
+<li>当明确知晓数值不可能为负时，选用无符号类型。</li>
+<li>使用int执行整数运算。在实际应用中，short常常显得太小而long一般和int有一样的尺寸。如果你的数值超过了int的表示范围，选用long long。</li>
+<li>在算数表达式中不要使用char或bool，只有在存放字符或布尔值时才使用它们。原因在于char类型在一些机器上是有符号的，而在另一些机器上又是无符号的。<u>如果你需要使用一个不大的整数，那么明确指定它的类型是signed char还是unsigned char</u>。比如一些数字char的操作。</li>
+<li>执行浮点数运算选用double，这是因为floa通常精度不够而且双精度浮点数和单精度浮点数的计算代价相差无几。</li>
+</ol>
+</blockquote>
+<h4 id="类型转换">类型转换</h4>
+<ul>
+<li>当我们赋予无符号类型一个超出它表示范围的值时，结果是初始值对无符号类型表示数值总数取模后的余数。</li>
+<li>当我们赋予<strong>带符号</strong>一个超出它表示范围的值时，结果是<strong>未定义的</strong>。</li>
+<li>当一个算数表达式中既有无符号数又有int值时，那个int值就会转换成无符号数。</li>
+</ul>
+<h4 id="字面值常量literal">字面值常量(literal)</h4>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">20 &#x2F;* 十进制 *&#x2F;</span><br><span class="line">024 &#x2F;* 八进制 *&#x2F;</span><br><span class="line">0x14 &#x2F;* 十六进制 *&#x2F;</span><br></pre></td></tr></table></figure>
+<p>转义序列：<code>‘\’</code>后跟八进制数字，<code>\x</code>后跟十六进制数字转义字符。如果反斜线<code>\</code>后面跟着的数字超过3个，只有前3个数字构成转义序列<code>u8"\1234"="S4"</code>。</p>
+<p>指定字面值类型（整型和浮点型）：</p>
+<table>
+<thead>
+<tr class="header">
+<th>后缀</th>
+<th>最小匹配类型</th>
+<th>后缀</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>u/U</td>
+<td>unsigned</td>
+<td>f/F</td>
+<td>float</td>
+</tr>
+<tr class="even">
+<td>l/L</td>
+<td>long</td>
+<td>l/L</td>
+<td>long double</td>
+</tr>
+<tr class="odd">
+<td>ll/LL</td>
+<td>long long</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="变量">变量</h2>
+<p><code>对象(object)</code>: 一块能存储数据并具有某种类型的内存空间</p>
+<h3 id="初始化">初始化</h3>
+<p>初始化不是赋值，初始化的含义式创建变量时赋予其一个初始值，而赋值的含义式把对象的当前值擦除，而以一个新值来替代。</p>
+<h4 id="默认初始化">默认初始化</h4>
+<p>如果内置类型的变量未被显式初始化，它的值由定义的位置决定。定义域仍和函数体之外的变量被初始化为0，而定义在函数体内部的内置类型变量将<strong>不被初始化</strong>。一个未被初始化的内置类型变量的值式未定义的，如果试图拷贝或以其他形式访问此类值将引发错误。</p>
+<blockquote>
+<p>未初始化的变量含有一个不确定的值，使用未初始化变量的值是一种错误的编程行为且很难调试。</p>
+</blockquote>
+<h3 id="变量声明和定义的关系">变量声明和定义的关系</h3>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">int</span> i; <span class="comment">// 声明i而非定义i</span></span><br><span class="line"><span class="keyword">int</span> j;  <span class="comment">// 声明并定义j</span></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">double</span> pi = <span class="number">3.14</span>; <span class="comment">//定义</span></span><br></pre></td></tr></table></figure>
+<p><strong>变量能且只能被定义一次，但是可以被多次声明。</strong></p>
+<p>声明和定义的区别看起来也许微不足道，但实际上却非常重要。如果要在多个文件中使用同一个变量，就必须将声明和定义分离。此时，变量的定义必须出现且只能出现在一个文件中，而其他用到该变量的文件必须对其进行声明，却绝对不能重复定义。</p>
+<h3 id="标识符">标识符</h3>
+<p>C++的标识符(identifier)由字母、数字和下划线组成，其中必须以字母或下划线开头。</p>
+<ul>
+<li>用户自定义的标识符中不能连续出现两个下划线，也不能以下划线紧连大写字母开头</li>
+<li>函数体外的标识符不能以下划线开头</li>
+</ul>
+<h3 id="作用域">作用域</h3>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="comment">// 函数内部不宜定义与全局变量名同名的新变量</span></span><br><span class="line"><span class="keyword">int</span> reused = <span class="number">42</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> unique = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">std</span>::count &lt;&lt; reused &lt;&lt; <span class="string">" "</span> &lt;&lt; unique &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    <span class="comment">// 输出#1：使用全局变量reused；输出 42 0</span></span><br><span class="line">    <span class="keyword">int</span> reused = <span class="number">0</span>;<span class="comment">// 新建局部变量reused，覆盖了全局变量reused</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; reused &lt;&lt; <span class="string">" "</span> &lt;&lt; unqiue &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    <span class="comment">// 输出#2：使用局部变量reused; 输出 0 0</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; ::reused &lt;&lt; <span class="string">" "</span> &lt;&lt; unique &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    <span class="comment">// 输出#3: 显式地访问全局变量reused; 输出 42 0</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="复合类型">复合类型</h2>
+<h3 id="引用">引用</h3>
+<ol type="1">
+<li>引用并非对象二十为一个就已经存在地对象所起的别名</li>
+<li>不能定义引用的引用</li>
+<li>引用只能绑定在对象上，而不能与<strong>字面值</strong>或<strong>某个表达式</strong>的计算结果绑定在一起(除非是常量引用)</li>
+<li>必须初始化</li>
+<li>一旦引用完成初始化，该引用将无法重新绑定到另外一个对象上</li>
+</ol>
+<h3 id="指针">指针</h3>
+<ol type="1">
+<li>指针本身是一个对象，允许对指针赋值和拷贝</li>
+<li>指针无需在定义时赋值</li>
+<li>指针存放某个对象的地址，需要使用<strong>取地址符&amp;</strong></li>
+<li>引用不是对象，没有实际地址，所以不能定义指向引用的指针</li>
+<li><code>*p</code>解引用符访问对象，解引用符仅适合于那些确实指向了某个对象的有效指针</li>
+</ol>
+<p>空指针(null pointer)不指向任何对象，在试图使用一个指针之前代码可以首先检擦它是否为空。一下</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> *p1 = <span class="literal">nullptr</span>; <span class="comment">//等价于int *p1 = 0;</span></span><br><span class="line"><span class="keyword">int</span> *p2 = <span class="number">0</span>; <span class="comment">//直接将p2初始化为字面常量0</span></span><br><span class="line"><span class="comment">// 需要首先#include cstdlib</span></span><br><span class="line"><span class="keyword">int</span> *p3 = <span class="literal">NULL</span>; <span class="comment">// 等价于 int *p3 = 0; 尽量使用 nullptr</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>建议：初始化所有指针。在大多数编译器环境下，如果使用了未经初始化的指针，则该指针所占内存空间的当前内容将被看作一个地址值。访问该指针，相当于去访问一个本不存在的位置上的本不存在的对象。</p>
+</blockquote>
+<h4 id="void-指针">void* 指针</h4>
+<p><strong>void</strong><em>是一种特殊的指针类型，可用于存放任意对象的地址。然而对于 <strong>void</strong></em>来说，内存空间仅仅是内存空间，没办法访问内存空间中所存的对象。(对void*指针使用解引用符<code>*</code>会报错)</p>
+<h4 id="理解复合指针的声明">理解复合指针的声明</h4>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> ival = <span class="number">1024</span>;</span><br><span class="line"><span class="keyword">int</span> *pi = &amp;ival; <span class="comment">// pi 指向一个int类型的数</span></span><br><span class="line"><span class="keyword">int</span> **ppi = &amp;pi; <span class="comment">// ppi 指向一个int类型的指针</span></span><br><span class="line"><span class="keyword">int</span> *&amp;r = pi;  <span class="comment">// r 一个对整型指针pi的引用</span></span><br></pre></td></tr></table></figure>
+<p>以上可以改写为：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> ival=<span class="number">1024</span>, *pi=&amp;ival, **ppi=&amp;pi, *&amp;r=pi;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>面对一条比较复杂的声明语句时，从右向左读，离变量名最近的符号对变量的类型右最直接的影响。</p>
+</blockquote>
+<h2 id="const-限定符">const 限定符</h2>
+<p>const大法：</p>
+<ol type="1">
+<li>const对象一旦创建后其值就不能再改变，所以const对象必须初始化</li>
+<li>如果利用一个对象去初始化另外一个对象，则它们是不是const都无关紧要</li>
+<li>如果想在多个文件之间共享const对象，必须在变量的定义之前添加extern关键字</li>
+</ol>
+<h3 id="const引用">const引用</h3>
+<p><code>常量引用</code>: 对const常量的引用，不能被用作修改它所绑定的对象</p>
+<p>常量引用初始化：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> i=<span class="number">42</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;r1 = i;		<span class="comment">// 正确 不必在意对象是否为常量</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;r2 = <span class="number">42</span>;		<span class="comment">// 正确 允许字面值</span></span><br><span class="line"><span class="keyword">int</span> &amp;r2_ = <span class="number">42</span>;			<span class="comment">// 错误 非常量引用不允许字面值</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;r3 = r1 * <span class="number">2</span>;	<span class="comment">// 正确 允许表达式 </span></span><br><span class="line"><span class="keyword">int</span> &amp;r3_ = r1 * <span class="number">2</span>;		<span class="comment">// 错误 非常量引用不允许表达式结果</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> &amp;dr1 = i;	<span class="comment">// 正确 允许数据类型隐性转换</span></span><br><span class="line"><span class="keyword">double</span> &amp;dr2 = i;		<span class="comment">// 错误 非常量引用必须和对象数据类型一致</span></span><br></pre></td></tr></table></figure>
+<p><em>为啥C++这样设计？</em></p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">double</span> dval = <span class="number">3.14</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;ri = dval;</span><br></pre></td></tr></table></figure>
+<p>编译器把上述代码变成如下:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">double</span> dval = <span class="number">3.14</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> temp = dval;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;ri = temp;</span><br></pre></td></tr></table></figure>
+<p>如果<span class="math inline">\(ri\)</span>不是常量引用，就允许对<span class="math inline">\(ri\)</span>赋值，并且丢弃精度，这样会改变<span class="math inline">\(ri\)</span>所引用对象的值。否则，我们绑定的对象就是一个临时量而非dval。我们既然用ri引用dval，就肯定想通过ri改变dval的值，否则干什么个ri赋值呢？既然大家不会想着把引用绑定到临时量上，C++也就把这种行为归为非法。</p>
+<p>常量引用值对引用做限制而对引用的对象是否为常量不做限制。</p>
+<h3 id="指针和const">指针和const</h3>
+<p><code>指向常量的指针</code>: 令指针指向常量，存放常量对象的地址。</p>
+<p><strong>允许一个指向常量的指针指向一个非常量对象（普通指针不允许）</strong></p>
+<p><code>常量指针</code>: const pointer，必须初始化，而且一旦初始化完成，则它的值（存放在指针中的那个地址）就不能再改变了。把*放在const关键字之前用以说明指针是一个常量。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> pi = <span class="number">3.1415</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> *<span class="keyword">const</span> pip = &amp;pi; <span class="comment">// pip是一个指向常量对象的常量指针</span></span><br></pre></td></tr></table></figure>
+<h3 id="顶层const">顶层const</h3>
+<p><code>顶层const</code>: (top-level const) 表示指针本身是个常量；表示任意对象都可以是一个常量。</p>
+<p><code>底层const</code>: (low-level const) 表示指针所指的对象是一个常量；表示所指对象是常量像引用和指针。</p>
+<p><strong>只有指针既可以是顶层const也可以是底层const</strong></p>
+<h4 id="拷贝操作">拷贝操作</h4>
+<ul>
+<li><p>顶层const不受拷贝操作影响</p></li>
+<li><p>而底层从上图的拷贝需要拷入和拷出的对象必须具有相同的底层const的资格，或者两个对象的数据类型必须能够转换。非常量可以转换成常量，反之则不行。</p></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> ci = <span class="number">42</span>;</span><br><span class="line"><span class="keyword">int</span> i = <span class="number">42</span>;</span><br><span class="line"><span class="keyword">int</span> &amp;r = ci; <span class="comment">// 错误：普通指针不能绑定到int常量上</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;r2 = i; <span class="comment">// 正确： 常量引用可以绑定到普通int上</span></span><br></pre></td></tr></table></figure>
+<h3 id="常量表达式">常量表达式</h3>
+<p>常量表达式是指值不会改变并且在<strong>编译过程</strong>就能得到计算结果的表达式。比如，字面值属于常量表达式，用常量表达式初始化的const对象也是常量表达式。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> sz = get_size(); <span class="comment">// sz 不是常量表达式</span></span><br></pre></td></tr></table></figure>
+<p>C++11新标准规定，允许将变量声明为constexpr类型以便由编译器来验证变量的值是否是一个常量表达式。申明为constexpr的变量一定是一个常量，而且必须用常量表达式初始化：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">constexpr</span> <span class="keyword">int</span> mf = <span class="number">20</span>;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">int</span> limit = mf + <span class="number">1</span>;  <span class="comment">// mf+1是常量表达式</span></span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">int</span> sz = size(); <span class="comment">// 只有当size是一个constexpr函数时才是一条正确的声明语句</span></span><br></pre></td></tr></table></figure>
+<p>如果在constexpr声明中是一个指针，那constexpr支队指针有效：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> *p = <span class="literal">nullptr</span>;		<span class="comment">// p是一个指向整型常量的指针</span></span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">int</span> *q = <span class="literal">nullptr</span>; <span class="comment">// q是一个指向整数的常量指针</span></span><br></pre></td></tr></table></figure>
+<h2 id="处理类型">处理类型</h2>
+<h3 id="类型别名">类型别名</h3>
+<p>两种方法定义类型别名，一是typedef，二是using。</p>
+<h4 id="typedef">typedef</h4>
+<p>定义类别别名，让复杂的类型名字变得简单明了、简单易用（更复杂（雾））。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">double</span> wages; <span class="comment">// wages 是 double 的同义词</span></span><br><span class="line"><span class="keyword">typedef</span> wages base, *p; <span class="comment">// base是double的同义词，p是double*的同义词</span></span><br></pre></td></tr></table></figure>
+<h4 id="using">using</h4>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">using</span> SI = Sales_item; <span class="comment">// SI是Sales_item的同义词</span></span><br></pre></td></tr></table></figure>
+<p>这样声明别名后就可以用别名来定义对象了。</p>
+<h4 id="指针常量和类别别名">指针、常量和类别别名</h4>
+<p><code>typedef</code>就是晦涩难懂的代名词</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">char</span> *pstring;	<span class="comment">// 为指向char的指针做别名</span></span><br><span class="line"><span class="keyword">const</span> pstring cstr = <span class="number">0</span>; <span class="comment">// cstr是一个指向char的常量指针</span></span><br><span class="line"><span class="keyword">const</span> pstring *ps;		<span class="comment">// ps是一个指向 指向char的常量指针 的指针 </span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> *cst = <span class="number">0</span>;   <span class="comment">// 是一个指向常量char的普通指针</span></span><br></pre></td></tr></table></figure>
+<h4 id="auto和decltype">auto和decltype</h4>
+<p>auto: 类型说明符，用它能让编译器代替我们去分析表达式所属的类型。auto定义的变量必须有初始值，auto在一条语句中声明多个变量必须保证同样的基本数据类型。</p>
+<p>decltype: 类型指示符，为了从表达式的类型推断出要定义的变量的类型，但是不想用该表达式的值初始化变量。</p>
+<ol type="1">
+<li><p><code>decltype</code>处理顶层<code>const</code>和引用的方式与<code>auto</code>不同，<code>auto</code> 会忽略顶层const和直接推演引用所指的类型，<code>decltype</code>会将顶层<code>const</code>和引用保留起来。 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> ci = <span class="number">0</span>, &amp;cj = ci;</span><br><span class="line"><span class="keyword">decltype</span>(ci) x1 = <span class="number">0</span>;   <span class="comment">// x1的类型是const int</span></span><br><span class="line"><span class="keyword">auto</span> x2 = ci;          <span class="comment">// x2的类型是int</span></span><br><span class="line"><span class="keyword">decltype</span>(cj) y1 = x;   <span class="comment">// y1的类型是const int &amp;</span></span><br><span class="line"><span class="keyword">auto</span> y2 = cj;          <span class="comment">// y2的类型是int</span></span><br><span class="line"><span class="keyword">auto</span> y3 = &amp;cj;		   <span class="comment">// y3的类型是const int*，取值算底层const会保留</span></span><br></pre></td></tr></table></figure></p></li>
+<li><p><code>decltype</code>处理（对指针）解引用操作得到引用类型，而<code>auto</code>得到指针所指对象的类型 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> i = <span class="number">1</span>, *p = &amp;i;		</span><br><span class="line"><span class="keyword">decltype</span>(*p) pr = i;	<span class="comment">// pr的类型是int &amp;</span></span><br><span class="line"><span class="keyword">auto</span> pa = *p;			<span class="comment">// pa的类型是int</span></span><br></pre></td></tr></table></figure></p></li>
+<li><p><code>decltype</code>结果类型与表达式形式密切相关</p></li>
+</ol>
+<p>如果<code>decltype</code>使用的是一个不加括号的变量，则得到的结果就是该变量的类型；如果给变量加上了一层或多层括号，编译器就会将把它当成一个表达式。变量是一种可以作为赋值语句左值的特殊表达式，所以这样的<code>decltype</code>就会的得到引用类型:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">1</span>, b = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">decltype</span>((a)) d=a; <span class="comment">// d的类型为int &amp;</span></span><br><span class="line"><span class="keyword">decltype</span>(a)   d2;  <span class="comment">// d2的类型为未初始化的int</span></span><br><span class="line"><span class="keyword">decltype</span>(a=b) d3=b; <span class="comment">// d3的类型为int &amp;</span></span><br></pre></td></tr></table></figure>
+<h2 id="自定义数据结构">自定义数据结构</h2>
+<p><code>struct</code>：通篇只讲这个。</p>
+<ul>
+<li>类内定义的名字必须唯一，但是可以和类外部定义的名字重复</li>
+<li>类体右侧的表示结束的花括号必须写一个分号，这是因为类体后面可以紧跟变量名以实对该类型对象的定义（但是不推荐这样做）</li>
+<li>类内允许有<strong>类内初始值</strong>来初始化类</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Sales_data</span> &#123;</span><span class="comment">/*...*/</span>&#125; accum, trans, *sp;</span><br><span class="line"><span class="comment">/* &lt;==&gt; */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Sales_Data</span> &#123;</span><span class="comment">/*...*/</span>&#125;;</span><br><span class="line">Sales_data accum, trans, *sp;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>一般来说最好不要把对象的定义和类的定义放在一起。这样做无异于把两种不同实体的定义混在了一条语句离，一会儿类，一会儿变量，非常不合适。</p>
+</blockquote>
+<h4 id="头文件保护符">头文件保护符</h4>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> SALES_DATA_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SALES_DATA_H</span></span><br><span class="line"><span class="comment">/* ... */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<p><strong>SALES_DATA_H</strong>为头文件保护符，如此的预处理变量必须唯一，通常的做法是基于头文件的名字来构建保护符的名字。</p>
+<p><code>#defube</code>: 把一个名字设定为预处理变量</p>
+<p><code>#ifdef</code>: 当且仅当变量已定义为真</p>
+<p><code>#ifndef</code>: 当且仅当变量未定义为真</p>
+<p>一旦检查结果为真，则执行后续操作直至遇到<code>#endif</code>为止。</p>
+]]></content>
+      <categories>
+        <category>Cpp</category>
+      </categories>
+      <tags>
+        <tag>language</tag>
+        <tag>CppPrimer</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>动态规划问题集</title>
     <url>/2020/06/02/DP/</url>
     <content><![CDATA[<!-- # 动态规划 -->
@@ -68,6 +338,157 @@ dp[i][j]=
       </tags>
   </entry>
   <entry>
+    <title>背包问题(上)</title>
+    <url>/2020/06/02/Knapsack1/</url>
+    <content><![CDATA[<p>此博客根据<a href="https://github.com/tianyicui/pack/blob/master/V2.pdf" target="_blank" rel="noopener">背包九讲</a>1-3章整理编写而成，记录学习总结。</p>
+<h2 id="背包问题">0-1背包问题</h2>
+<h3 id="题目">题目</h3>
+<p>有 <span class="math inline">\(N\)</span> 件物品和一个容量为 <span class="math inline">\(V\)</span> 的背包。放入第 <span class="math inline">\(i\)</span> 件物品耗费的费用是 <span class="math inline">\(C_i\)</span> 价值是 <span class="math inline">\(W_i\)</span>。求解将哪些物品装入背包可使价值总和最大。</p>
+<h3 id="思路">思路</h3>
+<p>定义子问题状态: <span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>件物品放入一个容量为<span class="math inline">\(v\)</span>的背包可以获得的最大价值。这里的前<span class="math inline">\(i\)</span>件物品包括第<span class="math inline">\(i\)</span>件物品。 状态转移方程： <span class="math display">\[
+F[i,v]=\max\{F[i-1,v], F[i-1,v-C_i]+W_i\}
+\]</span> <a id="more"></a> 这个状态转移方程非常好理解，对于第<span class="math inline">\(i\)</span>件物品，我们只有放与不放两种选项，如果不放，那么这个背包的价值就是和前<span class="math inline">\(i-1\)</span>件物品放入背包的价值一样，即<span class="math inline">\(F[i-1,v]\)</span>；如果放的话，那么这个背包的价值就是前<span class="math inline">\(i-1\)</span>件物品放入容量为<span class="math inline">\(v-C_i\)</span>的背包的价值再加上当前物品的价值<span class="math inline">\(W_i\)</span>。 接下来的问题就是如何填充这个二维数组<span class="math inline">\(F_{N\times V}\)</span>。首先我们要看到，由于我们根本不清楚这个<span class="math inline">\(V\)</span>有多大，<span class="math inline">\(C\)</span>里面有哪些数，所以我们在迭代时一定要保证<span class="math inline">\(F[i-1]\)</span>里所有的entry都是已知的，也就是前<span class="math inline">\(i\)</span>件物品在所有可能的背包容量下的价值。 伪代码： <img src="/2020/06/02/Knapsack1/image-20200527112309894.png" class="" title="pseudocode_01"> 代码实现：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackBasic</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [[<span class="number">0</span>] * (Vs) <span class="keyword">for</span> _ <span class="keyword">in</span> range(Ns)]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, N+<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[i][v] = max(dp[i<span class="number">-1</span>][v], dp[i<span class="number">-1</span>][v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[N][V]</span><br></pre></td></tr></table></figure>
+<p>边界点1：<span class="math inline">\(v=0,i=0\)</span>, 虽然我们的容量为<span class="math inline">\(V\)</span>，物品数目为<span class="math inline">\(N\)</span>，但我们有<span class="math inline">\(V+1\)</span>，<span class="math inline">\(N+1\)</span>种物品（包含0容量和前0件物品）。</p>
+<p>边界点2：<span class="math inline">\(v&lt;C_i\)</span>，易知当v小于<span class="math inline">\(C_i\)</span>时，根本无法将第<span class="math inline">\(i\)</span>件物品放入背包，所以我们的遍历空间为<span class="math inline">\(C_i...V\)</span>。</p>
+<h3 id="优化空间复杂度">优化空间复杂度</h3>
+<p>实用一个数组<span class="math inline">\(F[0...V]\)</span>来代替二维数组，原因在于状态转移方程只和上一次迭代的结果，也就是<span class="math inline">\(F[i-1, 0...V]\)</span>相关。所以我们可以基于上一个<span class="math inline">\(F_{i-1}\)</span>来更新当前<span class="math inline">\(F_i\)</span>。然而，我们必须逆序计算<span class="math inline">\(F[v]\)</span>, <span class="math inline">\(v \leftarrow V...0\)</span>，原因在于这样可以保证<span class="math inline">\(v-C_i\)</span>之前的entry是<span class="math inline">\(F_{i-1}\)</span>未更新的。</p>
+<p>伪代码：</p>
+<img src="/2020/06/02/Knapsack1/image-20200527132900818.png" class="" title="pseudocode_01">
+<p>代码实现:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackOpt</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
+<h3 id="题目变种">题目变种</h3>
+<p>要求==恰好装满背包==时的最优解。</p>
+<p>这种情况我们要重新定义一下子问题状态: <span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>件物品放入一个容量为<span class="math inline">\(v\)</span>的背包<em>恰好装满</em>时可以获得的最大价值。这里的前<span class="math inline">\(i\)</span>件物品包括第<span class="math inline">\(i\)</span>件物品。</p>
+<p>也就是说我们初始化的时候需要重新定义<span class="math inline">\(F\)</span>的合法数值，当<span class="math inline">\(i=0\)</span>，只有<span class="math inline">\(v=0\)</span>，才能满足恰好装满的条件，也就是没有任何物品放入背包，背包已满。<span class="math inline">\(v\)</span>的其他取值都初始化为<span class="math inline">\(-\infty\)</span>，也就是标记为不合法。</p>
+<p>代码实现:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackFull</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [float(<span class="string">'-inf'</span>)] * Vs</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
+<h3 id="复杂度">复杂度</h3>
+<p>时间复杂度为<span class="math inline">\(O(VN)\)</span></p>
+<p>优化后的空间复杂度为<span class="math inline">\(O(V)\)</span></p>
+<h2 id="完全背包问题">完全背包问题</h2>
+<h3 id="题目-1">题目</h3>
+<p>有<span class="math inline">\(N\)</span>种物品和一个容量为<span class="math inline">\(V\)</span>的背包，每种物品都有无限件可用。放入第<span class="math inline">\(i\)</span>种物品的费用是<span class="math inline">\(C_i\)</span>价值是<span class="math inline">\(W_i\)</span>。求解：将哪些物品装入背包，可以使得这些物品的耗费的费用总和不超过背包容量，且价值总和最大。</p>
+<h3 id="基本思路">基本思路</h3>
+<p>这个问题非常类似于0-1背包问题，所不同的是每种物品都有无限件。所以每种物品的取件数有<span class="math inline">\(\lfloor V/C_i \rfloor\)</span>种选择。</p>
+<p>现在我们仍旧定义原来的子问题<span class="math inline">\(F[i,v]\)</span>，只不过加上了可以重复取件的条件。</p>
+<p>于是乎状态转移方程需要发生改变: <span class="math display">\[
+F[i,v]=\max\{F[i-1,v-kC_i]+kW_i | 0 \leq kC_i \leq v\}
+\]</span> 这个和0-1背包问题一样有<span class="math inline">\(O(VN)\)</span>个状态需要求解，但是求解每个状态的时间不是常数而是<span class="math inline">\(O(\lfloor \frac{v}{C_i}\rfloor)\)</span>，总的时间复杂度为<span class="math inline">\(O(NV\sum^N_{i=1}{\frac{V}{C_i}})\)</span></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CompletePackBasic</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            tmp = []</span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">0</span>, (v // C[i<span class="number">-1</span>])+<span class="number">1</span>):</span><br><span class="line">                tmp.append(dp[v-k*C[i<span class="number">-1</span>]]+k*W[i<span class="number">-1</span>])</span><br><span class="line">            dp[v] = max(tmp)</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
+<h3 id="优化">优化</h3>
+<h4 id="优化1-对数据进行预处理">优化1 对数据进行预处理：</h4>
+<p>首先将费用大于 V 的物品去掉，然后使用类似计数排序的做法，计算出费用相同的物品中价值最高的是哪个，可以差不多用<span class="math inline">\(O(V +N)\)</span>地完成这个优化，除非重复费用的物品过多。</p>
+<h4 id="优化2-转化为01背包问题">优化2 转化为01背包问题：</h4>
+<p>这个优化非常刁钻，考虑到第<span class="math inline">\(i\)</span>种物品最多选 <span class="math inline">\(⌊V/C_i⌋\)</span> 件，于是可以把第<span class="math inline">\(i\)</span>种物品转化为<span class="math inline">\(⌊V/C_i⌋\)</span>件费用及价值均不变的物品。比如现有 <span class="math display">\[
+\begin{equation} \nonumber
+\begin{aligned}
+N &amp;= 4  \\ 
+V &amp;= 10 \\ 
+C &amp;= [10, 6, 3, 4]  \\ 
+W &amp;= [10, 7, 6, 5] \\ 
+\end{aligned} 
+\end{equation}
+\]</span> 我们可以将其转换为如下的0-1背包问题 <span class="math display">\[
+\begin{aligned}
+N &amp;= 7 \\
+V &amp;=10 \\
+C &amp;= [10,6,3,3,3,4,4] \\
+W &amp;= [10,7,6,6,6,5,5] \\
+\end{aligned}
+\]</span> 还有一种更骚的操作是：把第<span class="math inline">\(i\)</span>种物品拆成费用为<span class="math inline">\(C_i2^k\)</span>、价值为<span class="math inline">\(W_i2^k\)</span>的若干件物品，其中<span class="math inline">\(k\)</span>取遍满足<span class="math inline">\(C_i2^k≤V\)</span>的非负整数。不管最优策略选几件第$i $种物品，总可以表示成若干个不同<span class="math inline">\(2^k\)</span>物品的和。这样一来就把每种物品拆成<span class="math inline">\(O(\log ⌊V/Ci⌋)\)</span>件物品，是一个很大的改进。用之前的例子，我们可以将其装化为如下的01背包问题 <span class="math display">\[
+\begin{aligned}
+N &amp;= 6 \\
+V &amp;= 10 \\
+C &amp;= [10, 6, 3, 6, 4,8] \\
+W &amp;= [10, 7, 6, 12,5,10] \\
+\end{aligned}
+\]</span> 为什么可以如此转换呢？原因在于<span class="math inline">\(2^n-1=\sum_{i=0}^{n-1}2^{i}\)</span>，我们可以看到在上一个简单的01背包问题转换操作中，取3个费用为3价值为6的情况是用3个相同价值相同费用的物品实现的，而在这个转换方法中这种情况是由取1个费用为3和1个费用为6的物品实现的，大大减少了遍历的次数。</p>
+<h4 id="优化3-ovn-改变遍历次序">优化3 O(VN) 改变遍历次序</h4>
+<p>伪代码：</p>
+<img src="/2020/06/02/Knapsack1/image-20200527163346518.png" class="" title="pseudocode_03">
+<p>我们可以发现，这段伪代码和01背包问题仅仅只有<span class="math inline">\(v\)</span>的循环次序不同，现在采用增序递增的方式更新子状态。原因在于，此时我们需要一个可能已选入第<span class="math inline">\(i\)</span>种物品的子结果<span class="math inline">\(F[i,v-C_i]\)</span>。此时的状态转移方程为: <span class="math display">\[
+F[i,v]=\max\{F[i-1,v],F[i,v-C_i]+W_i\}
+\]</span> <span class="math inline">\(F[i-1,v]\)</span>：不放入第<span class="math inline">\(i\)</span>件物品</p>
+<p><span class="math inline">\(F[i,v-C_i]\)</span>: 上一次放了第<span class="math inline">\(i\)</span>件物品时的价值加上这次放第<span class="math inline">\(i\)</span>件物品</p>
+<p>此时的空间复杂度为<span class="math inline">\(O(V)\)</span>，时间复杂度依然为<span class="math inline">\(O(VN)\)</span>。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CompletePackVN</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
+<h2 id="多重背包问题">多重背包问题</h2>
+<h3 id="题目-2">题目</h3>
+<p>有<span class="math inline">\(N\)</span>种物品和一个容量为<span class="math inline">\(V\)</span>的背包。第<span class="math inline">\(i\)</span>种物品最多有<span class="math inline">\(M_i\)</span>件可用，每件耗费的空间是<span class="math inline">\(C_i\)</span>，价值是<span class="math inline">\(W_i\)</span>。求解将哪些物品装入背包可使这些物品的耗费的空间总和不超过背包容量，且价值总和最大。</p>
+<h3 id="基本思路-1">基本思路</h3>
+<p>这题和完全背包问题十分相似，在这里对于第<span class="math inline">\(i\)</span>种物品，我们有<span class="math inline">\(M_i+1\)</span>种策略：取0件，取1件，....，取<span class="math inline">\(M_i\)</span>件；而在完全背包问题种我们有<span class="math inline">\(\lfloor \frac{V}{C_i}\rfloor +1\)</span>种取法。所以我们只要稍微修改一下状态转移方程即可： <span class="math display">\[
+F[i,v]=\max\{F[i-1,v-k*C_i]+k*W_i|0\leq k \leq M_i\}
+\]</span> 此时的时间复杂的为<span class="math inline">\(O(V\sum_{i=1}^{N}M_i)\)</span>。</p>
+<h3 id="转化为01背包问题">转化为01背包问题</h3>
+<p>和之前的完全背包问题一样，多重背包问题也可以通过拆分转换为01背包问题。</p>
+<p>如完全背包问题中的<strong>优化1</strong>一样，我们可以将第<span class="math inline">\(i\)</span>种物品拆分成<span class="math inline">\(M_i\)</span>件相同费用相投价值的物品。此时的时间复杂度依然是<span class="math inline">\(O(V\sum_{i=1}^{N}M_i)\)</span>。</p>
+<p>实现代码：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">MultiPackBasic</span><span class="params">(N, V, C, W, M)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    将多重背包问题简单转换成01背包问题</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        m = M[i] - <span class="number">1</span></span><br><span class="line">        C += [C[i]] * m</span><br><span class="line">        W += [W[i]] * m</span><br><span class="line">        N += m</span><br><span class="line">    Vs = V + <span class="number">1</span> </span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
+<p>同样的，我们还可按照之前<strong>优化1</strong>中的第二种方法来拆分：</p>
+<p>将第<span class="math inline">\(i\)</span>种物品拆分成若干个01背包中的物品，这些物品的费用和价值均是原来的费用和价值乘以这个系数。这些系数分别为<span class="math inline">\(1,2,..,2^k\)</span>且<span class="math inline">\(k\)</span>是满足<span class="math inline">\(2^k\leq M_i\)</span>的最大整数。例如，如果<span class="math inline">\(M_i\)</span>为<span class="math inline">\(13\)</span>，则相应的<span class="math inline">\(k = 3\)</span>，这种最多取<span class="math inline">\(13\)</span>件的物品应被分成系数分别为<span class="math inline">\(1, 2, 4, 8\)</span>的四件物品。</p>
+<blockquote>
+<p>为什么我这里采用的系数和背包九讲里的系数不同？因为我按照的是之前完全背包问题的拆分方法，也就是拆到系数大到允许的物品件数为止。个人认为，这样的拆分方法更容易理解，也更容易实现和证明。</p>
+</blockquote>
+<p>代码实现：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">MultiPackBinary</span><span class="params">(N, V, C, W, M)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    将多重背包问题利用二进制的特性转换成01背包问题</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        Mi = M[i]</span><br><span class="line">        k = <span class="number">2</span></span><br><span class="line">        <span class="keyword">while</span> k &lt;= Mi:</span><br><span class="line">            N += <span class="number">1</span></span><br><span class="line">            W += [W[i] * k]</span><br><span class="line">            C += [C[i] * k]</span><br><span class="line">            k *= <span class="number">2</span></span><br><span class="line">    Vs = V + <span class="number">1</span> </span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
+<p>时间复杂度：<span class="math inline">\(O(V\sum_{i=1}^{N}\log{M_i})\)</span>；空间复杂度：<span class="math inline">\(O(V)\)</span> （我们可以筛掉不可能的取件数选项）。</p>
+<h4 id="二进制拆分法的数学证明">二进制拆分法的数学证明</h4>
+<p><em>本证明由某复旦数学系大佬提供</em></p>
+<p><span class="math inline">\(Proposition\)</span>: For any positive integer <span class="math inline">\(m \leq 2^{n}-1\)</span>，there exists a set <span class="math inline">\(S \subseteq \{0,1,2,...,n-1\}\)</span> and <span class="math inline">\(S\neq \phi\)</span> such that <span class="math inline">\(m=\sum_{i\in S}2^{i}\)</span>.</p>
+<p><span class="math inline">\(Proof\)</span>:</p>
+<p>It is obvious to get there are totally <span class="math inline">\(2^n-1\)</span> kinds of <span class="math inline">\(S\)</span>, because the number of permutations is <span class="math display">\[
+\sum_{i=1}^n{n \choose i}=2^n-1
+\]</span> Also, we can find the maximum of <span class="math inline">\(m\)</span> is <span class="math inline">\(2^n - 1\)</span> and the minimum is <span class="math inline">\(1\)</span>. There are totally <span class="math inline">\(2^n-1\)</span>, and the range of the sum is from <span class="math inline">\(1\)</span> to <span class="math inline">\(2^n-1\)</span>. It means that as long as we prove the sum of each <span class="math inline">\(S\)</span> is unique, we can prove the proposition. In mathematical words, for any <span class="math inline">\(S_i,S_j\)</span> where <span class="math inline">\(i\neq j\)</span>, <span class="math inline">\(\sum_{k\in S_i}2^k \neq \sum_{k \in S_j}2^k\)</span>.</p>
+<p>Given two different sets <span class="math inline">\(S_i\)</span> and <span class="math inline">\(S_j\)</span>, we can get <span class="math inline">\(G_i = S_i-S_j\)</span> and <span class="math inline">\(G_j=S_j-S_i\)</span>. WLOG, we only need to prove that <span class="math inline">\(\sum_{k\in G_i}2^k \neq \sum_{k \in G_j}2^k\)</span>, for any <span class="math inline">\(G_i,G_j\)</span> where <span class="math inline">\(i\neq j\)</span>.</p>
+<p>First situation, either <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index <span class="math inline">\(0\)</span>. WLOG, we assume <span class="math inline">\(G_i\)</span> contains the index <span class="math inline">\(0\)</span>. Then the component sum of <span class="math inline">\(G_i\)</span> is odd, while the component of <span class="math inline">\(G_j\)</span> is even. Therefore, they must be different.</p>
+<p><span class="math display">\[
+\sum_{k \in G_i}{2^k}=1+\sum_{k\neq 0, k \in G_i}{2^k} \neq \sum_{k\in G_j}2^k
+\]</span> Second situation, neither <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index 0. We defined that <span class="math inline">\(G_i=\{2^{i_k}|i_k&lt;i_{k+1},k=1,2,...,p\}\)</span> where <span class="math inline">\(p\)</span> is the number of entries in <span class="math inline">\(G_i\)</span>, similarly, <span class="math inline">\(G_j=\{2^{j_k}|j_k&lt;j_{k+1},k=1,2,...,q\}\)</span> where <span class="math inline">\(q\)</span> is the number of entries in <span class="math inline">\(G_j\)</span>. WLOG, we set <span class="math inline">\(i_1 &lt; j_1\)</span>.</p>
+<p>We assume that the internal summations of <span class="math inline">\(G_i\)</span> and <span class="math inline">\(G_j\)</span> are equal, we can get the following equation: <span class="math display">\[
+\begin{aligned} 
+\sum_{k \in G_i}2^k=\sum_{k \in G_j}2^k \\
+2^{i_1}+2^{i_2}+...+2^{i_p} = 2^{j_1}+2^{j_2}+...+2^{j_q} \\
+1+2^{i_2-i_1}+...+2^{i_p-i_1}=2^{j_1-i_1}+2^{j_2-i_1}+...+2^{j_q-i_1}
+\end{aligned}
+\]</span> Since <span class="math inline">\(G_i \cap G_j=\phi\)</span> and neither <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index of <span class="math inline">\(0\)</span>, therefore the left-hand side of equation is odd and the right-hand side is even, which contradicts the previous assumption of equivalence of internal summation of <span class="math inline">\(G_i\)</span> and <span class="math inline">\(G_j\)</span>.</p>
+<p>Thus, we can prove that the summation of any <span class="math inline">\(S\)</span> is unique, which further proves one-to-one mapping relation that for any positive integer <span class="math inline">\(m \leq 2^{n}-1\)</span>，there exists a unique set <span class="math inline">\(S \subseteq \{0,1,2,...,n-1\}\)</span> and <span class="math inline">\(S\neq \phi\)</span> such that <span class="math inline">\(m=\sum_{i\in S}2^{i}\)</span>.</p>
+<p>实际上我们可以通过二进制来看出一些端倪，比如 <span class="math display">\[
+\begin{aligned}11010110_{2} = \\
+&amp; 10000000_2+ \\
+&amp; 01000000_2+ \\
+&amp; 00010000_2+ \\
+&amp; 00000100_2 + \\
+&amp; 00000010_2
+\end{aligned}
+\]</span> 我们可以看到，任意一个整数都可以用二进制来表示，然后它的位数计算其实就是我们的拆分方式。</p>
+<h3 id="可行性问题的ovn算法">可行性问题的<span class="math inline">\(O(VN)\)</span>算法</h3>
+<p>如果问题考察的是"每种有若干件的物品能否填满给定容量的背包"，只要考虑填满背包的可行性，不需考虑没见物品的价值时，多重背包问题可以有<span class="math inline">\(O(VN)\)</span>复杂度的算法。</p>
+<p>事实上，0-1背包问题的装满可行性算法就是<span class="math inline">\(O(VN)\)</span>，所以比较直观的想法是利用上述拆分法将多重背包问题转换成0-1背包问题，然后解决，不过此时的时间复杂度是<span class="math inline">\(O(V\sum{M_i})\)</span>。</p>
+<p>所以我们需要对子状态进行重新定义：</p>
+<p><span class="math inline">\(F[i,v]\)</span>表示用前<span class="math inline">\(i\)</span>种物品填满容量为<span class="math inline">\(v\)</span>的背包后，还剩下多少个第<span class="math inline">\(i\)</span>种物品可用。定义<span class="math inline">\(F[i,V]=-1\)</span>为不合法，即未填满或无剩下。所以我们只要判断前<span class="math inline">\(i\)</span>物品填满容量为<span class="math inline">\(V\)</span>的背包后是否等于<span class="math inline">\(-1\)</span>就可以知道能否装满了。</p>
+<p>伪代码：</p>
+<img src="/2020/06/02/Knapsack1/image-20200602164925985.png" class="" title="pseudocode_04">
+<p>代码实现：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">canFullPack</span><span class="params">(N, V, C, M)</span>:</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">-1</span>] * Vs</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(V):</span><br><span class="line">            <span class="keyword">if</span> dp[v] &gt;= <span class="number">0</span>:</span><br><span class="line">                dp[v] = M[i<span class="number">-1</span>]</span><br><span class="line">            <span class="keyword">elif</span> dp[v] == <span class="number">-1</span>:</span><br><span class="line">                dp[v] = <span class="number">-1</span></span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[v] = max(dp[v-C[i<span class="number">-1</span>]]<span class="number">-1</span>, dp[v])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>] &gt;= <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>第二层循环中的第一层循环是初始化当前物品的<span class="math inline">\(M_i\)</span>在各个合法entry中的值，表明当前所有塞满的背包剩下最多<span class="math inline">\(M_i\)</span>的第<span class="math inline">\(i\)</span>件物品；</p>
+<p>第二层循环中的第二层循环是便是状态转移方程的实现， <span class="math display">\[
+F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
+\]</span> 为什么要定义最多剩下呢？这是一种贪婪的想法，我们需要尽可能的为后面的装填留更多的物品。</p>
+<h2 id="例题">例题</h2>
+<h4 id="零钱兑换"><a href="https://leetcode-cn.com/problems/coin-change/" target="_blank" rel="noopener">322. 零钱兑换</a></h4>
+<p>咱们接下来看一到经典例题，零钱兑换。<br> <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">coinChange</span><span class="params">(self, coins: List[int], amount: int)</span> -&gt; int:</span></span><br><span class="line">        Ns = len(coins) + <span class="number">1</span></span><br><span class="line">        Vs = amount + <span class="number">1</span></span><br><span class="line">        dp = [float(<span class="string">'inf'</span>)] * Vs</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">            <span class="keyword">for</span> v <span class="keyword">in</span> range(coins[i<span class="number">-1</span>], Vs):</span><br><span class="line">                dp[v] = min(dp[v], dp[v-coins[i<span class="number">-1</span>]]+<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span> <span class="keyword">if</span> dp[<span class="number">-1</span>] == float(<span class="string">'inf'</span>) <span class="keyword">else</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure></p>
+<p>这道题其实也可以转换成背包问题，我们把amount看作这个背包的容量，硬币就是价值为<span class="math inline">\(1\)</span>的物品，硬币的面值看作每件物品的费用。为什么我们把硬币的价值作为<span class="math inline">\(1\)</span>来处理呢？其实我们可以定义子状态<span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>种物品要装满容量为<span class="math inline">\(v\)</span>的背包至少所需要的件数，这和我们把硬币的价值看作<span class="math inline">\(1\)</span>其实是一样的。</p>
+]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>dynamic programming</tag>
+        <tag>knapsack</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>前缀和问题集</title>
     <url>/2020/06/02/PrefixSum/</url>
     <content><![CDATA[<h4 id="每个元音包含偶数次的最长子字符串"><a href="https://leetcode-cn.com/problems/find-the-longest-substring-containing-vowels-in-even-counts/" target="_blank" rel="noopener">1371. 每个元音包含偶数次的最长子字符串</a></h4>
@@ -84,43 +505,6 @@ dp[i][j]=
       </categories>
       <tags>
         <tag>prefix sum</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>《JavaScript DOM编程艺术》第三章读书笔记</title>
-    <url>/2020/06/02/jsdom3/</url>
-    <content><![CDATA[<h2 id="dom解释">DOM解释</h2>
-<ul>
-<li>D: 网页文档</li>
-<li>O：对象，自足的数据集合。JS里的对象可以分为三种类型
-<ol type="1">
-<li>用户定义对象(user-defined object): 由程序员自行创建的对象</li>
-<li>内建对象(native object): 内建的js对象，如Array，Math</li>
-<li>宿主对象(host object): 由浏览器提供的对象</li>
-</ol></li>
-<li>M： (X)HTML所代表的节点树模型 <a id="more"></a> ## 元素节点 元素节点时DOM中的原子，其包含文本节点和属性节点。<code>&lt;P&gt;</code>为元素节点，<code>&lt;p&gt;xxx&lt;/p&gt;</code>包含的xxx为文本节点，<code>&lt;p title='x'&gt;&lt;/p&gt;</code>中的title为属性节点</li>
-</ul>
-<h2 id="获取元素节点">获取元素节点</h2>
-<ol type="1">
-<li>getElementById <code>document.getElementById("&lt;id&gt;")</code></li>
-<li>getElementsByTagName 返回一个<code>对象数组</code>，每个对象分别对应这文档里给定标签的一个元素。 <code>document.getElementsByTagName("li")</code> 如果你想知道某份文档里共有多少个元素节点，可以使用通配符 <code>document.getElementsByTagName("*").length</code> 话可以将<code>getElementById</code>和<code>getElementsByTagName</code>结合起来， <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> shopping = <span class="built_in">document</span>.getElementById(<span class="string">"purchases"</span>);</span><br><span class="line"><span class="keyword">var</span> items = shopping.getElementsByTagName(<span class="string">"*"</span>);</span><br></pre></td></tr></table></figure></li>
-<li>getElementsByClassName 返回一个具有相同类名的元素的数组。 <code>document.getElementsByClassName("sale);</code></li>
-</ol>
-<h2 id="获取和设置属性">获取和设置属性</h2>
-<ol type="1">
-<li>getAttribute 该方法不属于<code>document</code>对象，所以不能通过其调用，它只能通过元素节点对象吊桶。 <code>object.get.Attribute(attribute);</code></li>
-<li>setAttribute <code>object.setAttribute(attribute, value);</code></li>
-</ol>
-<p><strong>通过setAttribute()方法对文档作出的改变，但这张改变并未反映到源代码中，也就是说，源代码中属性值仍旧是原来的属性值。这种“表里不一”的现象缘于DOM的工作模式：先加载文档的静态内容，再以动态方式对它们进行刷新，动态刷新不改变文档的静态内容，而对页面内容的刷新，不需要用户在他们的浏览器里执行刷新操作就可以实现。</strong></p>
-<p>个人对这句话的理解时，你在console中运行setAttribute的DOM操作不会影响静态的html源代码，但是浏览器已经将你的修改运行到了渲染中。比如你在console中修改attribute <code>href</code>, 源代码不会改变，但是你点击的那个超链接已经发生了改变。</p>
-]]></content>
-      <categories>
-        <category>Frontend</category>
-        <category>JavaScript</category>
-      </categories>
-      <tags>
-        <tag>DOM</tag>
-        <tag>DOM Scripting Notes</tag>
       </tags>
   </entry>
   <entry>
@@ -543,154 +927,61 @@ dp[i][j]=
       </tags>
   </entry>
   <entry>
-    <title>背包问题(上)</title>
-    <url>/2020/06/02/Knapsack1/</url>
-    <content><![CDATA[<p>此博客根据<a href="https://github.com/tianyicui/pack/blob/master/V2.pdf" target="_blank" rel="noopener">背包九讲</a>1-3章整理编写而成，记录学习总结。</p>
-<h2 id="背包问题">0-1背包问题</h2>
-<h3 id="题目">题目</h3>
-<p>有 <span class="math inline">\(N\)</span> 件物品和一个容量为 <span class="math inline">\(V\)</span> 的背包。放入第 <span class="math inline">\(i\)</span> 件物品耗费的费用是 <span class="math inline">\(C_i\)</span> 价值是 <span class="math inline">\(W_i\)</span>。求解将哪些物品装入背包可使价值总和最大。</p>
-<h3 id="思路">思路</h3>
-<p>定义子问题状态: <span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>件物品放入一个容量为<span class="math inline">\(v\)</span>的背包可以获得的最大价值。这里的前<span class="math inline">\(i\)</span>件物品包括第<span class="math inline">\(i\)</span>件物品。 状态转移方程： <span class="math display">\[
-F[i,v]=\max\{F[i-1,v], F[i-1,v-C_i]+W_i\}
-\]</span> <a id="more"></a> 这个状态转移方程非常好理解，对于第<span class="math inline">\(i\)</span>件物品，我们只有放与不放两种选项，如果不放，那么这个背包的价值就是和前<span class="math inline">\(i-1\)</span>件物品放入背包的价值一样，即<span class="math inline">\(F[i-1,v]\)</span>；如果放的话，那么这个背包的价值就是前<span class="math inline">\(i-1\)</span>件物品放入容量为<span class="math inline">\(v-C_i\)</span>的背包的价值再加上当前物品的价值<span class="math inline">\(W_i\)</span>。 接下来的问题就是如何填充这个二维数组<span class="math inline">\(F_{N\times V}\)</span>。首先我们要看到，由于我们根本不清楚这个<span class="math inline">\(V\)</span>有多大，<span class="math inline">\(C\)</span>里面有哪些数，所以我们在迭代时一定要保证<span class="math inline">\(F[i-1]\)</span>里所有的entry都是已知的，也就是前<span class="math inline">\(i\)</span>件物品在所有可能的背包容量下的价值。 伪代码： <img src="/2020/06/02/Knapsack1/image-20200527112309894.png" class="" title="pseudocode_01"> 代码实现：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackBasic</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [[<span class="number">0</span>] * (Vs) <span class="keyword">for</span> _ <span class="keyword">in</span> range(Ns)]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, N+<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[i][v] = max(dp[i<span class="number">-1</span>][v], dp[i<span class="number">-1</span>][v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[N][V]</span><br></pre></td></tr></table></figure>
-<p>边界点1：<span class="math inline">\(v=0,i=0\)</span>, 虽然我们的容量为<span class="math inline">\(V\)</span>，物品数目为<span class="math inline">\(N\)</span>，但我们有<span class="math inline">\(V+1\)</span>，<span class="math inline">\(N+1\)</span>种物品（包含0容量和前0件物品）。</p>
-<p>边界点2：<span class="math inline">\(v&lt;C_i\)</span>，易知当v小于<span class="math inline">\(C_i\)</span>时，根本无法将第<span class="math inline">\(i\)</span>件物品放入背包，所以我们的遍历空间为<span class="math inline">\(C_i...V\)</span>。</p>
-<h3 id="优化空间复杂度">优化空间复杂度</h3>
-<p>实用一个数组<span class="math inline">\(F[0...V]\)</span>来代替二维数组，原因在于状态转移方程只和上一次迭代的结果，也就是<span class="math inline">\(F[i-1, 0...V]\)</span>相关。所以我们可以基于上一个<span class="math inline">\(F_{i-1}\)</span>来更新当前<span class="math inline">\(F_i\)</span>。然而，我们必须逆序计算<span class="math inline">\(F[v]\)</span>, <span class="math inline">\(v \leftarrow V...0\)</span>，原因在于这样可以保证<span class="math inline">\(v-C_i\)</span>之前的entry是<span class="math inline">\(F_{i-1}\)</span>未更新的。</p>
-<p>伪代码：</p>
-<img src="/2020/06/02/Knapsack1/image-20200527132900818.png" class="" title="pseudocode_01">
-<p>代码实现:</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackOpt</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
-<h3 id="题目变种">题目变种</h3>
-<p>要求==恰好装满背包==时的最优解。</p>
-<p>这种情况我们要重新定义一下子问题状态: <span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>件物品放入一个容量为<span class="math inline">\(v\)</span>的背包<em>恰好装满</em>时可以获得的最大价值。这里的前<span class="math inline">\(i\)</span>件物品包括第<span class="math inline">\(i\)</span>件物品。</p>
-<p>也就是说我们初始化的时候需要重新定义<span class="math inline">\(F\)</span>的合法数值，当<span class="math inline">\(i=0\)</span>，只有<span class="math inline">\(v=0\)</span>，才能满足恰好装满的条件，也就是没有任何物品放入背包，背包已满。<span class="math inline">\(v\)</span>的其他取值都初始化为<span class="math inline">\(-\infty\)</span>，也就是标记为不合法。</p>
-<p>代码实现:</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackFull</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [float(<span class="string">'-inf'</span>)] * Vs</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
-<h3 id="复杂度">复杂度</h3>
-<p>时间复杂度为<span class="math inline">\(O(VN)\)</span></p>
-<p>优化后的空间复杂度为<span class="math inline">\(O(V)\)</span></p>
-<h2 id="完全背包问题">完全背包问题</h2>
-<h3 id="题目-1">题目</h3>
-<p>有<span class="math inline">\(N\)</span>种物品和一个容量为<span class="math inline">\(V\)</span>的背包，每种物品都有无限件可用。放入第<span class="math inline">\(i\)</span>种物品的费用是<span class="math inline">\(C_i\)</span>价值是<span class="math inline">\(W_i\)</span>。求解：将哪些物品装入背包，可以使得这些物品的耗费的费用总和不超过背包容量，且价值总和最大。</p>
-<h3 id="基本思路">基本思路</h3>
-<p>这个问题非常类似于0-1背包问题，所不同的是每种物品都有无限件。所以每种物品的取件数有<span class="math inline">\(\lfloor V/C_i \rfloor\)</span>种选择。</p>
-<p>现在我们仍旧定义原来的子问题<span class="math inline">\(F[i,v]\)</span>，只不过加上了可以重复取件的条件。</p>
-<p>于是乎状态转移方程需要发生改变: <span class="math display">\[
-F[i,v]=\max\{F[i-1,v-kC_i]+kW_i | 0 \leq kC_i \leq v\}
-\]</span> 这个和0-1背包问题一样有<span class="math inline">\(O(VN)\)</span>个状态需要求解，但是求解每个状态的时间不是常数而是<span class="math inline">\(O(\lfloor \frac{v}{C_i}\rfloor)\)</span>，总的时间复杂度为<span class="math inline">\(O(NV\sum^N_{i=1}{\frac{V}{C_i}})\)</span></p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CompletePackBasic</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            tmp = []</span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">0</span>, (v // C[i<span class="number">-1</span>])+<span class="number">1</span>):</span><br><span class="line">                tmp.append(dp[v-k*C[i<span class="number">-1</span>]]+k*W[i<span class="number">-1</span>])</span><br><span class="line">            dp[v] = max(tmp)</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
-<h3 id="优化">优化</h3>
-<h4 id="优化1-对数据进行预处理">优化1 对数据进行预处理：</h4>
-<p>首先将费用大于 V 的物品去掉，然后使用类似计数排序的做法，计算出费用相同的物品中价值最高的是哪个，可以差不多用<span class="math inline">\(O(V +N)\)</span>地完成这个优化，除非重复费用的物品过多。</p>
-<h4 id="优化2-转化为01背包问题">优化2 转化为01背包问题：</h4>
-<p>这个优化非常刁钻，考虑到第<span class="math inline">\(i\)</span>种物品最多选 <span class="math inline">\(⌊V/C_i⌋\)</span> 件，于是可以把第<span class="math inline">\(i\)</span>种物品转化为<span class="math inline">\(⌊V/C_i⌋\)</span>件费用及价值均不变的物品。比如现有 <span class="math display">\[
-\begin{equation} \nonumber
-\begin{aligned}
-N &amp;= 4  \\ 
-V &amp;= 10 \\ 
-C &amp;= [10, 6, 3, 4]  \\ 
-W &amp;= [10, 7, 6, 5] \\ 
-\end{aligned} 
-\end{equation}
-\]</span> 我们可以将其转换为如下的0-1背包问题 <span class="math display">\[
-\begin{aligned}
-N &amp;= 7 \\
-V &amp;=10 \\
-C &amp;= [10,6,3,3,3,4,4] \\
-W &amp;= [10,7,6,6,6,5,5] \\
-\end{aligned}
-\]</span> 还有一种更骚的操作是：把第<span class="math inline">\(i\)</span>种物品拆成费用为<span class="math inline">\(C_i2^k\)</span>、价值为<span class="math inline">\(W_i2^k\)</span>的若干件物品，其中<span class="math inline">\(k\)</span>取遍满足<span class="math inline">\(C_i2^k≤V\)</span>的非负整数。不管最优策略选几件第$i $种物品，总可以表示成若干个不同<span class="math inline">\(2^k\)</span>物品的和。这样一来就把每种物品拆成<span class="math inline">\(O(\log ⌊V/Ci⌋)\)</span>件物品，是一个很大的改进。用之前的例子，我们可以将其装化为如下的01背包问题 <span class="math display">\[
-\begin{aligned}
-N &amp;= 6 \\
-V &amp;= 10 \\
-C &amp;= [10, 6, 3, 6, 4,8] \\
-W &amp;= [10, 7, 6, 12,5,10] \\
-\end{aligned}
-\]</span> 为什么可以如此转换呢？原因在于<span class="math inline">\(2^n-1=\sum_{i=0}^{n-1}2^{i}\)</span>，我们可以看到在上一个简单的01背包问题转换操作中，取3个费用为3价值为6的情况是用3个相同价值相同费用的物品实现的，而在这个转换方法中这种情况是由取1个费用为3和1个费用为6的物品实现的，大大减少了遍历的次数。</p>
-<h4 id="优化3-ovn-改变遍历次序">优化3 O(VN) 改变遍历次序</h4>
-<p>伪代码：</p>
-<img src="/2020/06/02/Knapsack1/image-20200527163346518.png" class="" title="pseudocode_03">
-<p>我们可以发现，这段伪代码和01背包问题仅仅只有<span class="math inline">\(v\)</span>的循环次序不同，现在采用增序递增的方式更新子状态。原因在于，此时我们需要一个可能已选入第<span class="math inline">\(i\)</span>种物品的子结果<span class="math inline">\(F[i,v-C_i]\)</span>。此时的状态转移方程为: <span class="math display">\[
-F[i,v]=\max\{F[i-1,v],F[i,v-C_i]+W_i\}
-\]</span> <span class="math inline">\(F[i-1,v]\)</span>：不放入第<span class="math inline">\(i\)</span>件物品</p>
-<p><span class="math inline">\(F[i,v-C_i]\)</span>: 上一次放了第<span class="math inline">\(i\)</span>件物品时的价值加上这次放第<span class="math inline">\(i\)</span>件物品</p>
-<p>此时的空间复杂度为<span class="math inline">\(O(V)\)</span>，时间复杂度依然为<span class="math inline">\(O(VN)\)</span>。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CompletePackVN</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
-<h2 id="多重背包问题">多重背包问题</h2>
-<h3 id="题目-2">题目</h3>
-<p>有<span class="math inline">\(N\)</span>种物品和一个容量为<span class="math inline">\(V\)</span>的背包。第<span class="math inline">\(i\)</span>种物品最多有<span class="math inline">\(M_i\)</span>件可用，每件耗费的空间是<span class="math inline">\(C_i\)</span>，价值是<span class="math inline">\(W_i\)</span>。求解将哪些物品装入背包可使这些物品的耗费的空间总和不超过背包容量，且价值总和最大。</p>
-<h3 id="基本思路-1">基本思路</h3>
-<p>这题和完全背包问题十分相似，在这里对于第<span class="math inline">\(i\)</span>种物品，我们有<span class="math inline">\(M_i+1\)</span>种策略：取0件，取1件，....，取<span class="math inline">\(M_i\)</span>件；而在完全背包问题种我们有<span class="math inline">\(\lfloor \frac{V}{C_i}\rfloor +1\)</span>种取法。所以我们只要稍微修改一下状态转移方程即可： <span class="math display">\[
-F[i,v]=\max\{F[i-1,v-k*C_i]+k*W_i|0\leq k \leq M_i\}
-\]</span> 此时的时间复杂的为<span class="math inline">\(O(V\sum_{i=1}^{N}M_i)\)</span>。</p>
-<h3 id="转化为01背包问题">转化为01背包问题</h3>
-<p>和之前的完全背包问题一样，多重背包问题也可以通过拆分转换为01背包问题。</p>
-<p>如完全背包问题中的<strong>优化1</strong>一样，我们可以将第<span class="math inline">\(i\)</span>种物品拆分成<span class="math inline">\(M_i\)</span>件相同费用相投价值的物品。此时的时间复杂度依然是<span class="math inline">\(O(V\sum_{i=1}^{N}M_i)\)</span>。</p>
-<p>实现代码：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">MultiPackBasic</span><span class="params">(N, V, C, W, M)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    将多重背包问题简单转换成01背包问题</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        m = M[i] - <span class="number">1</span></span><br><span class="line">        C += [C[i]] * m</span><br><span class="line">        W += [W[i]] * m</span><br><span class="line">        N += m</span><br><span class="line">    Vs = V + <span class="number">1</span> </span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
-<p>同样的，我们还可按照之前<strong>优化1</strong>中的第二种方法来拆分：</p>
-<p>将第<span class="math inline">\(i\)</span>种物品拆分成若干个01背包中的物品，这些物品的费用和价值均是原来的费用和价值乘以这个系数。这些系数分别为<span class="math inline">\(1,2,..,2^k\)</span>且<span class="math inline">\(k\)</span>是满足<span class="math inline">\(2^k\leq M_i\)</span>的最大整数。例如，如果<span class="math inline">\(M_i\)</span>为<span class="math inline">\(13\)</span>，则相应的<span class="math inline">\(k = 3\)</span>，这种最多取<span class="math inline">\(13\)</span>件的物品应被分成系数分别为<span class="math inline">\(1, 2, 4, 8\)</span>的四件物品。</p>
-<blockquote>
-<p>为什么我这里采用的系数和背包九讲里的系数不同？因为我按照的是之前完全背包问题的拆分方法，也就是拆到系数大到允许的物品件数为止。个人认为，这样的拆分方法更容易理解，也更容易实现和证明。</p>
-</blockquote>
-<p>代码实现：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">MultiPackBinary</span><span class="params">(N, V, C, W, M)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    将多重背包问题利用二进制的特性转换成01背包问题</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        Mi = M[i]</span><br><span class="line">        k = <span class="number">2</span></span><br><span class="line">        <span class="keyword">while</span> k &lt;= Mi:</span><br><span class="line">            N += <span class="number">1</span></span><br><span class="line">            W += [W[i] * k]</span><br><span class="line">            C += [C[i] * k]</span><br><span class="line">            k *= <span class="number">2</span></span><br><span class="line">    Vs = V + <span class="number">1</span> </span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
-<p>时间复杂度：<span class="math inline">\(O(V\sum_{i=1}^{N}\log{M_i})\)</span>；空间复杂度：<span class="math inline">\(O(V)\)</span> （我们可以筛掉不可能的取件数选项）。</p>
-<h4 id="二进制拆分法的数学证明">二进制拆分法的数学证明</h4>
-<p><em>本证明由某复旦数学系大佬提供</em></p>
-<p><span class="math inline">\(Proposition\)</span>: For any positive integer <span class="math inline">\(m \leq 2^{n}-1\)</span>，there exists a set <span class="math inline">\(S \subseteq \{0,1,2,...,n-1\}\)</span> and <span class="math inline">\(S\neq \phi\)</span> such that <span class="math inline">\(m=\sum_{i\in S}2^{i}\)</span>.</p>
-<p><span class="math inline">\(Proof\)</span>:</p>
-<p>It is obvious to get there are totally <span class="math inline">\(2^n-1\)</span> kinds of <span class="math inline">\(S\)</span>, because the number of permutations is <span class="math display">\[
-\sum_{i=1}^n{n \choose i}=2^n-1
-\]</span> Also, we can find the maximum of <span class="math inline">\(m\)</span> is <span class="math inline">\(2^n - 1\)</span> and the minimum is <span class="math inline">\(1\)</span>. There are totally <span class="math inline">\(2^n-1\)</span>, and the range of the sum is from <span class="math inline">\(1\)</span> to <span class="math inline">\(2^n-1\)</span>. It means that as long as we prove the sum of each <span class="math inline">\(S\)</span> is unique, we can prove the proposition. In mathematical words, for any <span class="math inline">\(S_i,S_j\)</span> where <span class="math inline">\(i\neq j\)</span>, <span class="math inline">\(\sum_{k\in S_i}2^k \neq \sum_{k \in S_j}2^k\)</span>.</p>
-<p>Given two different sets <span class="math inline">\(S_i\)</span> and <span class="math inline">\(S_j\)</span>, we can get <span class="math inline">\(G_i = S_i-S_j\)</span> and <span class="math inline">\(G_j=S_j-S_i\)</span>. WLOG, we only need to prove that <span class="math inline">\(\sum_{k\in G_i}2^k \neq \sum_{k \in G_j}2^k\)</span>, for any <span class="math inline">\(G_i,G_j\)</span> where <span class="math inline">\(i\neq j\)</span>.</p>
-<p>First situation, either <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index <span class="math inline">\(0\)</span>. WLOG, we assume <span class="math inline">\(G_i\)</span> contains the index <span class="math inline">\(0\)</span>. Then the component sum of <span class="math inline">\(G_i\)</span> is odd, while the component of <span class="math inline">\(G_j\)</span> is even. Therefore, they must be different.</p>
-<p><span class="math display">\[
-\sum_{k \in G_i}{2^k}=1+\sum_{k\neq 0, k \in G_i}{2^k} \neq \sum_{k\in G_j}2^k
-\]</span> Second situation, neither <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index 0. We defined that <span class="math inline">\(G_i=\{2^{i_k}|i_k&lt;i_{k+1},k=1,2,...,p\}\)</span> where <span class="math inline">\(p\)</span> is the number of entries in <span class="math inline">\(G_i\)</span>, similarly, <span class="math inline">\(G_j=\{2^{j_k}|j_k&lt;j_{k+1},k=1,2,...,q\}\)</span> where <span class="math inline">\(q\)</span> is the number of entries in <span class="math inline">\(G_j\)</span>. WLOG, we set <span class="math inline">\(i_1 &lt; j_1\)</span>.</p>
-<p>We assume that the internal summations of <span class="math inline">\(G_i\)</span> and <span class="math inline">\(G_j\)</span> are equal, we can get the following equation: <span class="math display">\[
-\begin{aligned} 
-\sum_{k \in G_i}2^k=\sum_{k \in G_j}2^k \\
-2^{i_1}+2^{i_2}+...+2^{i_p} = 2^{j_1}+2^{j_2}+...+2^{j_q} \\
-1+2^{i_2-i_1}+...+2^{i_p-i_1}=2^{j_1-i_1}+2^{j_2-i_1}+...+2^{j_q-i_1}
-\end{aligned}
-\]</span> Since <span class="math inline">\(G_i \cap G_j=\phi\)</span> and neither <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index of <span class="math inline">\(0\)</span>, therefore the left-hand side of equation is odd and the right-hand side is even, which contradicts the previous assumption of equivalence of internal summation of <span class="math inline">\(G_i\)</span> and <span class="math inline">\(G_j\)</span>.</p>
-<p>Thus, we can prove that the summation of any <span class="math inline">\(S\)</span> is unique, which further proves one-to-one mapping relation that for any positive integer <span class="math inline">\(m \leq 2^{n}-1\)</span>，there exists a unique set <span class="math inline">\(S \subseteq \{0,1,2,...,n-1\}\)</span> and <span class="math inline">\(S\neq \phi\)</span> such that <span class="math inline">\(m=\sum_{i\in S}2^{i}\)</span>.</p>
-<p>实际上我们可以通过二进制来看出一些端倪，比如 <span class="math display">\[
-\begin{aligned}11010110_{2} = \\
-&amp; 10000000_2+ \\
-&amp; 01000000_2+ \\
-&amp; 00010000_2+ \\
-&amp; 00000100_2 + \\
-&amp; 00000010_2
-\end{aligned}
-\]</span> 我们可以看到，任意一个整数都可以用二进制来表示，然后它的位数计算其实就是我们的拆分方式。</p>
-<h3 id="可行性问题的ovn算法">可行性问题的<span class="math inline">\(O(VN)\)</span>算法</h3>
-<p>如果问题考察的是"每种有若干件的物品能否填满给定容量的背包"，只要考虑填满背包的可行性，不需考虑没见物品的价值时，多重背包问题可以有<span class="math inline">\(O(VN)\)</span>复杂度的算法。</p>
-<p>事实上，0-1背包问题的装满可行性算法就是<span class="math inline">\(O(VN)\)</span>，所以比较直观的想法是利用上述拆分法将多重背包问题转换成0-1背包问题，然后解决，不过此时的时间复杂度是<span class="math inline">\(O(V\sum{M_i})\)</span>。</p>
-<p>所以我们需要对子状态进行重新定义：</p>
-<p><span class="math inline">\(F[i,v]\)</span>表示用前<span class="math inline">\(i\)</span>种物品填满容量为<span class="math inline">\(v\)</span>的背包后，还剩下多少个第<span class="math inline">\(i\)</span>种物品可用。定义<span class="math inline">\(F[i,V]=-1\)</span>为不合法，即未填满或无剩下。所以我们只要判断前<span class="math inline">\(i\)</span>物品填满容量为<span class="math inline">\(V\)</span>的背包后是否等于<span class="math inline">\(-1\)</span>就可以知道能否装满了。</p>
-<p>伪代码：</p>
-<img src="/2020/06/02/Knapsack1/image-20200602164925985.png" class="" title="pseudocode_04">
-<p>代码实现：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">canFullPack</span><span class="params">(N, V, C, M)</span>:</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">-1</span>] * Vs</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(V):</span><br><span class="line">            <span class="keyword">if</span> dp[v] &gt;= <span class="number">0</span>:</span><br><span class="line">                dp[v] = M[i<span class="number">-1</span>]</span><br><span class="line">            <span class="keyword">elif</span> dp[v] == <span class="number">-1</span>:</span><br><span class="line">                dp[v] = <span class="number">-1</span></span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[v] = max(dp[v-C[i<span class="number">-1</span>]]<span class="number">-1</span>, dp[v])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>] &gt;= <span class="number">0</span></span><br></pre></td></tr></table></figure>
-<p>第二层循环中的第一层循环是初始化当前物品的<span class="math inline">\(M_i\)</span>在各个合法entry中的值，表明当前所有塞满的背包剩下最多<span class="math inline">\(M_i\)</span>的第<span class="math inline">\(i\)</span>件物品；</p>
-<p>第二层循环中的第二层循环是便是状态转移方程的实现， <span class="math display">\[
-F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
-\]</span> 为什么要定义最多剩下呢？这是一种贪婪的想法，我们需要尽可能的为后面的装填留更多的物品。</p>
-<h2 id="例题">例题</h2>
-<h4 id="零钱兑换"><a href="https://leetcode-cn.com/problems/coin-change/" target="_blank" rel="noopener">322. 零钱兑换</a></h4>
-<p>咱们接下来看一到经典例题，零钱兑换。<br> <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">coinChange</span><span class="params">(self, coins: List[int], amount: int)</span> -&gt; int:</span></span><br><span class="line">        Ns = len(coins) + <span class="number">1</span></span><br><span class="line">        Vs = amount + <span class="number">1</span></span><br><span class="line">        dp = [float(<span class="string">'inf'</span>)] * Vs</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">            <span class="keyword">for</span> v <span class="keyword">in</span> range(coins[i<span class="number">-1</span>], Vs):</span><br><span class="line">                dp[v] = min(dp[v], dp[v-coins[i<span class="number">-1</span>]]+<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span> <span class="keyword">if</span> dp[<span class="number">-1</span>] == float(<span class="string">'inf'</span>) <span class="keyword">else</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure></p>
-<p>这道题其实也可以转换成背包问题，我们把amount看作这个背包的容量，硬币就是价值为<span class="math inline">\(1\)</span>的物品，硬币的面值看作每件物品的费用。为什么我们把硬币的价值作为<span class="math inline">\(1\)</span>来处理呢？其实我们可以定义子状态<span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>种物品要装满容量为<span class="math inline">\(v\)</span>的背包至少所需要的件数，这和我们把硬币的价值看作<span class="math inline">\(1\)</span>其实是一样的。</p>
+    <title>《JavaScript DOM编程艺术》第六章读书笔记</title>
+    <url>/2020/06/21/jsdom6/</url>
+    <content><![CDATA[<h3 id="分离js和html">分离JS和HTML</h3>
+<p>作为一条原则，如果想用JavaScript给某哥网页添加一些行为，就不应该让JavaScript代码对这个网页的结构有任何依赖。</p>
+<a id="more"></a>
+<p>比如加上如下的检测，来探测浏览器是否支持这些DOM。 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementById) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementById(<span class="string">"imagegallery"</span>)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure></p>
+<h3 id="共享onload事件">共享onload事件</h3>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addLoadEvent</span>(<span class="params">func</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oldonload = <span class="built_in">window</span>.onload;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="built_in">window</span>.onload != <span class="string">'function'</span>) &#123;</span><br><span class="line">    <span class="built_in">window</span>.onload = func;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      oldonload();</span><br><span class="line">      func();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">addLoadEvent(firstFunction);</span><br><span class="line">addLoadEvent(secondFunction);</span><br></pre></td></tr></table></figure> 取代</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = firstFunction;</span><br><span class="line"><span class="built_in">window</span>.onload = secondFunction;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>Algorithm</category>
+        <category>Frontend</category>
+        <category>JavaScript</category>
       </categories>
       <tags>
-        <tag>dynamic programming</tag>
-        <tag>knapsack</tag>
+        <tag>DOM</tag>
+        <tag>DOM Scripting Notes</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《JavaScript DOM编程艺术》第三章读书笔记</title>
+    <url>/2020/06/02/jsdom3/</url>
+    <content><![CDATA[<h2 id="dom解释">DOM解释</h2>
+<ul>
+<li>D: 网页文档</li>
+<li>O：对象，自足的数据集合。JS里的对象可以分为三种类型
+<ol type="1">
+<li>用户定义对象(user-defined object): 由程序员自行创建的对象</li>
+<li>内建对象(native object): 内建的js对象，如Array，Math</li>
+<li>宿主对象(host object): 由浏览器提供的对象</li>
+</ol></li>
+<li>M： (X)HTML所代表的节点树模型 <a id="more"></a> ## 元素节点 元素节点时DOM中的原子，其包含文本节点和属性节点。<code>&lt;P&gt;</code>为元素节点，<code>&lt;p&gt;xxx&lt;/p&gt;</code>包含的xxx为文本节点，<code>&lt;p title='x'&gt;&lt;/p&gt;</code>中的title为属性节点</li>
+</ul>
+<h2 id="获取元素节点">获取元素节点</h2>
+<ol type="1">
+<li>getElementById <code>document.getElementById("&lt;id&gt;")</code></li>
+<li>getElementsByTagName 返回一个<code>对象数组</code>，每个对象分别对应这文档里给定标签的一个元素。 <code>document.getElementsByTagName("li")</code> 如果你想知道某份文档里共有多少个元素节点，可以使用通配符 <code>document.getElementsByTagName("*").length</code> 话可以将<code>getElementById</code>和<code>getElementsByTagName</code>结合起来， <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> shopping = <span class="built_in">document</span>.getElementById(<span class="string">"purchases"</span>);</span><br><span class="line"><span class="keyword">var</span> items = shopping.getElementsByTagName(<span class="string">"*"</span>);</span><br></pre></td></tr></table></figure></li>
+<li>getElementsByClassName 返回一个具有相同类名的元素的数组。 <code>document.getElementsByClassName("sale);</code></li>
+</ol>
+<h2 id="获取和设置属性">获取和设置属性</h2>
+<ol type="1">
+<li>getAttribute 该方法不属于<code>document</code>对象，所以不能通过其调用，它只能通过元素节点对象吊桶。 <code>object.get.Attribute(attribute);</code></li>
+<li>setAttribute <code>object.setAttribute(attribute, value);</code></li>
+</ol>
+<p><strong>通过setAttribute()方法对文档作出的改变，但这张改变并未反映到源代码中，也就是说，源代码中属性值仍旧是原来的属性值。这种“表里不一”的现象缘于DOM的工作模式：先加载文档的静态内容，再以动态方式对它们进行刷新，动态刷新不改变文档的静态内容，而对页面内容的刷新，不需要用户在他们的浏览器里执行刷新操作就可以实现。</strong></p>
+<p>个人对这句话的理解时，你在console中运行setAttribute的DOM操作不会影响静态的html源代码，但是浏览器已经将你的修改运行到了渲染中。比如你在console中修改attribute <code>href</code>, 源代码不会改变，但是你点击的那个超链接已经发生了改变。</p>
+]]></content>
+      <categories>
+        <category>Frontend</category>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>DOM</tag>
+        <tag>DOM Scripting Notes</tag>
       </tags>
   </entry>
   <entry>
@@ -721,27 +1012,6 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
 <li><code>node.firstChild</code>: 等价于<code>node.childNodes[0]</code></li>
 <li><code>node.lastChild</code>: 等价于<code>node.childNodes[node.childNodes.length-1]</code></li>
 </ul>
-]]></content>
-      <categories>
-        <category>Frontend</category>
-        <category>JavaScript</category>
-      </categories>
-      <tags>
-        <tag>DOM</tag>
-        <tag>DOM Scripting Notes</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>《JavaScript DOM编程艺术》第六章读书笔记</title>
-    <url>/2020/06/21/jsdom6/</url>
-    <content><![CDATA[<h3 id="分离js和html">分离JS和HTML</h3>
-<p>作为一条原则，如果想用JavaScript给某哥网页添加一些行为，就不应该让JavaScript代码对这个网页的结构有任何依赖。</p>
-<a id="more"></a>
-<p>比如加上如下的检测，来探测浏览器是否支持这些DOM。 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementById) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementById(<span class="string">"imagegallery"</span>)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure></p>
-<h3 id="共享onload事件">共享onload事件</h3>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addLoadEvent</span>(<span class="params">func</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oldonload = <span class="built_in">window</span>.onload;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="built_in">window</span>.onload != <span class="string">'function'</span>) &#123;</span><br><span class="line">    <span class="built_in">window</span>.onload = func;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      oldonload();</span><br><span class="line">      func();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>用 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">addLoadEvent(firstFunction);</span><br><span class="line">addLoadEvent(secondFunction);</span><br></pre></td></tr></table></figure> 取代</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = firstFunction;</span><br><span class="line"><span class="built_in">window</span>.onload = secondFunction;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>Frontend</category>
