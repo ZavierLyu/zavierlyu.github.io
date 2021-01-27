@@ -38,7 +38,8 @@
   <entry>
     <title>C++ 变量与基本类型</title>
     <url>/2020/06/28/C++%20%E5%8F%98%E9%87%8F%E4%B8%8E%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B/</url>
-    <content><![CDATA[<p>《C++ Primer（第五版）》第二章笔记 ## 基本内置类型</p>
+    <content><![CDATA[<p>《C++ Primer（第五版）》第二章笔记</p>
+<h2 id="基本内置类型">基本内置类型</h2>
 <table>
 <thead>
 <tr class="header">
@@ -1187,5 +1188,128 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
         <tag>DOM</tag>
         <tag>DOM Scripting Notes</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>javacore1</title>
+    <url>/2021/01/27/javacore1/</url>
+    <content><![CDATA[<p><em>语言只是实现目标的工具，而不是目标本身。</em></p>
+<a id="more"></a>
+<h2 id="建议">建议</h2>
+<h3 id="基础语法">基础语法</h3>
+<ol type="1">
+<li>不要在程序中使用char，最好将字符串作为抽象数据处理</li>
+<li>整数和布尔值之间不能相互转换</li>
+<li>一定不要使用“==”运算符检测两个字符串是否相等，判断的是两个字符串是否存放在相同的位置。以及其他装箱类比如(Integer)，而是使用<code>equals</code>。这个运算符只能确定两个字符串是否放置在同一个位置上。<strong>Integer只在-128～127有缓存， ==只会比较缓存是否一致，也就是指向的地址是否一致。所以(Integer)129 == (Integer)129是false。</strong></li>
+<li>有些时候需要由较短的字符串构建长字符串，每次拼接将会产生一个长字符串，比较浪费时间和空间。所以使用<code>StringBuilder</code>类就可以解决这个问题。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">StringBuilder builder = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">builder.append(ch); <span class="comment">// append a char;</span></span><br><span class="line">builder.append(str); <span class="comment">// append a string</span></span><br><span class="line">String completedString = builder.toString();</span><br></pre></td></tr></table></figure>
+<ol start="5" type="1">
+<li>用于printf的转换符</li>
+</ol>
+<figure>
+<img src="./javacore1/image-20210116163253477.png" alt="" /><figcaption>image-20210116163253477</figcaption>
+</figure>
+<ol start="6" type="1">
+<li>匿名数组</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 既有数组初始化</span></span><br><span class="line">smallPrimes = <span class="keyword">new</span> <span class="keyword">int</span>[] &#123;<span class="number">2</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">11</span>&#125;;</span><br><span class="line"><span class="comment">// 可以代替以下代码</span></span><br><span class="line"><span class="keyword">int</span>[] anonymous = &#123;<span class="number">2</span>,<span class="number">3</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">11</span>&#125;;</span><br><span class="line">smallPrimes = anonymous;</span><br></pre></td></tr></table></figure>
+<ol start="7" type="1">
+<li>For each循环</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// for (variable : collection) statement</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> element: array)</span><br><span class="line">  System.out.println(element);</span><br></pre></td></tr></table></figure>
+<ol start="8" type="1">
+<li><p>数组拷贝</p>
+<p>新数组拷贝旧数组中的各元素</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">int</span>[] copiedArray = Arrays.copyOf(Array, Array.length);</span><br></pre></td></tr></table></figure></li>
+<li><p><code>java.util.Arrays</code></p></li>
+</ol>
+<p><img src="./javacore1/image-20210120164650787.png" alt="image-20210120164650787" style="zoom:50%;" /></p>
+<p><img src="./javacore1/image-20210120164734643.png" alt="image-20210120164734643" style="zoom:50%;" /></p>
+<ol start="10" type="1">
+<li><p>不规则数组</p>
+<p>Java 实际上没有多维数组， 只有一维 数组。 多维数组被解释为<strong>数组的数组</strong>。</p></li>
+</ol>
+<figure>
+<img src="./javacore1/image-20210120165712075.png" alt="" /><figcaption>image-20210120165712075</figcaption>
+</figure>
+<p>所以我们可以非常方便的作出一个将不同长度的数组作为元素的数组:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span>[][] triangleArray = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>][];</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">  triangleArray[i] = <span class="keyword">new</span> <span class="keyword">int</span>[i+<span class="number">1</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这样我们就可以节省空间，方便遍历</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> r=<span class="number">0</span>; r &lt; triangleArray.length; r++) </span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> c=<span class="number">0</span>; c &lt; triangleArray[r].length; c++) &#123;...&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="类和对象">类和对象</h3>
+<ol type="1">
+<li><p>注意不要编写返回引用可变对象的访问器方法</p>
+<p>bad example:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span> </span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> Date hireDay;</span><br><span class="line">	<span class="keyword">public</span> Date getHireDay &#123;</span><br><span class="line">    <span class="keyword">return</span> hireDay;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样会造成如下结果:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Employee Jobs = <span class="keyword">new</span> Employee();</span><br><span class="line">Date d = Jobs.getHireDay();</span><br><span class="line">d.setTime(d.getTime() - <span class="number">100</span>); <span class="comment">// 这会造成Jobs里面的hireDay也会发生变化</span></span><br></pre></td></tr></table></figure>
+<figure>
+<img src="./javacore1/image-20210126221230569.png" alt="" /><figcaption>image-20210126221230569</figcaption>
+</figure>
+<p><strong>如果需要返回一个可变对象的引用，应该首先对它进行克隆(clone)。</strong></p>
+<p>revised:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span> </span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> Date hireDay;</span><br><span class="line">	<span class="keyword">public</span> Date getHireDay &#123;</span><br><span class="line">    <span class="keyword">return</span> hireDay.clone();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>一个类的方法可以访问这个类的任意对象的私有域</p></li>
+<li><p><strong>final实例域</strong>，构建对象时必须初始化这样的域。</p>
+<ul>
+<li>如果该对象是不可更改类型，如String，在后面的操作中，不能对它进行修改。</li>
+<li>如果该对象是可更改类型，如Date，在后面的操作中，该对象的引用不能指向其他对象，但是该对象可以修改。</li>
+</ul></li>
+<li><p><strong>static静态域和静态方法</strong></p></li>
+</ol>
+<ul>
+<li>如果将域定义为static，每个类中只能有一个这样的域。所有的实例共享一个静态域。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> nextId = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    id = nextId;</span><br><span class="line">    nextId++;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>即使没有一个Employee实例，<code>nextId</code>也存在，它属于类不属于实例。</p>
+<ul>
+<li>静态常量（用的比较多）</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Math</span> </span>&#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> PI = <span class="number">3.1415926535</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">System</span> </span>&#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> PrintStream out = ...;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>如果没有static，需要每次创建一个实例才能调用该常量</strong>。<strong>如果只有static没有final，每个实例都能更改共有静态域。</strong></p>
+<ul>
+<li><p>静态方法</p>
+<p>当有以下两种需求的时候可以使用静态方法：</p>
+<ol type="1">
+<li>方法不需要访问对象状态， 其所需参数都只通过显式参数提供(例如: Math.pow )</li>
+<li>方法只访问类的静态域</li>
+</ol>
+<p><strong>静态方法不能调用非静态实例域（隐式参数），因为实例域只有实例才有的域，而静态方法可以不创建实例就被调用，所以这种会引起错误的写法被禁止。</strong></p></li>
+<li><p>静态工厂方法</p>
+<p><a href="https://www.jianshu.com/p/ceb5ec8f1174" target="_blank" rel="noopener">reference</a></p>
+<p>主要用途：摒弃用new和构造函数来创建实例的方法。</p>
+<p>在外部调用的例子:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();</span><br><span class="line">NumberFormat percentFromat = Numberformat.getPercentInstance();</span><br><span class="line">Integer number = Integer.valueOf(<span class="string">"3"</span>);</span><br></pre></td></tr></table></figure>
+<p>优点：</p>
+<ol type="1">
+<li>每个对象的创建都有相应的名称，可读性高</li>
+</ol>
+<p>bad example: 全部用构造器创建，可读性低。(现在Date类都已经标记Depreciated)</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Date date = <span class="keyword">new</span> Date(<span class="number">121</span>,<span class="number">11</span>,<span class="number">25</span>);</span><br></pre></td></tr></table></figure>
+<p>good example:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Date date = Date.valueOf(<span class="string">"2021-12-25"</span>);</span><br></pre></td></tr></table></figure>
+<ol start="2" type="1">
+<li>工厂方法实现<a href="https://www.jianshu.com/p/eb30a388c5fc" target="_blank" rel="noopener">单例</a></li>
+<li>返回子类</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class Person &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Person <span class="title">getPlayerInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Player();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Person <span class="title">getCookerInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Cooker();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">Class Player extends Person&#123;</span><br><span class="line">&#125;</span><br><span class="line">Class Cooker extends Person&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="4" type="1">
+<li><p>解决构造器重载无法实现的函数签名相同的情况</p>
+<p>构造函数重载的缺陷:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> age = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">int</span> weight = <span class="number">30</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Child</span><span class="params">(<span class="keyword">int</span> age, <span class="keyword">int</span> weight)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.age = age;</span><br><span class="line">        <span class="keyword">this</span>.weight = weight;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Child</span><span class="params">(<span class="keyword">int</span> age)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.age = age;</span><br><span class="line">    &#125;</span><br><span class="line">  	<span class="function"><span class="keyword">public</span> <span class="title">Child</span><span class="params">(<span class="keyword">int</span> weight)</span> </span>&#123; <span class="comment">// ERROR: 函数签名重复</span></span><br><span class="line">      	<span class="keyword">this</span>.weight = weight;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>工厂方法实现:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> age = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">int</span> weight = <span class="number">30</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Child <span class="title">newChild</span><span class="params">(<span class="keyword">int</span> age, <span class="keyword">int</span> weight)</span> </span>&#123;</span><br><span class="line">        Child child = <span class="keyword">new</span> Child();</span><br><span class="line">        child.weight = weight;</span><br><span class="line">        child.age = age;</span><br><span class="line">        <span class="keyword">return</span> child;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Child <span class="title">newChildWithWeight</span><span class="params">(<span class="keyword">int</span> weight)</span> </span>&#123;</span><br><span class="line">        Child child = <span class="keyword">new</span> Child();</span><br><span class="line">        child.weight = weight;</span><br><span class="line">        <span class="keyword">return</span> child;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Child <span class="title">newChildWithAge</span><span class="params">(<span class="keyword">int</span> age)</span> </span>&#123;</span><br><span class="line">        Child child = <span class="keyword">new</span> Child();</span><br><span class="line">        child.age = age;</span><br><span class="line">        <span class="keyword">return</span> child;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>减少不必要的属性暴露</p></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Player</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TYPE_RUNNER = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TYPE_SWIMMER = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TYPE_RACER = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">int</span> type;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Player</span><span class="params">(<span class="keyword">int</span> type)</span> </span>&#123; <span class="comment">// 构造函数隐藏，避免外部调用</span></span><br><span class="line">        <span class="keyword">this</span>.type = type;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Player <span class="title">newRunner</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Player(TYPE_RUNNER);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Player <span class="title">newSwimmer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Player(TYPE_SWIMMER);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Player <span class="title">newRacer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Player(TYPE_RACER);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="6" type="1">
+<li>测试的时候不用每次都要重新创建实例赋值</li>
+</ol>
+<p>如果要写一连串的测试代码，如果需要测试的界面有多个，那么这一连串的代码可能还会被复制多次到项目的多个位置。用静态工厂方法代替手写构造器更为方便也使代码更加整洁。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span></span>&#123;</span><br><span class="line">    String name ;</span><br><span class="line">    <span class="keyword">int</span> age ;</span><br><span class="line">    String description;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> User <span class="title">newTestInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        User tester = <span class="keyword">new</span> User();</span><br><span class="line">        tester.setName(<span class="string">"隔壁老张"</span>);</span><br><span class="line">        tester.setAge(<span class="number">16</span>);</span><br><span class="line">        tester.setDescription(<span class="string">"我住隔壁我姓张！"</span>);</span><br><span class="line">        <span class="keyword">return</span> tester;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用的时候</span></span><br><span class="line"><span class="comment">/* AccountTester.java */</span></span><br><span class="line">User tester = User.newTestInstance();</span><br><span class="line">bindAccount(tester);</span><br><span class="line"><span class="comment">/* UiTester.java */</span></span><br><span class="line">User tester = User.newTestInstance();</span><br><span class="line">bindUI(tester);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用构造器时的混乱</span></span><br><span class="line"><span class="comment">/* AccountTester.java */</span></span><br><span class="line">User tester = <span class="keyword">new</span> User();</span><br><span class="line">tester.setName(<span class="string">"隔壁老张"</span>);</span><br><span class="line">tester.setAge(<span class="number">16</span>);</span><br><span class="line">tester.setDescription(<span class="string">"我住隔壁我姓张！"</span>);</span><br><span class="line">bindAccount(tester);</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Backend</category>
+      </categories>
   </entry>
 </search>
