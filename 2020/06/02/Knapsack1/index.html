@@ -32,7 +32,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/06/02/Knapsack1/image-20200527163346518.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/02/Knapsack1/image-20200602164925985.png">
 <meta property="article:published_time" content="2020-06-02T14:19:35.000Z">
-<meta property="article:modified_time" content="2020-06-02T14:42:57.124Z">
+<meta property="article:modified_time" content="2021-01-29T07:50:54.912Z">
 <meta property="article:author" content="Zhewen Lyu">
 <meta property="article:tag" content="dynamic programming">
 <meta property="article:tag" content="knapsack">
@@ -225,10 +225,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-06-02 22:19:35 / Modified: 22:42:57" itemprop="dateCreated datePublished" datetime="2020-06-02T22:19:35+08:00">2020-06-02</time>
+              <time title="Created: 2020-06-02 22:19:35" itemprop="dateCreated datePublished" datetime="2020-06-02T22:19:35+08:00">2020-06-02</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-29 15:50:54" itemprop="dateModified" datetime="2021-01-29T15:50:54+08:00">2021-01-29</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -268,7 +274,7 @@ F[i,v]=\max\{F[i-1,v], F[i-1,v-C_i]+W_i\}
 <p>代码实现:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackOpt</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
 <h3 id="题目变种">题目变种</h3>
-<p>要求==恰好装满背包==时的最优解。</p>
+<p>要求<em>恰好装满背包</em>时的最优解。</p>
 <p>这种情况我们要重新定义一下子问题状态: <span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>件物品放入一个容量为<span class="math inline">\(v\)</span>的背包<em>恰好装满</em>时可以获得的最大价值。这里的前<span class="math inline">\(i\)</span>件物品包括第<span class="math inline">\(i\)</span>件物品。</p>
 <p>也就是说我们初始化的时候需要重新定义<span class="math inline">\(F\)</span>的合法数值，当<span class="math inline">\(i=0\)</span>，只有<span class="math inline">\(v=0\)</span>，才能满足恰好装满的条件，也就是没有任何物品放入背包，背包已满。<span class="math inline">\(v\)</span>的其他取值都初始化为<span class="math inline">\(-\infty\)</span>，也就是标记为不合法。</p>
 <p>代码实现:</p>
@@ -344,7 +350,7 @@ F[i,v]=\max\{F[i-1,v-k*C_i]+k*W_i|0\leq k \leq M_i\}
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">MultiPackBinary</span><span class="params">(N, V, C, W, M)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    将多重背包问题利用二进制的特性转换成01背包问题</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        Mi = M[i]</span><br><span class="line">        k = <span class="number">2</span></span><br><span class="line">        <span class="keyword">while</span> k &lt;= Mi:</span><br><span class="line">            N += <span class="number">1</span></span><br><span class="line">            W += [W[i] * k]</span><br><span class="line">            C += [C[i] * k]</span><br><span class="line">            k *= <span class="number">2</span></span><br><span class="line">    Vs = V + <span class="number">1</span> </span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
 <p>时间复杂度：<span class="math inline">\(O(V\sum_{i=1}^{N}\log{M_i})\)</span>；空间复杂度：<span class="math inline">\(O(V)\)</span> （我们可以筛掉不可能的取件数选项）。</p>
 <h4 id="二进制拆分法的数学证明">二进制拆分法的数学证明</h4>
-<p><em>本证明由某复旦数学系大佬提供</em></p>
+<p><em>本证明由复旦某数学系大佬提供</em></p>
 <p><span class="math inline">\(Proposition\)</span>: For any positive integer <span class="math inline">\(m \leq 2^{n}-1\)</span>，there exists a set <span class="math inline">\(S \subseteq \{0,1,2,...,n-1\}\)</span> and <span class="math inline">\(S\neq \phi\)</span> such that <span class="math inline">\(m=\sum_{i\in S}2^{i}\)</span>.</p>
 <p><span class="math inline">\(Proof\)</span>:</p>
 <p>It is obvious to get there are totally <span class="math inline">\(2^n-1\)</span> kinds of <span class="math inline">\(S\)</span>, because the number of permutations is <span class="math display">\[
