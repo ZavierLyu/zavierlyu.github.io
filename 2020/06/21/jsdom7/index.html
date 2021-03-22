@@ -27,14 +27,14 @@
 <meta property="og:site_name" content="Garden of Sinners">
 <meta property="og:description" content="动态创建标记">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="d:/CUHKSZ/OneDrive%20-%20CUHK-ShenZhen/SharedDocuments/Hexo_blogs/Frontend/notes/jsdom7.assets/image-20200607171033679.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/21/jsdom7/image-20200607171033679.png">
 <meta property="article:published_time" content="2020-06-21T02:22:02.000Z">
-<meta property="article:modified_time" content="2020-06-27T16:25:09.341Z">
+<meta property="article:modified_time" content="2021-03-21T10:11:33.771Z">
 <meta property="article:author" content="Zhewen Lyu">
 <meta property="article:tag" content="DOM">
 <meta property="article:tag" content="DOM Scripting Notes">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="d:/CUHKSZ/OneDrive%20-%20CUHK-ShenZhen/SharedDocuments/Hexo_blogs/Frontend/notes/jsdom7.assets/image-20200607171033679.png">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/21/jsdom7/image-20200607171033679.png">
 
 <link rel="canonical" href="http://yoursite.com/2020/06/21/jsdom7/">
 
@@ -139,7 +139,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">15</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">16</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -230,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-06-28 00:25:09" itemprop="dateModified" datetime="2020-06-28T00:25:09+08:00">2020-06-28</time>
+                <time title="Modified: 2021-03-21 18:11:33" itemprop="dateModified" datetime="2021-03-21T18:11:33+08:00">2021-03-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -272,7 +272,7 @@
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.createTextNode(<span class="string">"Hello World"</span>);</span><br><span class="line"><span class="keyword">var</span> txt = <span class="built_in">document</span>.createTextNode(<span class="string">"Hello World"</span>);</span><br><span class="line">para.appendChild(txt);</span><br></pre></td></tr></table></figure>
 <h4 id="例子">例子</h4>
 <p>插入一个简单的元素 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>This is <span class="tag">&lt;<span class="name">em</span>&gt;</span>my<span class="tag">&lt;/<span class="name">em</span>&gt;</span> content.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure> 节点树：</p>
-<p><img src="D:\CUHKSZ\OneDrive - CUHK-ShenZhen\SharedDocuments\Hexo_blogs\Frontend\notes\jsdom7.assets\image-20200607171033679.png" alt="image-20200607171033679" style="zoom:50%;" /></p>
+<img src="/2020/06/21/jsdom7/image-20200607171033679.png" class="">
 <p>代码： <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> para = <span class="built_in">document</span>.createElement(<span class="string">'p'</span>);</span><br><span class="line"><span class="keyword">var</span> txt1 = <span class="built_in">document</span>.createTextNode(<span class="string">"This is "</span>);</span><br><span class="line"><span class="keyword">var</span> em = <span class="built_in">document</span>.createElement(<span class="string">'em'</span>);</span><br><span class="line"><span class="keyword">var</span> em_txt = <span class="built_in">document</span>.createTextNode(<span class="string">"my"</span>);</span><br><span class="line"><span class="keyword">var</span> txt2 = <span class="built_in">document</span>.createTextNode(<span class="string">" content."</span>);</span><br><span class="line">para.appendChild(txt1);</span><br><span class="line">em.appendChild(em_txt);</span><br><span class="line">para.appendChild(txt3);</span><br><span class="line"><span class="keyword">var</span> testdiv = <span class="built_in">document</span>.getElementById(<span class="string">"testdiv"</span>);</span><br><span class="line">testdiv.appendChild(para);</span><br></pre></td></tr></table></figure></p>
 <h3 id="在已有元素前插入一个新元素">在已有元素前插入一个新元素</h3>
 <p>DOM提供了名为insertBefore()方法，这个方法将把一个新元素插入到一个现有元素的前面。</p>
@@ -413,7 +413,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

@@ -36,6 +36,40 @@
       </tags>
   </entry>
   <entry>
+    <title>动态规划问题集</title>
+    <url>/2020/06/02/DP/</url>
+    <content><![CDATA[<!-- # 动态规划 -->
+<h4 id="最长回文子串"><a href="https://leetcode-cn.com/problems/longest-palindromic-substring/" target="_blank" rel="noopener">5. 最长回文子串</a></h4>
+<p>这题能在面试中做出来的有三种方法<br> 1. 暴力 <span class="math inline">\(O(n^3)\)</span> 2. 动态规划 <span class="math inline">\(O(n^2)\)</span> 3. 中心扩展 <span class="math inline">\(O(n^2)\)</span> <a id="more"></a></p>
+<h5 id="动态规划">动态规划</h5>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">longestPalindrome</span><span class="params">(self, s: str)</span> -&gt; str:</span></span><br><span class="line">        n = len(s)</span><br><span class="line">        ret = <span class="string">''</span></span><br><span class="line">        dp = [[<span class="number">0</span>] * n <span class="keyword">for</span> _ <span class="keyword">in</span> range(n)]</span><br><span class="line">        length = <span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span> length &lt;= n:</span><br><span class="line">            i = <span class="number">0</span></span><br><span class="line">            <span class="keyword">while</span> i &lt; n:</span><br><span class="line">                j = i + length - <span class="number">1</span></span><br><span class="line">                <span class="keyword">if</span> j &gt;= n:</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">                <span class="keyword">if</span> length == <span class="number">1</span>:</span><br><span class="line">                    dp[i][j] = <span class="number">1</span></span><br><span class="line">                <span class="keyword">elif</span> length == <span class="number">2</span>:</span><br><span class="line">                    dp[i][j] = int(s[i] == s[j])</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    dp[i][j] = int(dp[i+<span class="number">1</span>][j<span class="number">-1</span>] <span class="keyword">and</span> s[i] == s[j])</span><br><span class="line">                <span class="keyword">if</span> dp[i][j] <span class="keyword">and</span> length &gt; len(ret):</span><br><span class="line">                    ret = s[i:j+<span class="number">1</span>]</span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">            length += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure>
+<p>状态定义:</p>
+<p>dp[i][j]表示字符串从i到j，包括j，是否为回文字符串</p>
+<p>状态转移方程： <span class="math display">\[
+dp[i][j]=
+\begin{cases}
+1 &amp; dp[i+1][j-1] == 1\ and \ s[i]==s[j] \\
+0 &amp; \ otherwise
+\end{cases}
+\]</span> 难点1：如何遍历dp二维数组比较恰当。这里我们用子字符串长度<span class="math inline">\(length\)</span>来表示<span class="math inline">\(j\)</span>, <span class="math inline">\(j=i+length-1\)</span>, 由此我们可以实现二维数组对角线遍历而不会重复。</p>
+<p>边界点1：<span class="math inline">\(s\)</span>为空字符，我们在设置返回项时应该设置空字符（如果不提前规避的话）表示最长的回文字符串为空，长度为1。</p>
+<p>边界点2：单字符，双字符，皆为该dp的边界点。我们应该首先计算出这些边界点的状态。可以在遍历大遍历之前小遍历初始化，也可以在整个遍历里设置单独条件计算这些边界点的状态。</p>
+<p>边界点3：<span class="math inline">\(j\)</span>越界，只要保证<span class="math inline">\(j\)</span>不越界，那么<span class="math inline">\(i+1\)</span>肯定也不越界。</p>
+<h5 id="中心扩展">中心扩展</h5>
+<p>其实个人觉得，比起dp，中心扩展法更少边界值，更容易上手。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">longestPalindrome</span><span class="params">(self, s: str)</span> -&gt; str:</span></span><br><span class="line">        left, right = <span class="number">0</span>,<span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(s)):</span><br><span class="line">            left1, right1 = self.centerExpand(s, i, i)</span><br><span class="line">            left2, right2 = self.centerExpand(s, i, i+<span class="number">1</span>)</span><br><span class="line">            l, r = (left1, right1) <span class="keyword">if</span> right1-left1 &gt; right2-left2 <span class="keyword">else</span> (left2, right2)</span><br><span class="line">            left, right = (left, right) <span class="keyword">if</span> right-left &gt; r-l <span class="keyword">else</span> (l, r)</span><br><span class="line">        <span class="keyword">return</span> s[left:right+<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">centerExpand</span><span class="params">(self, s, i, j)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="number">0</span> &lt;= i <span class="keyword">and</span> j &lt; len(s) <span class="keyword">and</span> s[i]==s[j]:</span><br><span class="line">            i -= <span class="number">1</span></span><br><span class="line">            j += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> i+<span class="number">1</span>, j<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+<p>中心扩展法其实就是利用边界点（单字符和双字符）去扩展得到所有的回文子串。</p>
+<p>难点1：中心扩展函数的写法。一开始我用递归，有点麻烦，容易出错。后来看官方答案，这玩意要啥递归，while loop就完事了。</p>
+<p>边界点：其实只要中心扩展函数写得好，基本不用考虑边界点。像上方官答，双字符是不相等和第二个字符越界的条件都不用考虑。</p>
+]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>dynamic programming</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C++ 变量与基本类型</title>
     <url>/2020/06/28/C++%20%E5%8F%98%E9%87%8F%E4%B8%8E%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B/</url>
     <content><![CDATA[<p>《C++ Primer（第五版）》第二章笔记</p>
@@ -306,40 +340,6 @@
       </tags>
   </entry>
   <entry>
-    <title>动态规划问题集</title>
-    <url>/2020/06/02/DP/</url>
-    <content><![CDATA[<!-- # 动态规划 -->
-<h4 id="最长回文子串"><a href="https://leetcode-cn.com/problems/longest-palindromic-substring/" target="_blank" rel="noopener">5. 最长回文子串</a></h4>
-<p>这题能在面试中做出来的有三种方法<br> 1. 暴力 <span class="math inline">\(O(n^3)\)</span> 2. 动态规划 <span class="math inline">\(O(n^2)\)</span> 3. 中心扩展 <span class="math inline">\(O(n^2)\)</span> <a id="more"></a></p>
-<h5 id="动态规划">动态规划</h5>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">longestPalindrome</span><span class="params">(self, s: str)</span> -&gt; str:</span></span><br><span class="line">        n = len(s)</span><br><span class="line">        ret = <span class="string">''</span></span><br><span class="line">        dp = [[<span class="number">0</span>] * n <span class="keyword">for</span> _ <span class="keyword">in</span> range(n)]</span><br><span class="line">        length = <span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span> length &lt;= n:</span><br><span class="line">            i = <span class="number">0</span></span><br><span class="line">            <span class="keyword">while</span> i &lt; n:</span><br><span class="line">                j = i + length - <span class="number">1</span></span><br><span class="line">                <span class="keyword">if</span> j &gt;= n:</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">                <span class="keyword">if</span> length == <span class="number">1</span>:</span><br><span class="line">                    dp[i][j] = <span class="number">1</span></span><br><span class="line">                <span class="keyword">elif</span> length == <span class="number">2</span>:</span><br><span class="line">                    dp[i][j] = int(s[i] == s[j])</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    dp[i][j] = int(dp[i+<span class="number">1</span>][j<span class="number">-1</span>] <span class="keyword">and</span> s[i] == s[j])</span><br><span class="line">                <span class="keyword">if</span> dp[i][j] <span class="keyword">and</span> length &gt; len(ret):</span><br><span class="line">                    ret = s[i:j+<span class="number">1</span>]</span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">            length += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure>
-<p>状态定义:</p>
-<p>dp[i][j]表示字符串从i到j，包括j，是否为回文字符串</p>
-<p>状态转移方程： <span class="math display">\[
-dp[i][j]=
-\begin{cases}
-1 &amp; dp[i+1][j-1] == 1\ and \ s[i]==s[j] \\
-0 &amp; \ otherwise
-\end{cases}
-\]</span> 难点1：如何遍历dp二维数组比较恰当。这里我们用子字符串长度<span class="math inline">\(length\)</span>来表示<span class="math inline">\(j\)</span>, <span class="math inline">\(j=i+length-1\)</span>, 由此我们可以实现二维数组对角线遍历而不会重复。</p>
-<p>边界点1：<span class="math inline">\(s\)</span>为空字符，我们在设置返回项时应该设置空字符（如果不提前规避的话）表示最长的回文字符串为空，长度为1。</p>
-<p>边界点2：单字符，双字符，皆为该dp的边界点。我们应该首先计算出这些边界点的状态。可以在遍历大遍历之前小遍历初始化，也可以在整个遍历里设置单独条件计算这些边界点的状态。</p>
-<p>边界点3：<span class="math inline">\(j\)</span>越界，只要保证<span class="math inline">\(j\)</span>不越界，那么<span class="math inline">\(i+1\)</span>肯定也不越界。</p>
-<h5 id="中心扩展">中心扩展</h5>
-<p>其实个人觉得，比起dp，中心扩展法更少边界值，更容易上手。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">longestPalindrome</span><span class="params">(self, s: str)</span> -&gt; str:</span></span><br><span class="line">        left, right = <span class="number">0</span>,<span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(s)):</span><br><span class="line">            left1, right1 = self.centerExpand(s, i, i)</span><br><span class="line">            left2, right2 = self.centerExpand(s, i, i+<span class="number">1</span>)</span><br><span class="line">            l, r = (left1, right1) <span class="keyword">if</span> right1-left1 &gt; right2-left2 <span class="keyword">else</span> (left2, right2)</span><br><span class="line">            left, right = (left, right) <span class="keyword">if</span> right-left &gt; r-l <span class="keyword">else</span> (l, r)</span><br><span class="line">        <span class="keyword">return</span> s[left:right+<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">centerExpand</span><span class="params">(self, s, i, j)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="number">0</span> &lt;= i <span class="keyword">and</span> j &lt; len(s) <span class="keyword">and</span> s[i]==s[j]:</span><br><span class="line">            i -= <span class="number">1</span></span><br><span class="line">            j += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> i+<span class="number">1</span>, j<span class="number">-1</span></span><br></pre></td></tr></table></figure>
-<p>中心扩展法其实就是利用边界点（单字符和双字符）去扩展得到所有的回文子串。</p>
-<p>难点1：中心扩展函数的写法。一开始我用递归，有点麻烦，容易出错。后来看官方答案，这玩意要啥递归，while loop就完事了。</p>
-<p>边界点：其实只要中心扩展函数写得好，基本不用考虑边界点。像上方官答，双字符是不相等和第二个字符越界的条件都不用考虑。</p>
-]]></content>
-      <categories>
-        <category>Algorithm</category>
-      </categories>
-      <tags>
-        <tag>dynamic programming</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>前缀和问题集</title>
     <url>/2020/06/02/PrefixSum/</url>
     <content><![CDATA[<h4 id="每个元音包含偶数次的最长子字符串"><a href="https://leetcode-cn.com/problems/find-the-longest-substring-containing-vowels-in-even-counts/" target="_blank" rel="noopener">1371. 每个元音包含偶数次的最长子字符串</a></h4>
@@ -356,6 +356,169 @@ dp[i][j]=
       </categories>
       <tags>
         <tag>prefix sum</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>背包问题(上)</title>
+    <url>/2020/06/02/Knapsack1/</url>
+    <content><![CDATA[<p>此博客根据<a href="https://github.com/tianyicui/pack/blob/master/V2.pdf" target="_blank" rel="noopener">背包九讲</a>1-3章整理编写而成，记录学习总结。 一句话：01逆序，完全正序</p>
+<h2 id="背包问题">0-1背包问题</h2>
+<h3 id="题目">题目</h3>
+<p>有 <span class="math inline">\(N\)</span> 件物品和一个容量为 <span class="math inline">\(V\)</span> 的背包。放入第 <span class="math inline">\(i\)</span> 件物品耗费的费用是 <span class="math inline">\(C_i\)</span> 价值是 <span class="math inline">\(W_i\)</span>。求解将哪些物品装入背包可使价值总和最大。</p>
+<h3 id="思路">思路</h3>
+<p>定义子问题状态: <span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>件物品放入一个容量为<span class="math inline">\(v\)</span>的背包可以获得的最大价值。这里的前<span class="math inline">\(i\)</span>件物品包括第<span class="math inline">\(i\)</span>件物品。 状态转移方程： <span class="math display">\[
+F[i,v]=\max\{F[i-1,v], F[i-1,v-C_i]+W_i\}
+\]</span> <a id="more"></a> 这个状态转移方程非常好理解，对于第<span class="math inline">\(i\)</span>件物品，我们只有放与不放两种选项，如果不放，那么这个背包的价值就是和前<span class="math inline">\(i-1\)</span>件物品放入背包的价值一样，即<span class="math inline">\(F[i-1,v]\)</span>；如果放的话，那么这个背包的价值就是前<span class="math inline">\(i-1\)</span>件物品放入容量为<span class="math inline">\(v-C_i\)</span>的背包的价值再加上当前物品的价值<span class="math inline">\(W_i\)</span>。 接下来的问题就是如何填充这个二维数组<span class="math inline">\(F_{N\times V}\)</span>。首先我们要看到，由于我们根本不清楚这个<span class="math inline">\(V\)</span>有多大，<span class="math inline">\(C\)</span>里面有哪些数，所以我们在迭代时一定要保证<span class="math inline">\(F[i-1]\)</span>里所有的entry都是已知的，也就是前<span class="math inline">\(i\)</span>件物品在所有可能的背包容量下的价值。 伪代码： <img src="/2020/06/02/Knapsack1/image-20200527112309894.png" class="" title="pseudocode_01"> 代码实现：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackBasic</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [[<span class="number">0</span>] * (Vs) <span class="keyword">for</span> _ <span class="keyword">in</span> range(Ns)]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, N+<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[i][v] = max(dp[i<span class="number">-1</span>][v], dp[i<span class="number">-1</span>][v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[N][V]</span><br></pre></td></tr></table></figure>
+<p>边界点1：<span class="math inline">\(v=0,i=0\)</span>, 虽然我们的容量为<span class="math inline">\(V\)</span>，物品数目为<span class="math inline">\(N\)</span>，但我们有<span class="math inline">\(V+1\)</span>，<span class="math inline">\(N+1\)</span>种物品（包含0容量和前0件物品）。</p>
+<p>边界点2：<span class="math inline">\(v&lt;C_i\)</span>，易知当v小于<span class="math inline">\(C_i\)</span>时，根本无法将第<span class="math inline">\(i\)</span>件物品放入背包，所以我们的遍历空间为<span class="math inline">\(C_i...V\)</span>。</p>
+<h3 id="优化空间复杂度">优化空间复杂度</h3>
+<p>实用一个数组<span class="math inline">\(F[0...V]\)</span>来代替二维数组，原因在于状态转移方程只和上一次迭代的结果，也就是<span class="math inline">\(F[i-1, 0...V]\)</span>相关。所以我们可以基于上一个<span class="math inline">\(F_{i-1}\)</span>来更新当前<span class="math inline">\(F_i\)</span>。然而，我们必须逆序计算<span class="math inline">\(F[v]\)</span>, <span class="math inline">\(v \leftarrow V...0\)</span>，原因在于这样可以保证<span class="math inline">\(v-C_i\)</span>之前的entry是<span class="math inline">\(F_{i-1}\)</span>未更新的。</p>
+<p>伪代码：</p>
+<img src="/2020/06/02/Knapsack1/image-20200527132900818.png" class="" title="pseudocode_01">
+<p>代码实现:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackOpt</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
+<h3 id="题目变种">题目变种</h3>
+<p>要求<em>恰好装满背包</em>时的最优解。</p>
+<p>这种情况我们要重新定义一下子问题状态: <span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>件物品放入一个容量为<span class="math inline">\(v\)</span>的背包<em>恰好装满</em>时可以获得的最大价值。这里的前<span class="math inline">\(i\)</span>件物品包括第<span class="math inline">\(i\)</span>件物品。</p>
+<p>也就是说我们初始化的时候需要重新定义<span class="math inline">\(F\)</span>的合法数值，当<span class="math inline">\(i=0\)</span>，只有<span class="math inline">\(v=0\)</span>，才能满足恰好装满的条件，也就是没有任何物品放入背包，背包已满。<span class="math inline">\(v\)</span>的其他取值都初始化为<span class="math inline">\(-\infty\)</span>，也就是标记为不合法。</p>
+<p>代码实现:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackFull</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [float(<span class="string">'-inf'</span>)] * Vs</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
+<h3 id="复杂度">复杂度</h3>
+<p>时间复杂度为<span class="math inline">\(O(VN)\)</span></p>
+<p>优化后的空间复杂度为<span class="math inline">\(O(V)\)</span></p>
+<h3 id="目标和"><a href="https://leetcode-cn.com/problems/target-sum/" target="_blank" rel="noopener">494. 目标和</a></h3>
+<p>乍一看这题和0-1背包问题一点关系都没有，但是实际上还是一个背包问题。可以讲这一组数据分为两组，正数组和负数组。分别记为left和right <span class="math display">\[
+\begin{equation} \nonumber
+    \begin{aligned}
+    left - right = target \\
+    left - (sum - left) = target \\
+    left = \frac{target+sum}{2}
+    \end{aligned}
+\end{equation}
+\]</span> 如果left不是整数的话其实就代表这无解，然后我们就可以把这题转换成一个塞满整个背包有多少种方法的0-1背包问题。 1. 定义dp状态 <span class="math inline">\(dp[i,v]\)</span>为前i个物品能够装满容量为v的背包的方法数量 2. 状态转移 <span class="math display">\[
+dp[i,v] = dp[i-1,v] + dp[i-1,v-C_i]
+\]</span> <span class="math inline">\(dp[i-1,v]\)</span>表示不放第i个物品，前i-1已经装满v的组合数 <span class="math inline">\(dp[i-1,v-C_i]\)</span>表示放第i个物品的组合数，前i-1刚好还差<span class="math inline">\(C_i\)</span>大小的第i个物品 3. 优化空间 由于都是从i-1转换而来，所以i-1相当于当前数组还未更新的状态，于是有<code>dp[v] = dp[v] + dp[v-nums[i]];</code>。 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">findTargetSumWays</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> S)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> sum = sum(nums);</span><br><span class="line">        <span class="keyword">if</span> ((sum + S) % <span class="number">2</span> == <span class="number">1</span> || S &gt; <span class="number">1000</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> left = (sum + S) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[left+<span class="number">1</span>];</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> v=left; v &gt;= num; v--) &#123;</span><br><span class="line">                dp[v] = dp[v] + dp[v-nums[i]];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[left];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> e: nums) </span><br><span class="line">            ret += e;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="完全背包问题">完全背包问题</h2>
+<h3 id="题目-1">题目</h3>
+<p>有<span class="math inline">\(N\)</span>种物品和一个容量为<span class="math inline">\(V\)</span>的背包，每种物品都有无限件可用。放入第<span class="math inline">\(i\)</span>种物品的费用是<span class="math inline">\(C_i\)</span>价值是<span class="math inline">\(W_i\)</span>。求解：将哪些物品装入背包，可以使得这些物品的耗费的费用总和不超过背包容量，且价值总和最大。</p>
+<h3 id="基本思路">基本思路</h3>
+<p>这个问题非常类似于0-1背包问题，所不同的是每种物品都有无限件。所以每种物品的取件数有<span class="math inline">\(\lfloor V/C_i \rfloor\)</span>种选择。</p>
+<p>现在我们仍旧定义原来的子问题<span class="math inline">\(F[i,v]\)</span>，只不过加上了可以重复取件的条件。</p>
+<p>于是乎状态转移方程需要发生改变: <span class="math display">\[
+F[i,v]=\max\{F[i-1,v-kC_i]+kW_i | 0 \leq kC_i \leq v\}
+\]</span> 这个和0-1背包问题一样有<span class="math inline">\(O(VN)\)</span>个状态需要求解，但是求解每个状态的时间不是常数而是<span class="math inline">\(O(\lfloor \frac{v}{C_i}\rfloor)\)</span>，总的时间复杂度为<span class="math inline">\(O(NV\sum^N_{i=1}{\frac{V}{C_i}})\)</span></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CompletePackBasic</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            tmp = []</span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">0</span>, (v // C[i<span class="number">-1</span>])+<span class="number">1</span>):</span><br><span class="line">                tmp.append(dp[v-k*C[i<span class="number">-1</span>]]+k*W[i<span class="number">-1</span>])</span><br><span class="line">            dp[v] = max(tmp)</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
+<h3 id="优化">优化</h3>
+<h4 id="优化1-对数据进行预处理">优化1 对数据进行预处理：</h4>
+<p>首先将费用大于 V 的物品去掉，然后使用类似计数排序的做法，计算出费用相同的物品中价值最高的是哪个，可以差不多用<span class="math inline">\(O(V +N)\)</span>地完成这个优化，除非重复费用的物品过多。</p>
+<h4 id="优化2-转化为01背包问题">优化2 转化为01背包问题：</h4>
+<p>这个优化非常刁钻，考虑到第<span class="math inline">\(i\)</span>种物品最多选 <span class="math inline">\(⌊V/C_i⌋\)</span> 件，于是可以把第<span class="math inline">\(i\)</span>种物品转化为<span class="math inline">\(⌊V/C_i⌋\)</span>件费用及价值均不变的物品。比如现有 <span class="math display">\[
+\begin{equation} \nonumber
+\begin{aligned}
+N &amp;= 4  \\ 
+V &amp;= 10 \\ 
+C &amp;= [10, 6, 3, 4]  \\ 
+W &amp;= [10, 7, 6, 5] \\ 
+\end{aligned} 
+\end{equation}
+\]</span> 我们可以将其转换为如下的0-1背包问题 <span class="math display">\[
+\begin{aligned}
+N &amp;= 7 \\
+V &amp;=10 \\
+C &amp;= [10,6,3,3,3,4,4] \\
+W &amp;= [10,7,6,6,6,5,5] \\
+\end{aligned}
+\]</span> 还有一种更骚的操作是：把第<span class="math inline">\(i\)</span>种物品拆成费用为<span class="math inline">\(C_i2^k\)</span>、价值为<span class="math inline">\(W_i2^k\)</span>的若干件物品，其中<span class="math inline">\(k\)</span>取遍满足<span class="math inline">\(C_i2^k≤V\)</span>的非负整数。不管最优策略选几件第$i $种物品，总可以表示成若干个不同<span class="math inline">\(2^k\)</span>物品的和。这样一来就把每种物品拆成<span class="math inline">\(O(\log ⌊V/Ci⌋)\)</span>件物品，是一个很大的改进。用之前的例子，我们可以将其装化为如下的01背包问题 <span class="math display">\[
+\begin{aligned}
+N &amp;= 6 \\
+V &amp;= 10 \\
+C &amp;= [10, 6, 3, 6, 4,8] \\
+W &amp;= [10, 7, 6, 12,5,10] \\
+\end{aligned}
+\]</span> 为什么可以如此转换呢？原因在于<span class="math inline">\(2^n-1=\sum_{i=0}^{n-1}2^{i}\)</span>，我们可以看到在上一个简单的01背包问题转换操作中，取3个费用为3价值为6的情况是用3个相同价值相同费用的物品实现的，而在这个转换方法中这种情况是由取1个费用为3和1个费用为6的物品实现的，大大减少了遍历的次数。</p>
+<h4 id="优化3-ovn-改变遍历次序">优化3 O(VN) 改变遍历次序</h4>
+<p>伪代码：</p>
+<img src="/2020/06/02/Knapsack1/image-20200527163346518.png" class="" title="pseudocode_03">
+<p>我们可以发现，这段伪代码和01背包问题仅仅只有<span class="math inline">\(v\)</span>的循环次序不同，现在采用增序递增的方式更新子状态。原因在于，此时我们需要一个可能已选入第<span class="math inline">\(i\)</span>种物品的子结果<span class="math inline">\(F[i,v-C_i]\)</span>。此时的状态转移方程为: <span class="math display">\[
+F[i,v]=\max\{F[i-1,v],F[i,v-C_i]+W_i\}
+\]</span> <span class="math inline">\(F[i-1,v]\)</span>：不放入第<span class="math inline">\(i\)</span>件物品</p>
+<p><span class="math inline">\(F[i,v-C_i]\)</span>: 上一次放了第<span class="math inline">\(i\)</span>件物品时的价值加上这次放第<span class="math inline">\(i\)</span>件物品</p>
+<p>此时的空间复杂度为<span class="math inline">\(O(V)\)</span>，时间复杂度依然为<span class="math inline">\(O(VN)\)</span>。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CompletePackVN</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
+<h2 id="多重背包问题">多重背包问题</h2>
+<h3 id="题目-2">题目</h3>
+<p>有<span class="math inline">\(N\)</span>种物品和一个容量为<span class="math inline">\(V\)</span>的背包。第<span class="math inline">\(i\)</span>种物品最多有<span class="math inline">\(M_i\)</span>件可用，每件耗费的空间是<span class="math inline">\(C_i\)</span>，价值是<span class="math inline">\(W_i\)</span>。求解将哪些物品装入背包可使这些物品的耗费的空间总和不超过背包容量，且价值总和最大。</p>
+<h3 id="基本思路-1">基本思路</h3>
+<p>这题和完全背包问题十分相似，在这里对于第<span class="math inline">\(i\)</span>种物品，我们有<span class="math inline">\(M_i+1\)</span>种策略：取0件，取1件，....，取<span class="math inline">\(M_i\)</span>件；而在完全背包问题种我们有<span class="math inline">\(\lfloor \frac{V}{C_i}\rfloor +1\)</span>种取法。所以我们只要稍微修改一下状态转移方程即可： <span class="math display">\[
+F[i,v]=\max\{F[i-1,v-k*C_i]+k*W_i|0\leq k \leq M_i\}
+\]</span> 此时的时间复杂的为<span class="math inline">\(O(V\sum_{i=1}^{N}M_i)\)</span>。</p>
+<h3 id="转化为01背包问题">转化为01背包问题</h3>
+<p>和之前的完全背包问题一样，多重背包问题也可以通过拆分转换为01背包问题。</p>
+<p>如完全背包问题中的<strong>优化1</strong>一样，我们可以将第<span class="math inline">\(i\)</span>种物品拆分成<span class="math inline">\(M_i\)</span>件相同费用相投价值的物品。此时的时间复杂度依然是<span class="math inline">\(O(V\sum_{i=1}^{N}M_i)\)</span>。</p>
+<p>实现代码：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">MultiPackBasic</span><span class="params">(N, V, C, W, M)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    将多重背包问题简单转换成01背包问题</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        m = M[i] - <span class="number">1</span></span><br><span class="line">        C += [C[i]] * m</span><br><span class="line">        W += [W[i]] * m</span><br><span class="line">        N += m</span><br><span class="line">    Vs = V + <span class="number">1</span> </span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
+<p>同样的，我们还可按照之前<strong>优化1</strong>中的第二种方法来拆分：</p>
+<p>将第<span class="math inline">\(i\)</span>种物品拆分成若干个01背包中的物品，这些物品的费用和价值均是原来的费用和价值乘以这个系数。这些系数分别为<span class="math inline">\(1,2,..,2^k\)</span>且<span class="math inline">\(k\)</span>是满足<span class="math inline">\(2^k\leq M_i\)</span>的最大整数。例如，如果<span class="math inline">\(M_i\)</span>为<span class="math inline">\(13\)</span>，则相应的<span class="math inline">\(k = 3\)</span>，这种最多取<span class="math inline">\(13\)</span>件的物品应被分成系数分别为<span class="math inline">\(1, 2, 4, 8\)</span>的四件物品。</p>
+<blockquote>
+<p>为什么我这里采用的系数和背包九讲里的系数不同？因为我按照的是之前完全背包问题的拆分方法，也就是拆到系数大到允许的物品件数为止。个人认为，这样的拆分方法更容易理解，也更容易实现和证明。</p>
+</blockquote>
+<p>代码实现：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">MultiPackBinary</span><span class="params">(N, V, C, W, M)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    将多重背包问题利用二进制的特性转换成01背包问题</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        Mi = M[i]</span><br><span class="line">        k = <span class="number">2</span></span><br><span class="line">        <span class="keyword">while</span> k &lt;= Mi:</span><br><span class="line">            N += <span class="number">1</span></span><br><span class="line">            W += [W[i] * k]</span><br><span class="line">            C += [C[i] * k]</span><br><span class="line">            k *= <span class="number">2</span></span><br><span class="line">    Vs = V + <span class="number">1</span> </span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
+<p>时间复杂度：<span class="math inline">\(O(V\sum_{i=1}^{N}\log{M_i})\)</span>；空间复杂度：<span class="math inline">\(O(V)\)</span> （我们可以筛掉不可能的取件数选项）。</p>
+<h4 id="二进制拆分法的数学证明">二进制拆分法的数学证明</h4>
+<p><em>本证明由复旦某数学系大佬提供</em></p>
+<p><span class="math inline">\(Proposition\)</span>: For any positive integer <span class="math inline">\(m \leq 2^{n}-1\)</span>，there exists a set <span class="math inline">\(S \subseteq \{0,1,2,...,n-1\}\)</span> and <span class="math inline">\(S\neq \phi\)</span> such that <span class="math inline">\(m=\sum_{i\in S}2^{i}\)</span>.</p>
+<p><span class="math inline">\(Proof\)</span>:</p>
+<p>It is obvious to get there are totally <span class="math inline">\(2^n-1\)</span> kinds of <span class="math inline">\(S\)</span>, because the number of permutations is <span class="math display">\[
+\sum_{i=1}^n{n \choose i}=2^n-1
+\]</span> Also, we can find the maximum of <span class="math inline">\(m\)</span> is <span class="math inline">\(2^n - 1\)</span> and the minimum is <span class="math inline">\(1\)</span>. There are totally <span class="math inline">\(2^n-1\)</span>, and the range of the sum is from <span class="math inline">\(1\)</span> to <span class="math inline">\(2^n-1\)</span>. It means that as long as we prove the sum of each <span class="math inline">\(S\)</span> is unique, we can prove the proposition. In mathematical words, for any <span class="math inline">\(S_i,S_j\)</span> where <span class="math inline">\(i\neq j\)</span>, <span class="math inline">\(\sum_{k\in S_i}2^k \neq \sum_{k \in S_j}2^k\)</span>.</p>
+<p>Given two different sets <span class="math inline">\(S_i\)</span> and <span class="math inline">\(S_j\)</span>, we can get <span class="math inline">\(G_i = S_i-S_j\)</span> and <span class="math inline">\(G_j=S_j-S_i\)</span>. WLOG, we only need to prove that <span class="math inline">\(\sum_{k\in G_i}2^k \neq \sum_{k \in G_j}2^k\)</span>, for any <span class="math inline">\(G_i,G_j\)</span> where <span class="math inline">\(i\neq j\)</span>.</p>
+<p>First situation, either <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index <span class="math inline">\(0\)</span>. WLOG, we assume <span class="math inline">\(G_i\)</span> contains the index <span class="math inline">\(0\)</span>. Then the component sum of <span class="math inline">\(G_i\)</span> is odd, while the component of <span class="math inline">\(G_j\)</span> is even. Therefore, they must be different.</p>
+<p><span class="math display">\[
+\sum_{k \in G_i}{2^k}=1+\sum_{k\neq 0, k \in G_i}{2^k} \neq \sum_{k\in G_j}2^k
+\]</span> Second situation, neither <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index 0. We defined that <span class="math inline">\(G_i=\{2^{i_k}|i_k&lt;i_{k+1},k=1,2,...,p\}\)</span> where <span class="math inline">\(p\)</span> is the number of entries in <span class="math inline">\(G_i\)</span>, similarly, <span class="math inline">\(G_j=\{2^{j_k}|j_k&lt;j_{k+1},k=1,2,...,q\}\)</span> where <span class="math inline">\(q\)</span> is the number of entries in <span class="math inline">\(G_j\)</span>. WLOG, we set <span class="math inline">\(i_1 &lt; j_1\)</span>.</p>
+<p>We assume that the internal summations of <span class="math inline">\(G_i\)</span> and <span class="math inline">\(G_j\)</span> are equal, we can get the following equation: <span class="math display">\[
+\begin{aligned} 
+\sum_{k \in G_i}2^k=\sum_{k \in G_j}2^k \\
+2^{i_1}+2^{i_2}+...+2^{i_p} = 2^{j_1}+2^{j_2}+...+2^{j_q} \\
+1+2^{i_2-i_1}+...+2^{i_p-i_1}=2^{j_1-i_1}+2^{j_2-i_1}+...+2^{j_q-i_1}
+\end{aligned}
+\]</span> Since <span class="math inline">\(G_i \cap G_j=\phi\)</span> and neither <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index of <span class="math inline">\(0\)</span>, therefore the left-hand side of equation is odd and the right-hand side is even, which contradicts the previous assumption of equivalence of internal summation of <span class="math inline">\(G_i\)</span> and <span class="math inline">\(G_j\)</span>.</p>
+<p>Thus, we can prove that the summation of any <span class="math inline">\(S\)</span> is unique, which further proves one-to-one mapping relation that for any positive integer <span class="math inline">\(m \leq 2^{n}-1\)</span>，there exists a unique set <span class="math inline">\(S \subseteq \{0,1,2,...,n-1\}\)</span> and <span class="math inline">\(S\neq \phi\)</span> such that <span class="math inline">\(m=\sum_{i\in S}2^{i}\)</span>.</p>
+<p>实际上我们可以通过二进制来看出一些端倪，比如 <span class="math display">\[
+\begin{aligned}11010110_{2} = \\
+&amp; 10000000_2+ \\
+&amp; 01000000_2+ \\
+&amp; 00010000_2+ \\
+&amp; 00000100_2 + \\
+&amp; 00000010_2
+\end{aligned}
+\]</span> 我们可以看到，任意一个整数都可以用二进制来表示，然后它的位数计算其实就是我们的拆分方式。</p>
+<h3 id="可行性问题的ovn算法">可行性问题的<span class="math inline">\(O(VN)\)</span>算法</h3>
+<p>如果问题考察的是"每种有若干件的物品能否填满给定容量的背包"，只要考虑填满背包的可行性，不需考虑没见物品的价值时，多重背包问题可以有<span class="math inline">\(O(VN)\)</span>复杂度的算法。</p>
+<p>事实上，0-1背包问题的装满可行性算法就是<span class="math inline">\(O(VN)\)</span>，所以比较直观的想法是利用上述拆分法将多重背包问题转换成0-1背包问题，然后解决，不过此时的时间复杂度是<span class="math inline">\(O(V\sum{M_i})\)</span>。</p>
+<p>所以我们需要对子状态进行重新定义：</p>
+<p><span class="math inline">\(F[i,v]\)</span>表示用前<span class="math inline">\(i\)</span>种物品填满容量为<span class="math inline">\(v\)</span>的背包后，还剩下多少个第<span class="math inline">\(i\)</span>种物品可用。定义<span class="math inline">\(F[i,V]=-1\)</span>为不合法，即未填满。所以我们只要判断前<span class="math inline">\(i\)</span>物品填满容量为<span class="math inline">\(V\)</span>的背包后是否等于<span class="math inline">\(-1\)</span>就可以知道能否装满了。</p>
+<p>伪代码：</p>
+<img src="/2020/06/02/Knapsack1/image-20200602164925985.png" class="" title="pseudocode_04">
+<p>代码实现：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">canFullPack</span><span class="params">(N, V, C, M)</span>:</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">-1</span>] * Vs</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(V):</span><br><span class="line">            <span class="keyword">if</span> dp[v] &gt;= <span class="number">0</span>:</span><br><span class="line">                dp[v] = M[i<span class="number">-1</span>]</span><br><span class="line">            <span class="keyword">elif</span> dp[v] == <span class="number">-1</span>:</span><br><span class="line">                dp[v] = <span class="number">-1</span></span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[v] = max(dp[v-C[i<span class="number">-1</span>]]<span class="number">-1</span>, dp[v])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>] &gt;= <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>第二层循环中的第一层循环是初始化当前物品的<span class="math inline">\(M_i\)</span>在各个合法entry中的值，表明当前所有塞满的背包剩下最多<span class="math inline">\(M_i\)</span>的第<span class="math inline">\(i\)</span>件物品；</p>
+<p>第二层循环中的第二层循环是便是状态转移方程的实现， <span class="math display">\[
+F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
+\]</span> 为什么要定义最多剩下呢？这是一种贪婪的想法，我们需要尽可能的为后面的装填留更多的物品。</p>
+<h2 id="例题">例题</h2>
+<h4 id="零钱兑换"><a href="https://leetcode-cn.com/problems/coin-change/" target="_blank" rel="noopener">322. 零钱兑换</a></h4>
+<p>咱们接下来看一到经典例题，零钱兑换。<br> <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">coinChange</span><span class="params">(self, coins: List[int], amount: int)</span> -&gt; int:</span></span><br><span class="line">        Ns = len(coins) + <span class="number">1</span></span><br><span class="line">        Vs = amount + <span class="number">1</span></span><br><span class="line">        dp = [float(<span class="string">'inf'</span>)] * Vs</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">            <span class="keyword">for</span> v <span class="keyword">in</span> range(coins[i<span class="number">-1</span>], Vs):</span><br><span class="line">                dp[v] = min(dp[v], dp[v-coins[i<span class="number">-1</span>]]+<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span> <span class="keyword">if</span> dp[<span class="number">-1</span>] == float(<span class="string">'inf'</span>) <span class="keyword">else</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure></p>
+<p>这道题其实也可以转换成背包问题，我们把amount看作这个背包的容量，硬币就是价值为<span class="math inline">\(1\)</span>的物品，硬币的面值看作每件物品的费用。为什么我们把硬币的价值作为<span class="math inline">\(1\)</span>来处理呢？其实我们可以定义子状态<span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>种物品要装满容量为<span class="math inline">\(v\)</span>的背包至少所需要的件数，这和我们把硬币的价值看作<span class="math inline">\(1\)</span>其实是一样的。</p>
+]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>dynamic programming</tag>
+        <tag>knapsack</tag>
       </tags>
   </entry>
   <entry>
@@ -757,169 +920,6 @@ dp[i][j]=
       </tags>
   </entry>
   <entry>
-    <title>背包问题(上)</title>
-    <url>/2020/06/02/Knapsack1/</url>
-    <content><![CDATA[<p>此博客根据<a href="https://github.com/tianyicui/pack/blob/master/V2.pdf" target="_blank" rel="noopener">背包九讲</a>1-3章整理编写而成，记录学习总结。 一句话：01逆序，完全正序</p>
-<h2 id="背包问题">0-1背包问题</h2>
-<h3 id="题目">题目</h3>
-<p>有 <span class="math inline">\(N\)</span> 件物品和一个容量为 <span class="math inline">\(V\)</span> 的背包。放入第 <span class="math inline">\(i\)</span> 件物品耗费的费用是 <span class="math inline">\(C_i\)</span> 价值是 <span class="math inline">\(W_i\)</span>。求解将哪些物品装入背包可使价值总和最大。</p>
-<h3 id="思路">思路</h3>
-<p>定义子问题状态: <span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>件物品放入一个容量为<span class="math inline">\(v\)</span>的背包可以获得的最大价值。这里的前<span class="math inline">\(i\)</span>件物品包括第<span class="math inline">\(i\)</span>件物品。 状态转移方程： <span class="math display">\[
-F[i,v]=\max\{F[i-1,v], F[i-1,v-C_i]+W_i\}
-\]</span> <a id="more"></a> 这个状态转移方程非常好理解，对于第<span class="math inline">\(i\)</span>件物品，我们只有放与不放两种选项，如果不放，那么这个背包的价值就是和前<span class="math inline">\(i-1\)</span>件物品放入背包的价值一样，即<span class="math inline">\(F[i-1,v]\)</span>；如果放的话，那么这个背包的价值就是前<span class="math inline">\(i-1\)</span>件物品放入容量为<span class="math inline">\(v-C_i\)</span>的背包的价值再加上当前物品的价值<span class="math inline">\(W_i\)</span>。 接下来的问题就是如何填充这个二维数组<span class="math inline">\(F_{N\times V}\)</span>。首先我们要看到，由于我们根本不清楚这个<span class="math inline">\(V\)</span>有多大，<span class="math inline">\(C\)</span>里面有哪些数，所以我们在迭代时一定要保证<span class="math inline">\(F[i-1]\)</span>里所有的entry都是已知的，也就是前<span class="math inline">\(i\)</span>件物品在所有可能的背包容量下的价值。 伪代码： <img src="/2020/06/02/Knapsack1/image-20200527112309894.png" class="" title="pseudocode_01"> 代码实现：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackBasic</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [[<span class="number">0</span>] * (Vs) <span class="keyword">for</span> _ <span class="keyword">in</span> range(Ns)]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, N+<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[i][v] = max(dp[i<span class="number">-1</span>][v], dp[i<span class="number">-1</span>][v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[N][V]</span><br></pre></td></tr></table></figure>
-<p>边界点1：<span class="math inline">\(v=0,i=0\)</span>, 虽然我们的容量为<span class="math inline">\(V\)</span>，物品数目为<span class="math inline">\(N\)</span>，但我们有<span class="math inline">\(V+1\)</span>，<span class="math inline">\(N+1\)</span>种物品（包含0容量和前0件物品）。</p>
-<p>边界点2：<span class="math inline">\(v&lt;C_i\)</span>，易知当v小于<span class="math inline">\(C_i\)</span>时，根本无法将第<span class="math inline">\(i\)</span>件物品放入背包，所以我们的遍历空间为<span class="math inline">\(C_i...V\)</span>。</p>
-<h3 id="优化空间复杂度">优化空间复杂度</h3>
-<p>实用一个数组<span class="math inline">\(F[0...V]\)</span>来代替二维数组，原因在于状态转移方程只和上一次迭代的结果，也就是<span class="math inline">\(F[i-1, 0...V]\)</span>相关。所以我们可以基于上一个<span class="math inline">\(F_{i-1}\)</span>来更新当前<span class="math inline">\(F_i\)</span>。然而，我们必须逆序计算<span class="math inline">\(F[v]\)</span>, <span class="math inline">\(v \leftarrow V...0\)</span>，原因在于这样可以保证<span class="math inline">\(v-C_i\)</span>之前的entry是<span class="math inline">\(F_{i-1}\)</span>未更新的。</p>
-<p>伪代码：</p>
-<img src="/2020/06/02/Knapsack1/image-20200527132900818.png" class="" title="pseudocode_01">
-<p>代码实现:</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackOpt</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
-<h3 id="题目变种">题目变种</h3>
-<p>要求<em>恰好装满背包</em>时的最优解。</p>
-<p>这种情况我们要重新定义一下子问题状态: <span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>件物品放入一个容量为<span class="math inline">\(v\)</span>的背包<em>恰好装满</em>时可以获得的最大价值。这里的前<span class="math inline">\(i\)</span>件物品包括第<span class="math inline">\(i\)</span>件物品。</p>
-<p>也就是说我们初始化的时候需要重新定义<span class="math inline">\(F\)</span>的合法数值，当<span class="math inline">\(i=0\)</span>，只有<span class="math inline">\(v=0\)</span>，才能满足恰好装满的条件，也就是没有任何物品放入背包，背包已满。<span class="math inline">\(v\)</span>的其他取值都初始化为<span class="math inline">\(-\infty\)</span>，也就是标记为不合法。</p>
-<p>代码实现:</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ZeroOnePackFull</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [float(<span class="string">'-inf'</span>)] * Vs</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
-<h3 id="复杂度">复杂度</h3>
-<p>时间复杂度为<span class="math inline">\(O(VN)\)</span></p>
-<p>优化后的空间复杂度为<span class="math inline">\(O(V)\)</span></p>
-<h3 id="目标和"><a href="https://leetcode-cn.com/problems/target-sum/" target="_blank" rel="noopener">494. 目标和</a></h3>
-<p>乍一看这题和0-1背包问题一点关系都没有，但是实际上还是一个背包问题。可以讲这一组数据分为两组，正数组和负数组。分别记为left和right <span class="math display">\[
-\begin{equation} \nonumber
-    \begin{aligned}
-    left - right = target \\
-    left - (sum - left) = target \\
-    left = \frac{target+sum}{2}
-    \end{aligned}
-\end{equation}
-\]</span> 如果left不是整数的话其实就代表这无解，然后我们就可以把这题转换成一个塞满整个背包有多少种方法的0-1背包问题。 1. 定义dp状态 <span class="math inline">\(dp[i,v]\)</span>为前i个物品能够装满容量为v的背包的方法数量 2. 状态转移 <span class="math display">\[
-dp[i,v] = dp[i-1,v] + dp[i-1,v-C_i]
-\]</span> <span class="math inline">\(dp[i-1,v]\)</span>表示不放第i个物品，前i-1已经装满v的组合数 <span class="math inline">\(dp[i-1,v-C_i]\)</span>表示放第i个物品的组合数，前i-1刚好还差<span class="math inline">\(C_i\)</span>大小的第i个物品 3. 优化空间 由于都是从i-1转换而来，所以i-1相当于当前数组还未更新的状态，于是有<code>dp[v] = dp[v] + dp[v-nums[i]];</code>。 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">findTargetSumWays</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> S)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> sum = sum(nums);</span><br><span class="line">        <span class="keyword">if</span> ((sum + S) % <span class="number">2</span> == <span class="number">1</span> || S &gt; <span class="number">1000</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> left = (sum + S) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[left+<span class="number">1</span>];</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> v=left; v &gt;= num; v--) &#123;</span><br><span class="line">                dp[v] = dp[v] + dp[v-nums[i]];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[left];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> e: nums) </span><br><span class="line">            ret += e;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="完全背包问题">完全背包问题</h2>
-<h3 id="题目-1">题目</h3>
-<p>有<span class="math inline">\(N\)</span>种物品和一个容量为<span class="math inline">\(V\)</span>的背包，每种物品都有无限件可用。放入第<span class="math inline">\(i\)</span>种物品的费用是<span class="math inline">\(C_i\)</span>价值是<span class="math inline">\(W_i\)</span>。求解：将哪些物品装入背包，可以使得这些物品的耗费的费用总和不超过背包容量，且价值总和最大。</p>
-<h3 id="基本思路">基本思路</h3>
-<p>这个问题非常类似于0-1背包问题，所不同的是每种物品都有无限件。所以每种物品的取件数有<span class="math inline">\(\lfloor V/C_i \rfloor\)</span>种选择。</p>
-<p>现在我们仍旧定义原来的子问题<span class="math inline">\(F[i,v]\)</span>，只不过加上了可以重复取件的条件。</p>
-<p>于是乎状态转移方程需要发生改变: <span class="math display">\[
-F[i,v]=\max\{F[i-1,v-kC_i]+kW_i | 0 \leq kC_i \leq v\}
-\]</span> 这个和0-1背包问题一样有<span class="math inline">\(O(VN)\)</span>个状态需要求解，但是求解每个状态的时间不是常数而是<span class="math inline">\(O(\lfloor \frac{v}{C_i}\rfloor)\)</span>，总的时间复杂度为<span class="math inline">\(O(NV\sum^N_{i=1}{\frac{V}{C_i}})\)</span></p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CompletePackBasic</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            tmp = []</span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">0</span>, (v // C[i<span class="number">-1</span>])+<span class="number">1</span>):</span><br><span class="line">                tmp.append(dp[v-k*C[i<span class="number">-1</span>]]+k*W[i<span class="number">-1</span>])</span><br><span class="line">            dp[v] = max(tmp)</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
-<h3 id="优化">优化</h3>
-<h4 id="优化1-对数据进行预处理">优化1 对数据进行预处理：</h4>
-<p>首先将费用大于 V 的物品去掉，然后使用类似计数排序的做法，计算出费用相同的物品中价值最高的是哪个，可以差不多用<span class="math inline">\(O(V +N)\)</span>地完成这个优化，除非重复费用的物品过多。</p>
-<h4 id="优化2-转化为01背包问题">优化2 转化为01背包问题：</h4>
-<p>这个优化非常刁钻，考虑到第<span class="math inline">\(i\)</span>种物品最多选 <span class="math inline">\(⌊V/C_i⌋\)</span> 件，于是可以把第<span class="math inline">\(i\)</span>种物品转化为<span class="math inline">\(⌊V/C_i⌋\)</span>件费用及价值均不变的物品。比如现有 <span class="math display">\[
-\begin{equation} \nonumber
-\begin{aligned}
-N &amp;= 4  \\ 
-V &amp;= 10 \\ 
-C &amp;= [10, 6, 3, 4]  \\ 
-W &amp;= [10, 7, 6, 5] \\ 
-\end{aligned} 
-\end{equation}
-\]</span> 我们可以将其转换为如下的0-1背包问题 <span class="math display">\[
-\begin{aligned}
-N &amp;= 7 \\
-V &amp;=10 \\
-C &amp;= [10,6,3,3,3,4,4] \\
-W &amp;= [10,7,6,6,6,5,5] \\
-\end{aligned}
-\]</span> 还有一种更骚的操作是：把第<span class="math inline">\(i\)</span>种物品拆成费用为<span class="math inline">\(C_i2^k\)</span>、价值为<span class="math inline">\(W_i2^k\)</span>的若干件物品，其中<span class="math inline">\(k\)</span>取遍满足<span class="math inline">\(C_i2^k≤V\)</span>的非负整数。不管最优策略选几件第$i $种物品，总可以表示成若干个不同<span class="math inline">\(2^k\)</span>物品的和。这样一来就把每种物品拆成<span class="math inline">\(O(\log ⌊V/Ci⌋)\)</span>件物品，是一个很大的改进。用之前的例子，我们可以将其装化为如下的01背包问题 <span class="math display">\[
-\begin{aligned}
-N &amp;= 6 \\
-V &amp;= 10 \\
-C &amp;= [10, 6, 3, 6, 4,8] \\
-W &amp;= [10, 7, 6, 12,5,10] \\
-\end{aligned}
-\]</span> 为什么可以如此转换呢？原因在于<span class="math inline">\(2^n-1=\sum_{i=0}^{n-1}2^{i}\)</span>，我们可以看到在上一个简单的01背包问题转换操作中，取3个费用为3价值为6的情况是用3个相同价值相同费用的物品实现的，而在这个转换方法中这种情况是由取1个费用为3和1个费用为6的物品实现的，大大减少了遍历的次数。</p>
-<h4 id="优化3-ovn-改变遍历次序">优化3 O(VN) 改变遍历次序</h4>
-<p>伪代码：</p>
-<img src="/2020/06/02/Knapsack1/image-20200527163346518.png" class="" title="pseudocode_03">
-<p>我们可以发现，这段伪代码和01背包问题仅仅只有<span class="math inline">\(v\)</span>的循环次序不同，现在采用增序递增的方式更新子状态。原因在于，此时我们需要一个可能已选入第<span class="math inline">\(i\)</span>种物品的子结果<span class="math inline">\(F[i,v-C_i]\)</span>。此时的状态转移方程为: <span class="math display">\[
-F[i,v]=\max\{F[i-1,v],F[i,v-C_i]+W_i\}
-\]</span> <span class="math inline">\(F[i-1,v]\)</span>：不放入第<span class="math inline">\(i\)</span>件物品</p>
-<p><span class="math inline">\(F[i,v-C_i]\)</span>: 上一次放了第<span class="math inline">\(i\)</span>件物品时的价值加上这次放第<span class="math inline">\(i\)</span>件物品</p>
-<p>此时的空间复杂度为<span class="math inline">\(O(V)\)</span>，时间复杂度依然为<span class="math inline">\(O(VN)\)</span>。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CompletePackVN</span><span class="params">(N, V, C, W)</span>:</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[V]</span><br></pre></td></tr></table></figure>
-<h2 id="多重背包问题">多重背包问题</h2>
-<h3 id="题目-2">题目</h3>
-<p>有<span class="math inline">\(N\)</span>种物品和一个容量为<span class="math inline">\(V\)</span>的背包。第<span class="math inline">\(i\)</span>种物品最多有<span class="math inline">\(M_i\)</span>件可用，每件耗费的空间是<span class="math inline">\(C_i\)</span>，价值是<span class="math inline">\(W_i\)</span>。求解将哪些物品装入背包可使这些物品的耗费的空间总和不超过背包容量，且价值总和最大。</p>
-<h3 id="基本思路-1">基本思路</h3>
-<p>这题和完全背包问题十分相似，在这里对于第<span class="math inline">\(i\)</span>种物品，我们有<span class="math inline">\(M_i+1\)</span>种策略：取0件，取1件，....，取<span class="math inline">\(M_i\)</span>件；而在完全背包问题种我们有<span class="math inline">\(\lfloor \frac{V}{C_i}\rfloor +1\)</span>种取法。所以我们只要稍微修改一下状态转移方程即可： <span class="math display">\[
-F[i,v]=\max\{F[i-1,v-k*C_i]+k*W_i|0\leq k \leq M_i\}
-\]</span> 此时的时间复杂的为<span class="math inline">\(O(V\sum_{i=1}^{N}M_i)\)</span>。</p>
-<h3 id="转化为01背包问题">转化为01背包问题</h3>
-<p>和之前的完全背包问题一样，多重背包问题也可以通过拆分转换为01背包问题。</p>
-<p>如完全背包问题中的<strong>优化1</strong>一样，我们可以将第<span class="math inline">\(i\)</span>种物品拆分成<span class="math inline">\(M_i\)</span>件相同费用相投价值的物品。此时的时间复杂度依然是<span class="math inline">\(O(V\sum_{i=1}^{N}M_i)\)</span>。</p>
-<p>实现代码：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">MultiPackBasic</span><span class="params">(N, V, C, W, M)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    将多重背包问题简单转换成01背包问题</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        m = M[i] - <span class="number">1</span></span><br><span class="line">        C += [C[i]] * m</span><br><span class="line">        W += [W[i]] * m</span><br><span class="line">        N += m</span><br><span class="line">    Vs = V + <span class="number">1</span> </span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
-<p>同样的，我们还可按照之前<strong>优化1</strong>中的第二种方法来拆分：</p>
-<p>将第<span class="math inline">\(i\)</span>种物品拆分成若干个01背包中的物品，这些物品的费用和价值均是原来的费用和价值乘以这个系数。这些系数分别为<span class="math inline">\(1,2,..,2^k\)</span>且<span class="math inline">\(k\)</span>是满足<span class="math inline">\(2^k\leq M_i\)</span>的最大整数。例如，如果<span class="math inline">\(M_i\)</span>为<span class="math inline">\(13\)</span>，则相应的<span class="math inline">\(k = 3\)</span>，这种最多取<span class="math inline">\(13\)</span>件的物品应被分成系数分别为<span class="math inline">\(1, 2, 4, 8\)</span>的四件物品。</p>
-<blockquote>
-<p>为什么我这里采用的系数和背包九讲里的系数不同？因为我按照的是之前完全背包问题的拆分方法，也就是拆到系数大到允许的物品件数为止。个人认为，这样的拆分方法更容易理解，也更容易实现和证明。</p>
-</blockquote>
-<p>代码实现：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">MultiPackBinary</span><span class="params">(N, V, C, W, M)</span>:</span></span><br><span class="line">    <span class="string">'''</span></span><br><span class="line"><span class="string">    将多重背包问题利用二进制的特性转换成01背包问题</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        Mi = M[i]</span><br><span class="line">        k = <span class="number">2</span></span><br><span class="line">        <span class="keyword">while</span> k &lt;= Mi:</span><br><span class="line">            N += <span class="number">1</span></span><br><span class="line">            W += [W[i] * k]</span><br><span class="line">            C += [C[i] * k]</span><br><span class="line">            k *= <span class="number">2</span></span><br><span class="line">    Vs = V + <span class="number">1</span> </span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">0</span>] * Vs</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(Vs<span class="number">-1</span>, C[i<span class="number">-1</span>]<span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">            dp[v] = max(dp[v], dp[v-C[i<span class="number">-1</span>]]+W[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
-<p>时间复杂度：<span class="math inline">\(O(V\sum_{i=1}^{N}\log{M_i})\)</span>；空间复杂度：<span class="math inline">\(O(V)\)</span> （我们可以筛掉不可能的取件数选项）。</p>
-<h4 id="二进制拆分法的数学证明">二进制拆分法的数学证明</h4>
-<p><em>本证明由复旦某数学系大佬提供</em></p>
-<p><span class="math inline">\(Proposition\)</span>: For any positive integer <span class="math inline">\(m \leq 2^{n}-1\)</span>，there exists a set <span class="math inline">\(S \subseteq \{0,1,2,...,n-1\}\)</span> and <span class="math inline">\(S\neq \phi\)</span> such that <span class="math inline">\(m=\sum_{i\in S}2^{i}\)</span>.</p>
-<p><span class="math inline">\(Proof\)</span>:</p>
-<p>It is obvious to get there are totally <span class="math inline">\(2^n-1\)</span> kinds of <span class="math inline">\(S\)</span>, because the number of permutations is <span class="math display">\[
-\sum_{i=1}^n{n \choose i}=2^n-1
-\]</span> Also, we can find the maximum of <span class="math inline">\(m\)</span> is <span class="math inline">\(2^n - 1\)</span> and the minimum is <span class="math inline">\(1\)</span>. There are totally <span class="math inline">\(2^n-1\)</span>, and the range of the sum is from <span class="math inline">\(1\)</span> to <span class="math inline">\(2^n-1\)</span>. It means that as long as we prove the sum of each <span class="math inline">\(S\)</span> is unique, we can prove the proposition. In mathematical words, for any <span class="math inline">\(S_i,S_j\)</span> where <span class="math inline">\(i\neq j\)</span>, <span class="math inline">\(\sum_{k\in S_i}2^k \neq \sum_{k \in S_j}2^k\)</span>.</p>
-<p>Given two different sets <span class="math inline">\(S_i\)</span> and <span class="math inline">\(S_j\)</span>, we can get <span class="math inline">\(G_i = S_i-S_j\)</span> and <span class="math inline">\(G_j=S_j-S_i\)</span>. WLOG, we only need to prove that <span class="math inline">\(\sum_{k\in G_i}2^k \neq \sum_{k \in G_j}2^k\)</span>, for any <span class="math inline">\(G_i,G_j\)</span> where <span class="math inline">\(i\neq j\)</span>.</p>
-<p>First situation, either <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index <span class="math inline">\(0\)</span>. WLOG, we assume <span class="math inline">\(G_i\)</span> contains the index <span class="math inline">\(0\)</span>. Then the component sum of <span class="math inline">\(G_i\)</span> is odd, while the component of <span class="math inline">\(G_j\)</span> is even. Therefore, they must be different.</p>
-<p><span class="math display">\[
-\sum_{k \in G_i}{2^k}=1+\sum_{k\neq 0, k \in G_i}{2^k} \neq \sum_{k\in G_j}2^k
-\]</span> Second situation, neither <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index 0. We defined that <span class="math inline">\(G_i=\{2^{i_k}|i_k&lt;i_{k+1},k=1,2,...,p\}\)</span> where <span class="math inline">\(p\)</span> is the number of entries in <span class="math inline">\(G_i\)</span>, similarly, <span class="math inline">\(G_j=\{2^{j_k}|j_k&lt;j_{k+1},k=1,2,...,q\}\)</span> where <span class="math inline">\(q\)</span> is the number of entries in <span class="math inline">\(G_j\)</span>. WLOG, we set <span class="math inline">\(i_1 &lt; j_1\)</span>.</p>
-<p>We assume that the internal summations of <span class="math inline">\(G_i\)</span> and <span class="math inline">\(G_j\)</span> are equal, we can get the following equation: <span class="math display">\[
-\begin{aligned} 
-\sum_{k \in G_i}2^k=\sum_{k \in G_j}2^k \\
-2^{i_1}+2^{i_2}+...+2^{i_p} = 2^{j_1}+2^{j_2}+...+2^{j_q} \\
-1+2^{i_2-i_1}+...+2^{i_p-i_1}=2^{j_1-i_1}+2^{j_2-i_1}+...+2^{j_q-i_1}
-\end{aligned}
-\]</span> Since <span class="math inline">\(G_i \cap G_j=\phi\)</span> and neither <span class="math inline">\(G_i\)</span> or <span class="math inline">\(G_j\)</span> contains the index of <span class="math inline">\(0\)</span>, therefore the left-hand side of equation is odd and the right-hand side is even, which contradicts the previous assumption of equivalence of internal summation of <span class="math inline">\(G_i\)</span> and <span class="math inline">\(G_j\)</span>.</p>
-<p>Thus, we can prove that the summation of any <span class="math inline">\(S\)</span> is unique, which further proves one-to-one mapping relation that for any positive integer <span class="math inline">\(m \leq 2^{n}-1\)</span>，there exists a unique set <span class="math inline">\(S \subseteq \{0,1,2,...,n-1\}\)</span> and <span class="math inline">\(S\neq \phi\)</span> such that <span class="math inline">\(m=\sum_{i\in S}2^{i}\)</span>.</p>
-<p>实际上我们可以通过二进制来看出一些端倪，比如 <span class="math display">\[
-\begin{aligned}11010110_{2} = \\
-&amp; 10000000_2+ \\
-&amp; 01000000_2+ \\
-&amp; 00010000_2+ \\
-&amp; 00000100_2 + \\
-&amp; 00000010_2
-\end{aligned}
-\]</span> 我们可以看到，任意一个整数都可以用二进制来表示，然后它的位数计算其实就是我们的拆分方式。</p>
-<h3 id="可行性问题的ovn算法">可行性问题的<span class="math inline">\(O(VN)\)</span>算法</h3>
-<p>如果问题考察的是"每种有若干件的物品能否填满给定容量的背包"，只要考虑填满背包的可行性，不需考虑没见物品的价值时，多重背包问题可以有<span class="math inline">\(O(VN)\)</span>复杂度的算法。</p>
-<p>事实上，0-1背包问题的装满可行性算法就是<span class="math inline">\(O(VN)\)</span>，所以比较直观的想法是利用上述拆分法将多重背包问题转换成0-1背包问题，然后解决，不过此时的时间复杂度是<span class="math inline">\(O(V\sum{M_i})\)</span>。</p>
-<p>所以我们需要对子状态进行重新定义：</p>
-<p><span class="math inline">\(F[i,v]\)</span>表示用前<span class="math inline">\(i\)</span>种物品填满容量为<span class="math inline">\(v\)</span>的背包后，还剩下多少个第<span class="math inline">\(i\)</span>种物品可用。定义<span class="math inline">\(F[i,V]=-1\)</span>为不合法，即未填满。所以我们只要判断前<span class="math inline">\(i\)</span>物品填满容量为<span class="math inline">\(V\)</span>的背包后是否等于<span class="math inline">\(-1\)</span>就可以知道能否装满了。</p>
-<p>伪代码：</p>
-<img src="/2020/06/02/Knapsack1/image-20200602164925985.png" class="" title="pseudocode_04">
-<p>代码实现：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">canFullPack</span><span class="params">(N, V, C, M)</span>:</span></span><br><span class="line">    Ns = N + <span class="number">1</span></span><br><span class="line">    Vs = V + <span class="number">1</span></span><br><span class="line">    dp = [<span class="number">-1</span>] * Vs</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(V):</span><br><span class="line">            <span class="keyword">if</span> dp[v] &gt;= <span class="number">0</span>:</span><br><span class="line">                dp[v] = M[i<span class="number">-1</span>]</span><br><span class="line">            <span class="keyword">elif</span> dp[v] == <span class="number">-1</span>:</span><br><span class="line">                dp[v] = <span class="number">-1</span></span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> range(C[i<span class="number">-1</span>], Vs):</span><br><span class="line">            dp[v] = max(dp[v-C[i<span class="number">-1</span>]]<span class="number">-1</span>, dp[v])</span><br><span class="line">    <span class="keyword">return</span> dp[<span class="number">-1</span>] &gt;= <span class="number">0</span></span><br></pre></td></tr></table></figure>
-<p>第二层循环中的第一层循环是初始化当前物品的<span class="math inline">\(M_i\)</span>在各个合法entry中的值，表明当前所有塞满的背包剩下最多<span class="math inline">\(M_i\)</span>的第<span class="math inline">\(i\)</span>件物品；</p>
-<p>第二层循环中的第二层循环是便是状态转移方程的实现， <span class="math display">\[
-F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
-\]</span> 为什么要定义最多剩下呢？这是一种贪婪的想法，我们需要尽可能的为后面的装填留更多的物品。</p>
-<h2 id="例题">例题</h2>
-<h4 id="零钱兑换"><a href="https://leetcode-cn.com/problems/coin-change/" target="_blank" rel="noopener">322. 零钱兑换</a></h4>
-<p>咱们接下来看一到经典例题，零钱兑换。<br> <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">coinChange</span><span class="params">(self, coins: List[int], amount: int)</span> -&gt; int:</span></span><br><span class="line">        Ns = len(coins) + <span class="number">1</span></span><br><span class="line">        Vs = amount + <span class="number">1</span></span><br><span class="line">        dp = [float(<span class="string">'inf'</span>)] * Vs</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, Ns):</span><br><span class="line">            <span class="keyword">for</span> v <span class="keyword">in</span> range(coins[i<span class="number">-1</span>], Vs):</span><br><span class="line">                dp[v] = min(dp[v], dp[v-coins[i<span class="number">-1</span>]]+<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span> <span class="keyword">if</span> dp[<span class="number">-1</span>] == float(<span class="string">'inf'</span>) <span class="keyword">else</span> dp[<span class="number">-1</span>]</span><br></pre></td></tr></table></figure></p>
-<p>这道题其实也可以转换成背包问题，我们把amount看作这个背包的容量，硬币就是价值为<span class="math inline">\(1\)</span>的物品，硬币的面值看作每件物品的费用。为什么我们把硬币的价值作为<span class="math inline">\(1\)</span>来处理呢？其实我们可以定义子状态<span class="math inline">\(F[i,v]\)</span>为前<span class="math inline">\(i\)</span>种物品要装满容量为<span class="math inline">\(v\)</span>的背包至少所需要的件数，这和我们把硬币的价值看作<span class="math inline">\(1\)</span>其实是一样的。</p>
-]]></content>
-      <categories>
-        <category>Algorithm</category>
-      </categories>
-      <tags>
-        <tag>dynamic programming</tag>
-        <tag>knapsack</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>树相关问题集</title>
     <url>/2020/06/02/Tree/</url>
     <content><![CDATA[<p><em>二叉树，永远的神。</em> <a id="more"></a></p>
@@ -1082,81 +1082,6 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
       </categories>
   </entry>
   <entry>
-    <title>《JavaScript DOM编程艺术》第三章读书笔记</title>
-    <url>/2020/06/02/jsdom3/</url>
-    <content><![CDATA[<h2 id="dom解释">DOM解释</h2>
-<ul>
-<li>D: 网页文档</li>
-<li>O：对象，自足的数据集合。JS里的对象可以分为三种类型
-<ol type="1">
-<li>用户定义对象(user-defined object): 由程序员自行创建的对象</li>
-<li>内建对象(native object): 内建的js对象，如Array，Math</li>
-<li>宿主对象(host object): 由浏览器提供的对象</li>
-</ol></li>
-<li>M： (X)HTML所代表的节点树模型 <a id="more"></a> ## 元素节点 元素节点时DOM中的原子，其包含文本节点和属性节点。<code>&lt;P&gt;</code>为元素节点，<code>&lt;p&gt;xxx&lt;/p&gt;</code>包含的xxx为文本节点，<code>&lt;p title='x'&gt;&lt;/p&gt;</code>中的title为属性节点</li>
-</ul>
-<h2 id="获取元素节点">获取元素节点</h2>
-<ol type="1">
-<li>getElementById <code>document.getElementById("&lt;id&gt;")</code></li>
-<li>getElementsByTagName 返回一个<code>对象数组</code>，每个对象分别对应这文档里给定标签的一个元素。 <code>document.getElementsByTagName("li")</code> 如果你想知道某份文档里共有多少个元素节点，可以使用通配符 <code>document.getElementsByTagName("*").length</code> 话可以将<code>getElementById</code>和<code>getElementsByTagName</code>结合起来， <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> shopping = <span class="built_in">document</span>.getElementById(<span class="string">"purchases"</span>);</span><br><span class="line"><span class="keyword">var</span> items = shopping.getElementsByTagName(<span class="string">"*"</span>);</span><br></pre></td></tr></table></figure></li>
-<li>getElementsByClassName 返回一个具有相同类名的元素的数组。 <code>document.getElementsByClassName("sale);</code></li>
-</ol>
-<h2 id="获取和设置属性">获取和设置属性</h2>
-<ol type="1">
-<li>getAttribute 该方法不属于<code>document</code>对象，所以不能通过其调用，它只能通过元素节点对象吊桶。 <code>object.get.Attribute(attribute);</code></li>
-<li>setAttribute <code>object.setAttribute(attribute, value);</code></li>
-</ol>
-<p><strong>通过setAttribute()方法对文档作出的改变，但这张改变并未反映到源代码中，也就是说，源代码中属性值仍旧是原来的属性值。这种“表里不一”的现象缘于DOM的工作模式：先加载文档的静态内容，再以动态方式对它们进行刷新，动态刷新不改变文档的静态内容，而对页面内容的刷新，不需要用户在他们的浏览器里执行刷新操作就可以实现。</strong></p>
-<p>个人对这句话的理解时，你在console中运行setAttribute的DOM操作不会影响静态的html源代码，但是浏览器已经将你的修改运行到了渲染中。比如你在console中修改attribute <code>href</code>, 源代码不会改变，但是你点击的那个超链接已经发生了改变。</p>
-]]></content>
-      <categories>
-        <category>Frontend</category>
-        <category>JavaScript</category>
-      </categories>
-      <tags>
-        <tag>DOM</tag>
-        <tag>DOM Scripting Notes</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>《JavaScript DOM编程艺术》第四章读书笔记</title>
-    <url>/2020/06/02/jsdom4/</url>
-    <content><![CDATA[<p>这里我们主要谈的是html上对用户事件的处理。</p>
-<h2 id="事件处理函数">事件处理函数</h2>
-<p>时间处理函数的作用是，在特定时间发生时调用特定的JavaScript代码。 <a id="more"></a> <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"images/fireworks.jpg"</span> <span class="attr">title</span>=<span class="string">"A fireworks display"</span> <span class="attr">onclick</span>=<span class="string">"showPic(this); return false;"</span>&gt;</span></span><br><span class="line">Fireworks<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">pic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> source = pic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">let</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>, source);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>this</code>表示这个<code>&lt;a&gt;</code>元素节点</li>
-<li><code>event = "JS statements"</code>来添加事件处理函数的语法</li>
-<li>如果仅仅把使劲按处理函数放到图片列表的一个链接中，我们会遇到一个问题：点击这个链接时，不仅<code>showPic</code>函数被调用，链接被点击的默认行为也会被调用。这意味着用户还是会被带到图片查看窗口。我们需要组织这个默认行为被调用。</li>
-</ul>
-<p>一旦事件发生，相应的js代码就会得到执行。被调哦那个的js代码可以返回一个值，这个值将被传递给那个时间处理函数，并让这个处理函数出发的js代码返回布尔值true或false。如果返回的时true，onclick时间处理函数九认为"这个链接被点击了"；反之，如果返回的值时false，onclick时间处理函数就认为"这个链接没有被点击"。因此，<code>return false;</code>可以防止用户被带到目标链接窗口。</p>
-<h3 id="nodetype属性">nodeType属性</h3>
-<p><code>node.nodeType</code>获取节点的nodeType属性。 nodeType属性总共有12种，期中仅有3种具有实用价值：</p>
-<ul>
-<li>元素节点：1</li>
-<li>属性节点：2</li>
-<li>文本节点：3</li>
-</ul>
-<h3 id="替代文本节点">替代文本节点</h3>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">whichpic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> source = whichpic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">var</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>,source);</span><br><span class="line">  <span class="keyword">var</span> text = whichpic.getAttribute(<span class="string">"title"</span>);</span><br><span class="line">  <span class="keyword">var</span> description = <span class="built_in">document</span>.getElementById(<span class="string">"description"</span>);</span><br><span class="line">  description.firstChild.nodeValue = text;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里我们通过firstChild来渠道<code>&lt;p&gt;</code>元素节点的文本节点。如果该元素节点有包含文本的话，那么该元素的firstChild就为文本节点，否则时其他（元素）节点。</p>
-<ul>
-<li><code>node.nodeValue</code>: 取文本节点的值</li>
-<li><code>node.firstChild</code>: 等价于<code>node.childNodes[0]</code></li>
-<li><code>node.lastChild</code>: 等价于<code>node.childNodes[node.childNodes.length-1]</code></li>
-</ul>
-]]></content>
-      <categories>
-        <category>Frontend</category>
-        <category>JavaScript</category>
-      </categories>
-      <tags>
-        <tag>DOM</tag>
-        <tag>DOM Scripting Notes</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>《JavaScript DOM编程艺术》第五章读书笔记</title>
     <url>/2020/06/02/jsdom5/</url>
     <content><![CDATA[<p>JavaScript平稳退化，兼容和性能问题(tips)。 <a id="more"></a></p>
@@ -1247,7 +1172,7 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">document</span>.createTextNode(<span class="string">"Hello World"</span>);</span><br><span class="line"><span class="keyword">var</span> txt = <span class="built_in">document</span>.createTextNode(<span class="string">"Hello World"</span>);</span><br><span class="line">para.appendChild(txt);</span><br></pre></td></tr></table></figure>
 <h4 id="例子">例子</h4>
 <p>插入一个简单的元素 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>This is <span class="tag">&lt;<span class="name">em</span>&gt;</span>my<span class="tag">&lt;/<span class="name">em</span>&gt;</span> content.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure> 节点树：</p>
-<p><img src="D:\CUHKSZ\OneDrive - CUHK-ShenZhen\SharedDocuments\Hexo_blogs\Frontend\notes\jsdom7.assets\image-20200607171033679.png" alt="image-20200607171033679" style="zoom:50%;" /></p>
+<img src="/2020/06/21/jsdom7/image-20200607171033679.png" class="">
 <p>代码： <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> para = <span class="built_in">document</span>.createElement(<span class="string">'p'</span>);</span><br><span class="line"><span class="keyword">var</span> txt1 = <span class="built_in">document</span>.createTextNode(<span class="string">"This is "</span>);</span><br><span class="line"><span class="keyword">var</span> em = <span class="built_in">document</span>.createElement(<span class="string">'em'</span>);</span><br><span class="line"><span class="keyword">var</span> em_txt = <span class="built_in">document</span>.createTextNode(<span class="string">"my"</span>);</span><br><span class="line"><span class="keyword">var</span> txt2 = <span class="built_in">document</span>.createTextNode(<span class="string">" content."</span>);</span><br><span class="line">para.appendChild(txt1);</span><br><span class="line">em.appendChild(em_txt);</span><br><span class="line">para.appendChild(txt3);</span><br><span class="line"><span class="keyword">var</span> testdiv = <span class="built_in">document</span>.getElementById(<span class="string">"testdiv"</span>);</span><br><span class="line">testdiv.appendChild(para);</span><br></pre></td></tr></table></figure></p>
 <h3 id="在已有元素前插入一个新元素">在已有元素前插入一个新元素</h3>
 <p>DOM提供了名为insertBefore()方法，这个方法将把一个新元素插入到一个现有元素的前面。</p>
@@ -1296,6 +1221,30 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
       <tags>
         <tag>DOM</tag>
         <tag>DOM Scripting Notes</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>阿里笔试20210322</title>
+    <url>/2021/03/22/%E9%98%BF%E9%87%8C%E7%AC%94%E8%AF%9520210322/</url>
+    <content><![CDATA[<p>Java实习生 笔试</p>
+<a id="more"></a>
+<h3 id="背包装满问题">01背包装满问题</h3>
+<p>花里胡哨讲了一大堆就是问，<span class="math inline">\(n\)</span>个物品，限重<span class="math inline">\(m\)</span>, 每个物品<span class="math inline">\(w_i\)</span>, 从这几个物品中任选几个问是否能恰好装满。 也可说是01换零钱。</p>
+<p>全AC，<span class="math inline">\(O(mn)\)</span> <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">knapsack</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n, <span class="keyword">int</span>[] weights)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span>[] dp = <span class="keyword">new</span> <span class="keyword">boolean</span>[m+<span class="number">1</span>];</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> v=m; v &gt;= weights[i]; v--) &#123;</span><br><span class="line">            dp[v] = dp[v] || dp[v-weights[i]];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(dp[m]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="石子游戏-v"><a href="https://leetcode-cn.com/problems/stone-game-v/" target="_blank" rel="noopener">1563. 石子游戏 V</a></h3>
+<p>一排球，每个球都有各自的值，每轮在中间划分两排（保持顺序不变），哪排球的总分值多，哪排球抛弃，剩下的那一排算入游戏总分，如果分值相同任选一个抛弃。 求问能够得到的最高分数。 例子：{6,2,4,4,5,5}</p>
+<p>第一轮：{6,2,4};{4,5,5} 总分=6+2+4=12 去掉{4,5,5}</p>
+<p>第二轮：{6};{2,4} 总分=12+2+4=18 去掉{6}</p>
+<p>第三轮：{2};{4} 总分=18+2=20 去掉{4} 返回20</p>
+<p><strong>第一种方法（笔试时的思路）：二分法+贪心（错误解法🙅）</strong> <span class="math inline">\(O(N^2)\)</span> <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">ball</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (head &gt;= rear) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> index = head;</span><br><span class="line">    <span class="keyword">int</span> total = sum(a, head, rear);</span><br><span class="line">    <span class="keyword">int</span> rightSum = total;</span><br><span class="line">    <span class="keyword">int</span> leftSum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> minDelta = total;</span><br><span class="line">    <span class="keyword">int</span> points;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=index; i &lt; rear; i++) &#123;</span><br><span class="line">        leftSum += a[i];</span><br><span class="line">        rightSum -= a[i];</span><br><span class="line">        <span class="keyword">int</span> delta = Math.abs(rightSum-leftSum);</span><br><span class="line">        <span class="keyword">if</span> (delta &lt; minDelta) &#123;</span><br><span class="line">            minDelta = delta;</span><br><span class="line">            index=i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    leftSum = sum(a, head, index);</span><br><span class="line">    rightSum = sum(a, index+<span class="number">1</span>, rear);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (leftSum &gt; rightSum) &#123;</span><br><span class="line">        points = rightSum + ball(a, index+<span class="number">1</span>, rear);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (leftSum &lt; rightSum) &#123;</span><br><span class="line">        points = leftSum + ball(a, head, index);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">//  等于情况取高值</span></span><br><span class="line">        points = leftSum + Math.max(ball(a, head, index), ball(a, index+<span class="number">1</span>, rear));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> points;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=head; i &lt;= rear; i++) &#123;</span><br><span class="line">        ret += nums[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>写的时候没想好，找leftSum和rightSum差最小的index的时候搞得太麻烦了，什么单调递增递减的，全搜就完事了，也不影响复杂度，真的给一些边缘情况搞得心态爆炸，45分钟的做题时间最后只通了5%，真是作死啊。</p>
+</blockquote>
+<p><strong>第二种方法：暴力递归+Memo</strong> <span class="math inline">\(O(N^3)\)</span></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span>[][] memo;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">stoneGameV</span><span class="params">(<span class="keyword">int</span>[] stoneValue)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> N = stoneValue.length;</span><br><span class="line">        memo = <span class="keyword">new</span> <span class="keyword">int</span>[N][N];</span><br><span class="line">        <span class="keyword">return</span> ball(stoneValue, <span class="number">0</span>, N-<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">ball</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (head &gt;= rear) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (memo[head][rear] != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> memo[head][rear];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> total = sum(a, head, rear);</span><br><span class="line">        <span class="keyword">int</span> leftSum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> rightSum = total;</span><br><span class="line">        <span class="keyword">int</span> points = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=head; i &lt; rear; i++) &#123;</span><br><span class="line">            leftSum += a[i];</span><br><span class="line">            rightSum -= a[i];</span><br><span class="line">            <span class="keyword">if</span> (leftSum &lt; rightSum) &#123;</span><br><span class="line">                points = Math.max(points, leftSum+ball(a, head, i));</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (leftSum &gt; rightSum) &#123;</span><br><span class="line">                points = Math.max(points, rightSum+ball(a, i+<span class="number">1</span>, rear));</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                points = Math.max(points, leftSum+Math.max(ball(a, head, i), ball(a, i+<span class="number">1</span>, rear)));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        memo[head][rear] = points;</span><br><span class="line">        <span class="keyword">return</span> points;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=head; i &lt;= rear; i++) &#123;</span><br><span class="line">            ret += nums[i];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>面筋</tag>
       </tags>
   </entry>
   <entry>
@@ -1394,6 +1343,81 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
 ]]></content>
       <tags>
         <tag>面筋</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《JavaScript DOM编程艺术》第三章读书笔记</title>
+    <url>/2020/06/02/jsdom3/</url>
+    <content><![CDATA[<h2 id="dom解释">DOM解释</h2>
+<ul>
+<li>D: 网页文档</li>
+<li>O：对象，自足的数据集合。JS里的对象可以分为三种类型
+<ol type="1">
+<li>用户定义对象(user-defined object): 由程序员自行创建的对象</li>
+<li>内建对象(native object): 内建的js对象，如Array，Math</li>
+<li>宿主对象(host object): 由浏览器提供的对象</li>
+</ol></li>
+<li>M： (X)HTML所代表的节点树模型 <a id="more"></a> ## 元素节点 元素节点时DOM中的原子，其包含文本节点和属性节点。<code>&lt;P&gt;</code>为元素节点，<code>&lt;p&gt;xxx&lt;/p&gt;</code>包含的xxx为文本节点，<code>&lt;p title='x'&gt;&lt;/p&gt;</code>中的title为属性节点</li>
+</ul>
+<h2 id="获取元素节点">获取元素节点</h2>
+<ol type="1">
+<li>getElementById <code>document.getElementById("&lt;id&gt;")</code></li>
+<li>getElementsByTagName 返回一个<code>对象数组</code>，每个对象分别对应这文档里给定标签的一个元素。 <code>document.getElementsByTagName("li")</code> 如果你想知道某份文档里共有多少个元素节点，可以使用通配符 <code>document.getElementsByTagName("*").length</code> 话可以将<code>getElementById</code>和<code>getElementsByTagName</code>结合起来， <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> shopping = <span class="built_in">document</span>.getElementById(<span class="string">"purchases"</span>);</span><br><span class="line"><span class="keyword">var</span> items = shopping.getElementsByTagName(<span class="string">"*"</span>);</span><br></pre></td></tr></table></figure></li>
+<li>getElementsByClassName 返回一个具有相同类名的元素的数组。 <code>document.getElementsByClassName("sale);</code></li>
+</ol>
+<h2 id="获取和设置属性">获取和设置属性</h2>
+<ol type="1">
+<li>getAttribute 该方法不属于<code>document</code>对象，所以不能通过其调用，它只能通过元素节点对象吊桶。 <code>object.get.Attribute(attribute);</code></li>
+<li>setAttribute <code>object.setAttribute(attribute, value);</code></li>
+</ol>
+<p><strong>通过setAttribute()方法对文档作出的改变，但这张改变并未反映到源代码中，也就是说，源代码中属性值仍旧是原来的属性值。这种“表里不一”的现象缘于DOM的工作模式：先加载文档的静态内容，再以动态方式对它们进行刷新，动态刷新不改变文档的静态内容，而对页面内容的刷新，不需要用户在他们的浏览器里执行刷新操作就可以实现。</strong></p>
+<p>个人对这句话的理解时，你在console中运行setAttribute的DOM操作不会影响静态的html源代码，但是浏览器已经将你的修改运行到了渲染中。比如你在console中修改attribute <code>href</code>, 源代码不会改变，但是你点击的那个超链接已经发生了改变。</p>
+]]></content>
+      <categories>
+        <category>Frontend</category>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>DOM</tag>
+        <tag>DOM Scripting Notes</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《JavaScript DOM编程艺术》第四章读书笔记</title>
+    <url>/2020/06/02/jsdom4/</url>
+    <content><![CDATA[<p>这里我们主要谈的是html上对用户事件的处理。</p>
+<h2 id="事件处理函数">事件处理函数</h2>
+<p>时间处理函数的作用是，在特定时间发生时调用特定的JavaScript代码。 <a id="more"></a> <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"images/fireworks.jpg"</span> <span class="attr">title</span>=<span class="string">"A fireworks display"</span> <span class="attr">onclick</span>=<span class="string">"showPic(this); return false;"</span>&gt;</span></span><br><span class="line">Fireworks<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">pic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> source = pic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">let</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>, source);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>this</code>表示这个<code>&lt;a&gt;</code>元素节点</li>
+<li><code>event = "JS statements"</code>来添加事件处理函数的语法</li>
+<li>如果仅仅把使劲按处理函数放到图片列表的一个链接中，我们会遇到一个问题：点击这个链接时，不仅<code>showPic</code>函数被调用，链接被点击的默认行为也会被调用。这意味着用户还是会被带到图片查看窗口。我们需要组织这个默认行为被调用。</li>
+</ul>
+<p>一旦事件发生，相应的js代码就会得到执行。被调哦那个的js代码可以返回一个值，这个值将被传递给那个时间处理函数，并让这个处理函数出发的js代码返回布尔值true或false。如果返回的时true，onclick时间处理函数九认为"这个链接被点击了"；反之，如果返回的值时false，onclick时间处理函数就认为"这个链接没有被点击"。因此，<code>return false;</code>可以防止用户被带到目标链接窗口。</p>
+<h3 id="nodetype属性">nodeType属性</h3>
+<p><code>node.nodeType</code>获取节点的nodeType属性。 nodeType属性总共有12种，期中仅有3种具有实用价值：</p>
+<ul>
+<li>元素节点：1</li>
+<li>属性节点：2</li>
+<li>文本节点：3</li>
+</ul>
+<h3 id="替代文本节点">替代文本节点</h3>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showPic</span>(<span class="params">whichpic</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> source = whichpic.getAttribute(<span class="string">"href"</span>);</span><br><span class="line">  <span class="keyword">var</span> placeholder = <span class="built_in">document</span>.getElementById(<span class="string">"placeholder"</span>);</span><br><span class="line">  placeholder.setAttribute(<span class="string">"src"</span>,source);</span><br><span class="line">  <span class="keyword">var</span> text = whichpic.getAttribute(<span class="string">"title"</span>);</span><br><span class="line">  <span class="keyword">var</span> description = <span class="built_in">document</span>.getElementById(<span class="string">"description"</span>);</span><br><span class="line">  description.firstChild.nodeValue = text;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里我们通过firstChild来渠道<code>&lt;p&gt;</code>元素节点的文本节点。如果该元素节点有包含文本的话，那么该元素的firstChild就为文本节点，否则时其他（元素）节点。</p>
+<ul>
+<li><code>node.nodeValue</code>: 取文本节点的值</li>
+<li><code>node.firstChild</code>: 等价于<code>node.childNodes[0]</code></li>
+<li><code>node.lastChild</code>: 等价于<code>node.childNodes[node.childNodes.length-1]</code></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Frontend</category>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>DOM</tag>
+        <tag>DOM Scripting Notes</tag>
       </tags>
   </entry>
 </search>
