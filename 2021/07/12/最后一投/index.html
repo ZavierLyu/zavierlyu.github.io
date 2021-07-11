@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":2,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="之前觉得人总是在回过头看的时候才会发现自己走了这么长的一段不得了的路，但是实际上回头看的时候只会觉得当时多么困难的事情并没有什么值得骄傲的。在今年春招的时候总是想着结束后要写一个总结来记录这多么不容易的过程，但当现在真正拿到offer后似乎又没啥动力去写了。我觉得我总是在不过不管怎样，大学生涯的最后一个学期里干的最主要的事情，也许还是有值得纪念和分享的价值吧。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最后一投--2021春招总结">
+<meta property="og:url" content="http://yoursite.com/2021/07/12/%E6%9C%80%E5%90%8E%E4%B8%80%E6%8A%95/index.html">
+<meta property="og:site_name" content="Garden of Sinners">
+<meta property="og:description" content="之前觉得人总是在回过头看的时候才会发现自己走了这么长的一段不得了的路，但是实际上回头看的时候只会觉得当时多么困难的事情并没有什么值得骄傲的。在今年春招的时候总是想着结束后要写一个总结来记录这多么不容易的过程，但当现在真正拿到offer后似乎又没啥动力去写了。我觉得我总是在不过不管怎样，大学生涯的最后一个学期里干的最主要的事情，也许还是有值得纪念和分享的价值吧。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-07-11T17:17:23.000Z">
+<meta property="article:modified_time" content="2021-07-11T17:24:57.909Z">
+<meta property="article:author" content="Zhewen Lyu">
+<meta property="article:tag" content="-- 招聘">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/07/12/%E6%9C%80%E5%90%8E%E4%B8%80%E6%8A%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>最后一投--2021春招总结 | Garden of Sinners</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Garden of Sinners</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-cv">
+
+    <a href="/cv/ZhewenLyu-CUHKSZ-eng.pdf" rel="section"><i class="fa fa-user fa-fw"></i>cv</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">8</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">17</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/ZavierLyu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/12/%E6%9C%80%E5%90%8E%E4%B8%80%E6%8A%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Zhewen Lyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Garden of Sinners">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          最后一投--2021春招总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-07-12 01:17:23 / Modified: 01:24:57" itemprop="dateCreated datePublished" datetime="2021-07-12T01:17:23+08:00">2021-07-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A2%8E%E7%A2%8E%E5%BF%B5/" itemprop="url" rel="index"><span itemprop="name">-- 碎碎念</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>之前觉得人总是在回过头看的时候才会发现自己走了这么长的一段不得了的路，但是实际上回头看的时候只会觉得当时多么困难的事情并没有什么值得骄傲的。在今年春招的时候总是想着结束后要写一个总结来记录这多么不容易的过程，但当现在真正拿到offer后似乎又没啥动力去写了。我觉得我总是在不过不管怎样，大学生涯的最后一个学期里干的最主要的事情，也许还是有值得纪念和分享的价值吧。</p>
+<a id="more"></a>
+<p>本文其实没有什么干货，大部分都是我关于这段求职之路的心路历程，碎碎念居多，纪念性比实用性可能更强一点。所以不好意思，奔着笔经和面经的朋友们可能要失望了。</p>
+<h2 id="背景">背景</h2>
+<p>其实我毕业后的主去向是海外申研我在进入新年来，差不多结束申请的时候就有过想要defer找工的打算。一月份的时候各大使馆还没有开，美国的疫情和Asian Hate还很严重，所以就有想要defer一年然后去个厂打工积累些经验的打算。后来到三月份，拿到了莱斯大学的offer，并且咨询了一下确定可以defer，于是心里就暗自打算春招一定要找到一份工作，或者如果真的有好的美校offer就去大厂的暑期实习。因此我在这个阶段实习和全职是都有去投的。</p>
+<p>其实我的简历是比较拉垮的，GPA在一个中等的水平，只有一个小厂实习，没有很多meaty project，大部分的project都是龙大里上课用来水分数的。钟老师的课的作业我也列上了，但是其实有很多作业只知道表层的东西并不懂底层的逻辑。其实这个背景去找工还是挺吃亏的，因为我想走的是Java的开发岗，但是我却从来没有跟着做完哪怕一个大的web project，Java的核心像多线程，容器，反射，内部类之类的也是到五月份才学的差不多。Spring的技术栈和其他中间件是一窍不通，设计模式只知道单例，redis也没有接触过，mysql只会增删改查。我想我这样的背景也能找到几份还算可以的工作，正在读的朋友如果要找工作的话真的可以不用那么焦虑（如果不考虑大厂的话）。</p>
+<p>至于刷题的话，我从一月份开始坚持每天至少刷一两题，主要是跟着labuladong的公众号文章来刷，个人感觉这位博主的刷题方法和解题思路还是很适合我的。所以如果想要参考刷题的路线，可以试一试labuladong的线路。</p>
+<p>至于学Java的话，主要是看《Java 核心技术 I》和B站上的视频，刷面试题看的是Java Guide和CyC2018，这两本互相借鉴。然后同时我买了一本《计算机网络：自顶向下》中文版开始学，《自顶向下》是我看过讲的最深入浅出的教材之一，写的非常好，看的时候真的有醍醐灌顶的感觉。</p>
+<p>还有一点可能比较特殊的是，我大四下只上一门课，还是一门比较水的课。为了好好准备春招，我退了老钟的compiler（顺便做了第一个作业），退了强化学习，所以我的求职之路可能比较特殊，属于临时抱佛脚，所以朋友们，找工的准备还是越早越好。</p>
+<p>接下来的话我就用流水账的方式记录下我投的公司和岗位吧。</p>
+<h2 id="时间轴">时间轴</h2>
+<h3 id="腾讯留学生实习-一面挂">腾讯留学生实习 一面挂</h3>
+<p>三月初的时候我投了一波腾讯的留学生实习后端，百度Java开发，华为的通用软件开发。腾讯面的早，当时刷题初现成效，但其实还有很多Java的面试题没有接触，因此没有意外地挂了腾讯PCG的留学生实习。我个人感觉，留学生暑期实习和秋招向的暑期实习差别并不大，他们还是想找实习干好能留任的人，所以表明想要留任而不是什么锻炼自己的态度还是挺重要的。当时的面试我记得问了一个最大连续乘积的问题，是最大连续和变种，然后我就按最大连续和来写了，甚至状态转移方程也只是将加号改成乘号，没有考虑负负得正的情况。所以在做最大连续乘积的时候，dp列表不仅要记最大值，也要记最小值也就是负值。这题我印象贼深刻，是因为我用错误的方法做了出来，然后自己写了几个测试例子都通过了（没有负数），然后面试官看了一眼没有指出来然后直接让我问有什么问题了。搞得我以为自己要过了呢。</p>
+<p>后来我又投了腾讯的全职啊以及其他岗位的实习什么的，就再也没被捞上来了。</p>
+<h3 id="百度java开发-笔试挂">百度Java开发 笔试挂</h3>
+<p>百度笔试只AC了一道，挂了。</p>
+<h3 id="华为通用软件开发-综测挂">华为通用软件开发 综测挂</h3>
+<p>华为的应聘过程真是记忆犹新。我参加了1次笔试，2次综合测试（性格测试），4次技术面试外加1次所谓综合测试澄清面试，然后因为性格测试挂了。这一趟下来我的微信列表里多了4个华为HR，我不得不给他们打上标签，以免以后吐槽华为的时候给他们看到（比如现在）。我笔试满分，三道编程题做完还有40分钟，交卷稳AC，所以当时有点期待又有点自豪。结果盲目的自信导致第一次的面试很糟糕，面的似乎是终端开发的部门，我竟然倒在了一个小小的删除链表的中间节点上。好吧其实快慢指针甚至解决环状链表东哥（labuladong）的公众号都有讲，但是我没看。后面问了几个八股文的题又没怎么答的上来。好在我最后态度诚恳，问面试官有什么不足之处我可以改改，面试官也很耐心地和我说了很多。本来我以为会挂的，后面竟然被换到了另外一个部门，好像是做鸿蒙生态智能云的。我记得非常清楚，但是第一面是在周三，然后挂了之后换部门， HR说这周部门结束全部春招面试，就周日一起一二三面大冲关。我周日在TB三楼订了一天，重读八股文，上午一二面，下午主管面。非常有意思的是我二面做的题是最长回文子串，然后我用最长子序列的套路去做了，然后因为有一些测试用例是可以过的，面试官竟然没有发现，就又这么蒙混过关了。我写的时候就感觉不太对，但又不知道在哪里，后面再去搜原题的时候才发现自己写错了。下午三面的是主管，人感觉很友善，问了我的一个项目并以此考了一道场景题，问提高我们那种靠Wi-Fi数据算的到课率有什么比较好的解决方案，就是不仅仅是算法上的改进，我说了加传感器或者有计划地设置路由器。感觉大佬对这个答案还挺满意，然后给我讲到华为作为硬件厂的解决方案可能更多还是设计传感器和人机交互的方面，不像互联网大厂更擅长大数据算法。我听完后赞不绝口，自以为面试场上逢伯乐，相谈甚欢，被问到想做终端还是做云端，我说做云端，云计算我上过，铠哥还给我写过推荐信呢。offer未下，我已芳心暗许。唯一的内鬼想法就是怕美签ban我华为的工作经历。真好真好，还没进华为就想着为华为抛弃美帝了，然后没想到综测给我整了那么大一幺蛾子。</p>
+<p>我原本以为综测只是走个流程，可没想到菊厂真的认为能够从几道性格题里找到狼性文化。我第一次综测，没过，第二次的时候还没意识到事情的严重性，又瞎做。后来问HR咋还没来offer呢，然后对面说我综测没过要补一轮澄清面试。澄清面试？老人，地铁，手机，jpg。这个所谓的澄清面试就是华为找第三方来给你做个面试，问你几个性格题，比如遇到过的困难，你同事对你不好你该咋整，公司给你象征251天的定向休假手环的时候你该先伸哪只手之类的。然后我又挂了，我不太明白，但是大受震撼。我3月初投的华为，到后面彻底被拒这一套下来至少4月3号后了，因为我生日的时候还是笑呵呵地发朋友圈拿面试通过当offer。</p>
+<h3 id="美团测试开发-一面挂">美团测试开发 一面挂</h3>
+<p>“等华为offer”这期间呢我就隐约感觉这事要凉，所以期间还投了美团的测试开发和通过学长的内推投了阿里淘系的可转正实习。美团笔试，AC两道，测开加了一道专门的题。一面的面试官比较典型的秃头程序员形象，听完我的自我介绍后觉得我投测试有退而求其次之嫌，典型八股题加两道算法题。第一道竟然是atoi，还让我自己想输入输出，真的整吐了，力扣上的atoi输入输出明明白白，这面试官给的题就一个描述还不带测试用例，写了半天没写明白跳到第二道题。第二道题好像是个dp，忘了，没做出来。一个星期后收到拒信，意料之内。</p>
+<h3 id="阿里java开发实习-三面挂">阿里Java开发实习 三面挂</h3>
+<p>阿里经典一小时笔试，一道背包，一道石子游戏II。背包十五分钟解决，石子游戏想用骚的结果边界条件太多，好吧其实思路也是错的，只过了10%。学长说有内推，笔试不太差基本能面试。然后一面，一个超温柔的小哥哥，电话面试，面得很开心，八股文都踩到了，Java题也着调了，算法题口头思路稳过，芳心暗许阿里爸爸。二面，Java题变难，多线程细考，操作系统也问得比较细，计网问到TCP的ARQ，算法题口头思路，感觉自己只答出了一半多一点，心里已经做好挂的准备了。意外有三面，我以为阿里三面是HR面，觉得阿里offer已是囊中之物，结果三面不仅不是HR面，还不是主管面，是交叉面，问了很多技术细节。我说我会Java，但简历上还写了C++，被问了C++，一问三不知。三面难度比二面还大，这回是一半都没有答上来，面试一半我就知道这次铁定要悲剧了。结果不出意外，三天后，流程终止，重新投递。有意思的是，第二次投递后又有部门来找我面试，那时候大概是4月底吧，我问实习能转正否，对面支支吾吾说如果表现好的话还是有转正几率的，大伙儿在电话线里相视一笑，没问算法题也没问八股文就问项目，我觉得这回对面是真心找实习，专门实习的那种实习，可惜我当时又芳心暗许携程，所以决定不做阿里的舔狗。面试结束后第二天，流程终止，重新投递，Pick Up Art YYDS。</p>
+<h3 id="字节java开发-一面挂">字节Java开发 一面挂</h3>
+<p>看到这里可能有人会问为啥不投宇宙节。其实字节我也有投，一开始都在投实习，不管日常还是实习都是秒拒。后来比较迟的时候，大概四月中旬吧才转投字节北京企业应用的Java开发全职，两个星期后才有笔试通知。笔试四道AC了一道半。面试正常八股文加算法题。算法问了接雨水，我十分钟做了出来，面试官突然发现我之前面试做过，我本想装傻当不知道最后还是承认之前面试做过，结果面试官也没换题。感觉有点刷KPI的味道。之前字节实习面试第二天甚至当天就能知道结果，然而这次我是一个星期后去官网刷的时候才发现流程终止，并且这个部门的岗位介绍已经没了。</p>
+<h3 id="滴滴网易b站小米猿辅导特斯拉-投递无果">滴滴、网易、B站、小米、猿辅导、特斯拉 投递无果</h3>
+<p>在被通知华为综测挂了之后呢，我连忙开始了新的一轮的投递。这时候我的海外研究生的offer基本是定了，即defer一年去Rice的CS Master项目。NYU Tandon的还先交了400刀的占位费，最后想想，纽约的生活还是太紧张了，纽约人民可不像《心灵奇旅》里那样那么淳朴，所以还是决定去休斯顿，至少莱斯的校园有围墙。</p>
+<p>新投的公司有很多，大小厂都有。总的来说，后端开放的难度在终端厂是要比互联网厂低一些的。也许终端厂的主营业务不是软件，所以他们招人门槛会低一些，只要你写过代码就行，八股文不会深入问。蓝绿厂我二选一挑了蓝厂，倒不是因为多喜欢Vivo，只是扔硬币选中罢了。投小米是因为室友录了秋招，让他帮我内推，但是小米结束的早，和雷总做不成朋友。网易投了杭研院，无果。滴滴投北京Java，无果。其实四月中旬的时候，大部分大厂都差不多结束春招了。网传的金三银四，其实只有金三，四月份只是开始发offer的时候。此时再录，近乎于捡漏中的捡漏了。当时的心态说实话还是挺焦虑的，我真的很想再defer的这一年去工作积累下经验。联想到NUS 3+1+1的经历，感觉自己想要做成的事一件都不会做成。特斯拉是他们来学校弄讲座的时候我去投的，其实他们来学校搞宣传找的就只是销售而已，真正的研发在上海。后来学校弄了一个大湾区的招聘会，我和我的室友带着简历去参加了，一路上我投了六七家吧。有消息的就三家，金蝶，闻泰和证通电子，其他的小厂没消息我也不记得了。要我说实话，学校这个招聘会帮助其实并不是那么大，唯一我觉得靠谱的是深圳市税务局的实习，其他的你当面和HR聊得再开心，背后也不一定会有你的机会。</p>
+<h3 id="闻泰科技-笔试挂">闻泰科技 笔试挂</h3>
+<p>闻泰投的上海的Java开发，比较快的来了笔试。笔试都是选择题，没有大的编程题，大多选择题关于数据结构和Java。个人感觉难度还行，做完没有很吃力，但是就是一直没消息，没给面试。因为当时在面的有携程，Vivo和Shopee，所以闻泰没有太放在心上。</p>
+<h3 id="证通电子-迷之无消息">证通电子 迷之无消息</h3>
+<p>体验最差的应聘。倒不是因为面试官多么不堪，而是这个人力资源部和研发部门的脱节让我感觉这个公司管理上非常混乱。HR打电话来让我准备线下的面试，研发有两个工作地点，一个是宝安总部，一个是南山科技园边上的软件园。因为这个是线下的面试。一般的线下面试都会一天之内一套下来给你答复。过完所有面试，然后现场决定给不给offer或者进不进池子。所以我还满怀期待的去准备这个面试，觉得自己的第一份offer终于要来了。我选了南山软件园，心想这个地方我之前实习的时候常去，体验还不错，离学校也更近一点。结果到了那个地方才发现这软件园的分部就是半层楼，那里的工作环境和中科大厦真的差了十万八千里。工位旧得我觉得可以在这里拍古早港片。到了楼上前台没有人，打了HR的电话才叫人来给我开门。好吧，其实这些都还不是重点。也许其实能在中科大厦租得起的公司才是少数，真实的码农就应该在这种地方工作。面试官似乎是这个分部的主管，聊了半天竟然好像不知道我今天回来应聘似的。看完了我的简历表示我可能更适合后端，他们这儿主要是做终端，有个小部门做后端，当时那个部门的主管不在，表示他可以帮忙转交简历推荐。还说下次我可能还要再来一趟线下。我嘴上好的好的，心里已经开始吐槽了。我大老远地从龙岗跑到南山就是让你给我转交一下简历？HR没给你简历吗，你事先不会看一下吗，这明明用电话面试就能解决的事情都2021年了还在疫情尚未解除的情况下让我跑这么远跟你唠嗑呢。</p>
+<p>好在那天下午阳光明媚，深圳尚未上40度，我骑上共享单车，耳机里放着VV的《Fly》，我因为没有offer仍旧怀着一颗资本家万岁的舔狗心理，所以没有太埋怨这家公司，倒是为有这样奇葩的体验，能够为后来者揭露这样SB的公司还颇有几分光荣和自豪。</p>
+<h3 id="金蝶后端-拒笔试">金蝶后端 拒笔试</h3>
+<p>金蝶我4月17号就弄了网申，结果他5月11号才让我做笔试。那时候我已经拿到了Vivo的offer，在面携程的HR面，就直接放弃笔试了。说实话，真不知道金蝶怎么想的，四月份的网申，一个月后才发笔试，五月份大伙儿基本都定了，龙大都快毕业典礼了，想招谁呢。</p>
+<h3 id="shopee-后端-二面挂">Shopee 后端 二面挂</h3>
+<p>因为之前有想去NUS嘛，就关注了一下新加坡这边的互联网公司。虾皮是一家做东南亚电商的新加坡公司，美股节节高的Sea Limited，然后他的研发中心是在深圳。虾皮的口碑还是挺好的，基本能work life balance，薪资尚可，企业氛围也不错，技术力也不差，因此当时还是挺想去虾厂的，然后过了笔试和一面，最后倒在了二面上。虾皮的笔试不难，是选择题加编程题，leetcode easy题，但是面试还是有点难度的。个人感觉虾皮的面试是可以感受到分层的，一面基本就是常规八股文加leetcode middle题，二面会开始细问项目和技术栈。二面的时候考了一个场景题，不会，问了一些中间件接触过吗，不害意思没有，好那你有什么问题想问我吗，GG。说实话，其实自己临时起意找工抱佛脚，没有什么靠谱的项目做过，真的还是挺心虚的。虽然我面过的绝大多数都不会问到中间件和框架，还是基础知识偏多一点，但是如果问到就回不知道，还真是挺尴尬的。</p>
+<h4 id="vivo-java开发-oc">VIVO Java开发 OC</h4>
+<p>VIVO是在差不多四月中旬的时候投的网申，然后四月底的时候过了技术面，五一回来后面了HR面，然后一个星期后就offer call了，三天之内做决定，因为当时是第一个offer，就没有想太多就签了两方，工作地点估计是在深圳宝安。VIVO的招聘流程是相当比较简单的，没有笔试，只有一个技术面，基本就是和你聊天谈谈职业计划，简历也不会问很深，算法题最多写一个排序；然后HR面就是正常问一些规划和大学生活之类的问题这样，也是不会超纲。个人感觉，华为被打压后，VIVO这两年开始起色，今夏还到欧洲杯上打广告，确实有一定的扩招。但是低难度的过关也意味着相对较低的薪水。不过也还好，VIVO基本上是能给终端厂的平均水平的，这个薪水还是能吊打招聘会上90%的企业。更何况这样的终端厂的work life balance基本还是可以的。当时签了后加了VIVO的群，也是了解了一下VIVO的情况。VIVO的工作环境，福利，配套设施还是挺不错的，入职后也会有比较大规模的那种培训活动，类似于那种夏令营吧，也可以结交一些工作上的朋友。个人影响流觉得VIVO，OPPO，小米的面试都不会太难，当然薪资也很难会有高的突破，但他们体量大，很多大城市里都有分公司，在意城市的话很推荐投一投做个保底。</p>
+<h3 id="携程-服务端开发-oc">携程 服务端开发 OC</h3>
+<p>当初没offer的时候最想去的就是携程，HR面被问到在手上有offer的几家里最想去哪个，我也说了携程。结果最后没有选择去，真是渣男行为哈哈。携程其实也不错，笔试全AC，两轮技术面也不难，主要是面试用的赛码网我怎么也无法连上视频，结果我的面试都是用电话来解决的，算是一个不大不小的波折吧。携程给的也基本够得上互联网大厂平均位，比VIVO略高一点。公司大楼漂亮，氛围不错，福利也多，楼下的网鱼网咖环境很好，还有猫。之前去上海玩错过动车回家的时候就和基友在携程总部楼下的网鱼网咖熬夜打古墓丽影，想起来就肝痛。</p>
+<h3 id="拼多多-服务端开发-oc">拼多多 服务端开发 OC</h3>
+<p>多多是我拿到的最后一个offer，也是最终选择要去的offer。说实话，我在开始准备春招的时候可从来没想过我要去拼多多。本来看不上觉得电商太卷了，奈何他们给的实在太多了。多多的笔试略难，但容易进面试，我的面试不怎么考八股文，就问算法题或者场景题，考了IP地址查询和整数反转，但好像有听其他同学有说Java考的还挺深的。可能看组吧，我面的是搜索组，感觉两个面试官都挺好的，让我惊讶的是第一个面试官感觉非常精神，完全不像11116的样子哈哈，然后第二个面试官花名叫劳尔，搞得我都想在面试最后问一句是不是皇马球迷了。多多的福利的话就我目前所知到的就是第一年住宿都免费然后公司包三餐。然后会有签字费，不过签字费是要随着第一年的年终奖发的，估计我是捞不到了。至于为啥选择拼多多，我心想就干一年，只要不丢命，应该问题不大。明年要继续出国读书，11116积累一下工作经验就当是体验生活吧。因为我感觉我自己是那种有压力才会有动力的，所以也想挑战下也许是全世界最卷的厂的生活，当然最终目的还是摆脱卷拥抱wlb。</p>
+<h2 id="总结">总结</h2>
+<p>因为疫情，很多事情变得不确定起来，不管是海外申请还是找工实习，我的很多决定都是在我的计划之外的。从本来信心满满的NUS 3+1+1到美校DDL三个月前开始撒钱找中介和托福培训，再到最后决定defer准备找工。我感觉我的很多事情都像是只完成了一半就要转到下一个事情了，没有哪件事是非常圆满地完成的，所有的结果都带有一点小遗憾，感觉很多事情都是意料之中的意料之外。清楚自己的能力的有限不能将每件事做到尽善尽美，但至少要完成每件事。也许就是这个想要完成的信念才让我坚持要去最后一投吧。从12月5号的第一次托福上百到五月份春招尾声才拿到第一份工作offer。有时候想想不如就这样吧。托福98分也能申个保底？没有工作这一年在家呆着也能自学？但心里总是有那一股劲感觉不服，老子都遭了这么多罪了凭啥结果就这？也许就是这一股不服劲才支撑着我永远要去最后一投。我不知道给看到这里的各位有什么样的启发能够给到。直白一点的话，那就是凡事都早准备吧，如果实在中途有了意外要改变战略也不要放弃，你要相信自己的努力配得上想要的结果。正如加缪所说，人生是荒诞的，但是人生的意义就在于反抗这荒诞。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8B%9B%E8%81%98/" rel="tag"># -- 招聘</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/22/%E9%98%BF%E9%87%8C%E7%AC%94%E8%AF%9520210322/" rel="prev" title="阿里笔试20210322">
+      <i class="fa fa-chevron-left"></i> 阿里笔试20210322
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#时间轴"><span class="nav-number">2.</span> <span class="nav-text">时间轴</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#腾讯留学生实习-一面挂"><span class="nav-number">2.1.</span> <span class="nav-text">腾讯留学生实习 一面挂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#百度java开发-笔试挂"><span class="nav-number">2.2.</span> <span class="nav-text">百度Java开发 笔试挂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#华为通用软件开发-综测挂"><span class="nav-number">2.3.</span> <span class="nav-text">华为通用软件开发 综测挂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#美团测试开发-一面挂"><span class="nav-number">2.4.</span> <span class="nav-text">美团测试开发 一面挂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阿里java开发实习-三面挂"><span class="nav-number">2.5.</span> <span class="nav-text">阿里Java开发实习 三面挂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字节java开发-一面挂"><span class="nav-number">2.6.</span> <span class="nav-text">字节Java开发 一面挂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#滴滴网易b站小米猿辅导特斯拉-投递无果"><span class="nav-number">2.7.</span> <span class="nav-text">滴滴、网易、B站、小米、猿辅导、特斯拉 投递无果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#闻泰科技-笔试挂"><span class="nav-number">2.8.</span> <span class="nav-text">闻泰科技 笔试挂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#证通电子-迷之无消息"><span class="nav-number">2.9.</span> <span class="nav-text">证通电子 迷之无消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#金蝶后端-拒笔试"><span class="nav-number">2.10.</span> <span class="nav-text">金蝶后端 拒笔试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shopee-后端-二面挂"><span class="nav-number">2.11.</span> <span class="nav-text">Shopee 后端 二面挂</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#vivo-java开发-oc"><span class="nav-number">2.11.1.</span> <span class="nav-text">VIVO Java开发 OC</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#携程-服务端开发-oc"><span class="nav-number">2.12.</span> <span class="nav-text">携程 服务端开发 OC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#拼多多-服务端开发-oc"><span class="nav-number">2.13.</span> <span class="nav-text">拼多多 服务端开发 OC</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zhewen Lyu"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Zhewen Lyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZavierLyu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZavierLyu" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xzavierlv@outlook.com" title="E-Mail → mailto:xzavierlv@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhewen Lyu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+    </div>
+</body>
+</html>
