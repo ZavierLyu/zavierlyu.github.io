@@ -1,6 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>C++ 问题集</title>
+    <url>/2020/06/21/Cpp-Problems-Collection/</url>
+    <content><![CDATA[<h3 id="n-与-stdendl-的区别"><code>'\n\'</code> 与 <code>std::endl</code> 的区别</h3>
+<ul>
+<li>''表示内容为一个回车符的字符。</li>
+<li>std::endl 是流操纵符(manipulator)，输出的作用和输出''类似，其效果是结束当前行，并将与设备关联的缓冲区(buffer)中的内容冲刷(flush)到设备中。缓冲刷新操作可以保证到目前为止程序所产生的所有输出都真正写入输出流中，而不是仅停留在内存中等待写入流。 <a id="more"></a></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br></pre></td></tr></table></figure>
+<p>等价于 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">'\n'</span> &lt;&lt; <span class="built_in">std</span>::flush;</span><br></pre></td></tr></table></figure> 对于有输出缓冲的流(例如cout、clog)，如果不手动进行缓冲区刷新操作，将在缓冲区满后自动刷新输出。不过对于cout来说(相对于文件输出流等)，缓冲一般体现得并不明显。但是必要情况下使用endl代替''一般是个好习惯。 对于无缓冲的流(例如标准错误输出流cerr)，刷新是不必要的，可以直接使用 ''，过多的endl会影响程序的执行效率。</p>
+<h3 id="说明指针和引用的区别">说明指针和引用的区别</h3>
+<ul>
+<li>引用是另一个对象的别名，而指针本身就是一个对象。</li>
+<li>引用必须初始化，并且一旦定义了引用就无法再绑定到其他对象。而指针无须在定义时赋初值，也可以重新赋值让其指向其他对象。</li>
+</ul>
+<h3 id="常量指针和常量引用有什么不同">常量指针和常量引用有什么不同？</h3>
+<p>常量指针（const pointer）是常量化的指针是正规翻译，常量引用（reference to const）是对常量的引用是坊间俗称。</p>
+<h3 id="说明decltype和auto的区别">说明decltype和auto的区别</h3>
+<p>auto: 类型说明符，用它能让编译器代替我们去分析表达式所属的类型。auto定义的变量必须有初始值，auto在一条语句中声明多个变量必须保证同样的基本数据类型。</p>
+<p>decltype: 类型指示符，为了从表达式的类型推断出要定义的变量的类型，但是不想用该表达式的值初始化变量。</p>
+<ol type="1">
+<li><p><code>decltype</code>处理顶层<code>const</code>和引用的方式与<code>auto</code>不同，<code>auto</code> 会忽略顶层const和直接推演引用所指的类型，<code>decltype</code>会将顶层<code>const</code>和引用保留起来。 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> ci = <span class="number">0</span>, &amp;cj = ci;</span><br><span class="line"><span class="keyword">decltype</span>(ci) x1 = <span class="number">0</span>;   <span class="comment">// x1的类型是const int</span></span><br><span class="line"><span class="keyword">auto</span> x2 = ci;          <span class="comment">// x2的类型是int</span></span><br><span class="line"><span class="keyword">decltype</span>(cj) y1 = x;   <span class="comment">// y1的类型是const int &amp;</span></span><br><span class="line"><span class="keyword">auto</span> y2 = cj;          <span class="comment">// y2的类型是int</span></span><br><span class="line"><span class="keyword">auto</span> y3 = &amp;cj;		   <span class="comment">// y3的类型是const int*，取值算底层const会保留</span></span><br></pre></td></tr></table></figure></p></li>
+<li><p><code>decltype</code>处理（对指针）解引用操作得到引用类型，而<code>auto</code>得到指针所指对象的类型 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> i = <span class="number">1</span>, *p = &amp;i;		</span><br><span class="line"><span class="keyword">decltype</span>(*p) pr = i;	<span class="comment">// pr的类型是int &amp;</span></span><br><span class="line"><span class="keyword">auto</span> pa = *p;			<span class="comment">// pa的类型是int</span></span><br></pre></td></tr></table></figure></p></li>
+<li><p><code>decltype</code>结果类型与表达式形式密切相关</p></li>
+</ol>
+<p>如果<code>decltype</code>使用的是一个不加括号的变量，则得到的结果就是该变量的类型；如果给变量加上了一层或多层括号，编译器就会将把它当成一个表达式。变量是一种可以作为赋值语句左值的特殊表达式，所以这样的<code>decltype</code>就会的得到引用类型:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">1</span>, b = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">decltype</span>((a)) d=a; <span class="comment">// d的类型为int &amp;</span></span><br><span class="line"><span class="keyword">decltype</span>(a)   d2;  <span class="comment">// d2的类型为未初始化的int</span></span><br><span class="line"><span class="keyword">decltype</span>(a=b) d3=b; <span class="comment">// d3的类型为int &amp;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Cpp</category>
+      </categories>
+      <tags>
+        <tag>language</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>动态规划问题集</title>
+    <url>/2020/06/02/DP/</url>
+    <content><![CDATA[<!-- # 动态规划 -->
+<h4 id="最长回文子串"><a href="https://leetcode-cn.com/problems/longest-palindromic-substring/" target="_blank" rel="noopener">5. 最长回文子串</a></h4>
+<p>这题能在面试中做出来的有三种方法<br> 1. 暴力 <span class="math inline">\(O(n^3)\)</span> 2. 动态规划 <span class="math inline">\(O(n^2)\)</span> 3. 中心扩展 <span class="math inline">\(O(n^2)\)</span> <a id="more"></a></p>
+<h5 id="动态规划">动态规划</h5>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">longestPalindrome</span><span class="params">(self, s: str)</span> -&gt; str:</span></span><br><span class="line">        n = len(s)</span><br><span class="line">        ret = <span class="string">''</span></span><br><span class="line">        dp = [[<span class="number">0</span>] * n <span class="keyword">for</span> _ <span class="keyword">in</span> range(n)]</span><br><span class="line">        length = <span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span> length &lt;= n:</span><br><span class="line">            i = <span class="number">0</span></span><br><span class="line">            <span class="keyword">while</span> i &lt; n:</span><br><span class="line">                j = i + length - <span class="number">1</span></span><br><span class="line">                <span class="keyword">if</span> j &gt;= n:</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">                <span class="keyword">if</span> length == <span class="number">1</span>:</span><br><span class="line">                    dp[i][j] = <span class="number">1</span></span><br><span class="line">                <span class="keyword">elif</span> length == <span class="number">2</span>:</span><br><span class="line">                    dp[i][j] = int(s[i] == s[j])</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    dp[i][j] = int(dp[i+<span class="number">1</span>][j<span class="number">-1</span>] <span class="keyword">and</span> s[i] == s[j])</span><br><span class="line">                <span class="keyword">if</span> dp[i][j] <span class="keyword">and</span> length &gt; len(ret):</span><br><span class="line">                    ret = s[i:j+<span class="number">1</span>]</span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">            length += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure>
+<p>状态定义:</p>
+<p>dp[i][j]表示字符串从i到j，包括j，是否为回文字符串</p>
+<p>状态转移方程： <span class="math display">\[
+dp[i][j]=
+\begin{cases}
+1 &amp; dp[i+1][j-1] == 1\ and \ s[i]==s[j] \\
+0 &amp; \ otherwise
+\end{cases}
+\]</span> 难点1：如何遍历dp二维数组比较恰当。这里我们用子字符串长度<span class="math inline">\(length\)</span>来表示<span class="math inline">\(j\)</span>, <span class="math inline">\(j=i+length-1\)</span>, 由此我们可以实现二维数组对角线遍历而不会重复。</p>
+<p>边界点1：<span class="math inline">\(s\)</span>为空字符，我们在设置返回项时应该设置空字符（如果不提前规避的话）表示最长的回文字符串为空，长度为1。</p>
+<p>边界点2：单字符，双字符，皆为该dp的边界点。我们应该首先计算出这些边界点的状态。可以在遍历大遍历之前小遍历初始化，也可以在整个遍历里设置单独条件计算这些边界点的状态。</p>
+<p>边界点3：<span class="math inline">\(j\)</span>越界，只要保证<span class="math inline">\(j\)</span>不越界，那么<span class="math inline">\(i+1\)</span>肯定也不越界。</p>
+<h5 id="中心扩展">中心扩展</h5>
+<p>其实个人觉得，比起dp，中心扩展法更少边界值，更容易上手。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">longestPalindrome</span><span class="params">(self, s: str)</span> -&gt; str:</span></span><br><span class="line">        left, right = <span class="number">0</span>,<span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(s)):</span><br><span class="line">            left1, right1 = self.centerExpand(s, i, i)</span><br><span class="line">            left2, right2 = self.centerExpand(s, i, i+<span class="number">1</span>)</span><br><span class="line">            l, r = (left1, right1) <span class="keyword">if</span> right1-left1 &gt; right2-left2 <span class="keyword">else</span> (left2, right2)</span><br><span class="line">            left, right = (left, right) <span class="keyword">if</span> right-left &gt; r-l <span class="keyword">else</span> (l, r)</span><br><span class="line">        <span class="keyword">return</span> s[left:right+<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">centerExpand</span><span class="params">(self, s, i, j)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="number">0</span> &lt;= i <span class="keyword">and</span> j &lt; len(s) <span class="keyword">and</span> s[i]==s[j]:</span><br><span class="line">            i -= <span class="number">1</span></span><br><span class="line">            j += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> i+<span class="number">1</span>, j<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+<p>中心扩展法其实就是利用边界点（单字符和双字符）去扩展得到所有的回文子串。</p>
+<p>难点1：中心扩展函数的写法。一开始我用递归，有点麻烦，容易出错。后来看官方答案，这玩意要啥递归，while loop就完事了。</p>
+<p>边界点：其实只要中心扩展函数写得好，基本不用考虑边界点。像上方官答，双字符是不相等和第二个字符越界的条件都不用考虑。</p>
+]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>dynamic programming</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C++ 变量与基本类型</title>
     <url>/2020/06/28/C++%20%E5%8F%98%E9%87%8F%E4%B8%8E%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B/</url>
     <content><![CDATA[<p>《C++ Primer（第五版）》第二章笔记</p>
@@ -271,94 +340,6 @@
       </tags>
   </entry>
   <entry>
-    <title>C++ 问题集</title>
-    <url>/2020/06/21/Cpp-Problems-Collection/</url>
-    <content><![CDATA[<h3 id="n-与-stdendl-的区别"><code>'\n\'</code> 与 <code>std::endl</code> 的区别</h3>
-<ul>
-<li>''表示内容为一个回车符的字符。</li>
-<li>std::endl 是流操纵符(manipulator)，输出的作用和输出''类似，其效果是结束当前行，并将与设备关联的缓冲区(buffer)中的内容冲刷(flush)到设备中。缓冲刷新操作可以保证到目前为止程序所产生的所有输出都真正写入输出流中，而不是仅停留在内存中等待写入流。 <a id="more"></a></li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br></pre></td></tr></table></figure>
-<p>等价于 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">'\n'</span> &lt;&lt; <span class="built_in">std</span>::flush;</span><br></pre></td></tr></table></figure> 对于有输出缓冲的流(例如cout、clog)，如果不手动进行缓冲区刷新操作，将在缓冲区满后自动刷新输出。不过对于cout来说(相对于文件输出流等)，缓冲一般体现得并不明显。但是必要情况下使用endl代替''一般是个好习惯。 对于无缓冲的流(例如标准错误输出流cerr)，刷新是不必要的，可以直接使用 ''，过多的endl会影响程序的执行效率。</p>
-<h3 id="说明指针和引用的区别">说明指针和引用的区别</h3>
-<ul>
-<li>引用是另一个对象的别名，而指针本身就是一个对象。</li>
-<li>引用必须初始化，并且一旦定义了引用就无法再绑定到其他对象。而指针无须在定义时赋初值，也可以重新赋值让其指向其他对象。</li>
-</ul>
-<h3 id="常量指针和常量引用有什么不同">常量指针和常量引用有什么不同？</h3>
-<p>常量指针（const pointer）是常量化的指针是正规翻译，常量引用（reference to const）是对常量的引用是坊间俗称。</p>
-<h3 id="说明decltype和auto的区别">说明decltype和auto的区别</h3>
-<p>auto: 类型说明符，用它能让编译器代替我们去分析表达式所属的类型。auto定义的变量必须有初始值，auto在一条语句中声明多个变量必须保证同样的基本数据类型。</p>
-<p>decltype: 类型指示符，为了从表达式的类型推断出要定义的变量的类型，但是不想用该表达式的值初始化变量。</p>
-<ol type="1">
-<li><p><code>decltype</code>处理顶层<code>const</code>和引用的方式与<code>auto</code>不同，<code>auto</code> 会忽略顶层const和直接推演引用所指的类型，<code>decltype</code>会将顶层<code>const</code>和引用保留起来。 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> ci = <span class="number">0</span>, &amp;cj = ci;</span><br><span class="line"><span class="keyword">decltype</span>(ci) x1 = <span class="number">0</span>;   <span class="comment">// x1的类型是const int</span></span><br><span class="line"><span class="keyword">auto</span> x2 = ci;          <span class="comment">// x2的类型是int</span></span><br><span class="line"><span class="keyword">decltype</span>(cj) y1 = x;   <span class="comment">// y1的类型是const int &amp;</span></span><br><span class="line"><span class="keyword">auto</span> y2 = cj;          <span class="comment">// y2的类型是int</span></span><br><span class="line"><span class="keyword">auto</span> y3 = &amp;cj;		   <span class="comment">// y3的类型是const int*，取值算底层const会保留</span></span><br></pre></td></tr></table></figure></p></li>
-<li><p><code>decltype</code>处理（对指针）解引用操作得到引用类型，而<code>auto</code>得到指针所指对象的类型 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> i = <span class="number">1</span>, *p = &amp;i;		</span><br><span class="line"><span class="keyword">decltype</span>(*p) pr = i;	<span class="comment">// pr的类型是int &amp;</span></span><br><span class="line"><span class="keyword">auto</span> pa = *p;			<span class="comment">// pa的类型是int</span></span><br></pre></td></tr></table></figure></p></li>
-<li><p><code>decltype</code>结果类型与表达式形式密切相关</p></li>
-</ol>
-<p>如果<code>decltype</code>使用的是一个不加括号的变量，则得到的结果就是该变量的类型；如果给变量加上了一层或多层括号，编译器就会将把它当成一个表达式。变量是一种可以作为赋值语句左值的特殊表达式，所以这样的<code>decltype</code>就会的得到引用类型:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">1</span>, b = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">decltype</span>((a)) d=a; <span class="comment">// d的类型为int &amp;</span></span><br><span class="line"><span class="keyword">decltype</span>(a)   d2;  <span class="comment">// d2的类型为未初始化的int</span></span><br><span class="line"><span class="keyword">decltype</span>(a=b) d3=b; <span class="comment">// d3的类型为int &amp;</span></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>Cpp</category>
-      </categories>
-      <tags>
-        <tag>language</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>动态规划问题集</title>
-    <url>/2020/06/02/DP/</url>
-    <content><![CDATA[<!-- # 动态规划 -->
-<h4 id="最长回文子串"><a href="https://leetcode-cn.com/problems/longest-palindromic-substring/" target="_blank" rel="noopener">5. 最长回文子串</a></h4>
-<p>这题能在面试中做出来的有三种方法<br> 1. 暴力 <span class="math inline">\(O(n^3)\)</span> 2. 动态规划 <span class="math inline">\(O(n^2)\)</span> 3. 中心扩展 <span class="math inline">\(O(n^2)\)</span> <a id="more"></a></p>
-<h5 id="动态规划">动态规划</h5>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">longestPalindrome</span><span class="params">(self, s: str)</span> -&gt; str:</span></span><br><span class="line">        n = len(s)</span><br><span class="line">        ret = <span class="string">''</span></span><br><span class="line">        dp = [[<span class="number">0</span>] * n <span class="keyword">for</span> _ <span class="keyword">in</span> range(n)]</span><br><span class="line">        length = <span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span> length &lt;= n:</span><br><span class="line">            i = <span class="number">0</span></span><br><span class="line">            <span class="keyword">while</span> i &lt; n:</span><br><span class="line">                j = i + length - <span class="number">1</span></span><br><span class="line">                <span class="keyword">if</span> j &gt;= n:</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">                <span class="keyword">if</span> length == <span class="number">1</span>:</span><br><span class="line">                    dp[i][j] = <span class="number">1</span></span><br><span class="line">                <span class="keyword">elif</span> length == <span class="number">2</span>:</span><br><span class="line">                    dp[i][j] = int(s[i] == s[j])</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    dp[i][j] = int(dp[i+<span class="number">1</span>][j<span class="number">-1</span>] <span class="keyword">and</span> s[i] == s[j])</span><br><span class="line">                <span class="keyword">if</span> dp[i][j] <span class="keyword">and</span> length &gt; len(ret):</span><br><span class="line">                    ret = s[i:j+<span class="number">1</span>]</span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">            length += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure>
-<p>状态定义:</p>
-<p>dp[i][j]表示字符串从i到j，包括j，是否为回文字符串</p>
-<p>状态转移方程： <span class="math display">\[
-dp[i][j]=
-\begin{cases}
-1 &amp; dp[i+1][j-1] == 1\ and \ s[i]==s[j] \\
-0 &amp; \ otherwise
-\end{cases}
-\]</span> 难点1：如何遍历dp二维数组比较恰当。这里我们用子字符串长度<span class="math inline">\(length\)</span>来表示<span class="math inline">\(j\)</span>, <span class="math inline">\(j=i+length-1\)</span>, 由此我们可以实现二维数组对角线遍历而不会重复。</p>
-<p>边界点1：<span class="math inline">\(s\)</span>为空字符，我们在设置返回项时应该设置空字符（如果不提前规避的话）表示最长的回文字符串为空，长度为1。</p>
-<p>边界点2：单字符，双字符，皆为该dp的边界点。我们应该首先计算出这些边界点的状态。可以在遍历大遍历之前小遍历初始化，也可以在整个遍历里设置单独条件计算这些边界点的状态。</p>
-<p>边界点3：<span class="math inline">\(j\)</span>越界，只要保证<span class="math inline">\(j\)</span>不越界，那么<span class="math inline">\(i+1\)</span>肯定也不越界。</p>
-<h5 id="中心扩展">中心扩展</h5>
-<p>其实个人觉得，比起dp，中心扩展法更少边界值，更容易上手。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">longestPalindrome</span><span class="params">(self, s: str)</span> -&gt; str:</span></span><br><span class="line">        left, right = <span class="number">0</span>,<span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(s)):</span><br><span class="line">            left1, right1 = self.centerExpand(s, i, i)</span><br><span class="line">            left2, right2 = self.centerExpand(s, i, i+<span class="number">1</span>)</span><br><span class="line">            l, r = (left1, right1) <span class="keyword">if</span> right1-left1 &gt; right2-left2 <span class="keyword">else</span> (left2, right2)</span><br><span class="line">            left, right = (left, right) <span class="keyword">if</span> right-left &gt; r-l <span class="keyword">else</span> (l, r)</span><br><span class="line">        <span class="keyword">return</span> s[left:right+<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">centerExpand</span><span class="params">(self, s, i, j)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="number">0</span> &lt;= i <span class="keyword">and</span> j &lt; len(s) <span class="keyword">and</span> s[i]==s[j]:</span><br><span class="line">            i -= <span class="number">1</span></span><br><span class="line">            j += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> i+<span class="number">1</span>, j<span class="number">-1</span></span><br></pre></td></tr></table></figure>
-<p>中心扩展法其实就是利用边界点（单字符和双字符）去扩展得到所有的回文子串。</p>
-<p>难点1：中心扩展函数的写法。一开始我用递归，有点麻烦，容易出错。后来看官方答案，这玩意要啥递归，while loop就完事了。</p>
-<p>边界点：其实只要中心扩展函数写得好，基本不用考虑边界点。像上方官答，双字符是不相等和第二个字符越界的条件都不用考虑。</p>
-]]></content>
-      <categories>
-        <category>Algorithm</category>
-      </categories>
-      <tags>
-        <tag>dynamic programming</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>前缀和问题集</title>
-    <url>/2020/06/02/PrefixSum/</url>
-    <content><![CDATA[<h4 id="每个元音包含偶数次的最长子字符串"><a href="https://leetcode-cn.com/problems/find-the-longest-substring-containing-vowels-in-even-counts/" target="_blank" rel="noopener">1371. 每个元音包含偶数次的最长子字符串</a></h4>
-<a id="more"></a>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">findTheLongestSubstring</span><span class="params">(self, s: str)</span> -&gt; int:</span></span><br><span class="line">        n = len(s)</span><br><span class="line">        status = <span class="number">0</span></span><br><span class="line">        pos = [<span class="number">-1</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">1</span> &lt;&lt; <span class="number">5</span>)]</span><br><span class="line">        pos[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">        ret = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">            <span class="keyword">if</span> s[i] == <span class="string">'a'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">4</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'e'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">3</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'i'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">2</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'o'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">1</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'u'</span>:</span><br><span class="line">                status ^= <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> pos[status] == <span class="number">-1</span>:</span><br><span class="line">                pos[status] = i+<span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                ret = max(ret, i+<span class="number">1</span>-pos[status])</span><br><span class="line">        <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure>
-<p>这个问题的关键在于利用前缀和来确定子串的状态。这里的前缀和定义为前<span class="math inline">\(i\)</span>个字符中，每个元音字符出现的奇偶性，用来代替出现的次数。我们用二进制编码来代替状态的哈希结构，比如前<span class="math inline">\(i\)</span>个字符a, e, i, o, u出现的次数的奇偶性分别为奇，奇，偶，偶，偶，则其编码为<code>11000</code>。只要我们知道前<span class="math inline">\(i\)</span>个字符的状态和前<span class="math inline">\(j\)</span>个字符的状态，我们就可以知道从第<span class="math inline">\(i+1\)</span>个字符到第<span class="math inline">\(j\)</span>个字符的元音出现次数奇偶性状态，也就是只要前<span class="math inline">\(i\)</span>个字符的二进制编码和前<span class="math inline">\(j\)</span>个字符的二进制编码相同，我们就可以确定<span class="math inline">\(i+1\)</span>到<span class="math inline">\(j\)</span>元音出现次数为偶数。原因在于差为偶则被减数和减数奇偶性相同。</p>
-<p>难点1：前缀和由出现次数转换为奇偶性</p>
-<p>优化点1：二进制编码</p>
-<p>优化点2：抛弃哈希记录每个字符的前缀和，反而用编码作为key来记录该前缀和出现的index，将时间复杂度从<span class="math inline">\(O(n^2)\)</span>降至<span class="math inline">\(O(n)\)</span></p>
-<p>边界点1：<code>pos[0]=0</code>，原因在于非原因字符最早出现的index一定是空字符串</p>
-]]></content>
-      <categories>
-        <category>Algorithm</category>
-      </categories>
-      <tags>
-        <tag>prefix sum</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>背包问题(上)</title>
     <url>/2020/06/02/Knapsack1/</url>
     <content><![CDATA[<p>此博客根据<a href="https://github.com/tianyicui/pack/blob/master/V2.pdf" target="_blank" rel="noopener">背包九讲</a>1-3章整理编写而成，记录学习总结。 一句话：01逆序，完全正序</p>
@@ -519,6 +500,54 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
       <tags>
         <tag>dynamic programming</tag>
         <tag>knapsack</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前缀和问题集</title>
+    <url>/2020/06/02/PrefixSum/</url>
+    <content><![CDATA[<h4 id="每个元音包含偶数次的最长子字符串"><a href="https://leetcode-cn.com/problems/find-the-longest-substring-containing-vowels-in-even-counts/" target="_blank" rel="noopener">1371. 每个元音包含偶数次的最长子字符串</a></h4>
+<a id="more"></a>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">findTheLongestSubstring</span><span class="params">(self, s: str)</span> -&gt; int:</span></span><br><span class="line">        n = len(s)</span><br><span class="line">        status = <span class="number">0</span></span><br><span class="line">        pos = [<span class="number">-1</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">1</span> &lt;&lt; <span class="number">5</span>)]</span><br><span class="line">        pos[<span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">        ret = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">            <span class="keyword">if</span> s[i] == <span class="string">'a'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">4</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'e'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">3</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'i'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">2</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'o'</span>:</span><br><span class="line">                status ^= <span class="number">1</span> &lt;&lt; <span class="number">1</span></span><br><span class="line">            <span class="keyword">elif</span> s[i] == <span class="string">'u'</span>:</span><br><span class="line">                status ^= <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> pos[status] == <span class="number">-1</span>:</span><br><span class="line">                pos[status] = i+<span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                ret = max(ret, i+<span class="number">1</span>-pos[status])</span><br><span class="line">        <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure>
+<p>这个问题的关键在于利用前缀和来确定子串的状态。这里的前缀和定义为前<span class="math inline">\(i\)</span>个字符中，每个元音字符出现的奇偶性，用来代替出现的次数。我们用二进制编码来代替状态的哈希结构，比如前<span class="math inline">\(i\)</span>个字符a, e, i, o, u出现的次数的奇偶性分别为奇，奇，偶，偶，偶，则其编码为<code>11000</code>。只要我们知道前<span class="math inline">\(i\)</span>个字符的状态和前<span class="math inline">\(j\)</span>个字符的状态，我们就可以知道从第<span class="math inline">\(i+1\)</span>个字符到第<span class="math inline">\(j\)</span>个字符的元音出现次数奇偶性状态，也就是只要前<span class="math inline">\(i\)</span>个字符的二进制编码和前<span class="math inline">\(j\)</span>个字符的二进制编码相同，我们就可以确定<span class="math inline">\(i+1\)</span>到<span class="math inline">\(j\)</span>元音出现次数为偶数。原因在于差为偶则被减数和减数奇偶性相同。</p>
+<p>难点1：前缀和由出现次数转换为奇偶性</p>
+<p>优化点1：二进制编码</p>
+<p>优化点2：抛弃哈希记录每个字符的前缀和，反而用编码作为key来记录该前缀和出现的index，将时间复杂度从<span class="math inline">\(O(n^2)\)</span>降至<span class="math inline">\(O(n)\)</span></p>
+<p>边界点1：<code>pos[0]=0</code>，原因在于非原因字符最早出现的index一定是空字符串</p>
+]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>prefix sum</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树相关问题集</title>
+    <url>/2020/06/02/Tree/</url>
+    <content><![CDATA[<p><em>二叉树，永远的神。</em> <a id="more"></a></p>
+<h4 id="从前序与中序遍历序列构造二叉树"><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/" target="_blank" rel="noopener">105. 从前序与中序遍历序列构造二叉树</a></h4>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">buildTree</span><span class="params">(self, preorder: List[int], inorder: List[int])</span> -&gt; TreeNode:</span></span><br><span class="line">        <span class="keyword">if</span> len(preorder) == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">        root = TreeNode(preorder[<span class="number">0</span>])</span><br><span class="line">        root_index = inorder.index(root.val)</span><br><span class="line">        left_inorder = inorder[:root_index]</span><br><span class="line">        right_inorder = inorder[root_index+<span class="number">1</span>:]</span><br><span class="line">        left_preorder = preorder[<span class="number">1</span>:<span class="number">1</span>+len(left_inorder)]</span><br><span class="line">        right_preorder = preorder[<span class="number">1</span>+len(left_inorder):]</span><br><span class="line">        root.left = self.buildTree(left_preorder, left_inorder)</span><br><span class="line">        root.right = self.buildTree(right_preorder, right_inorder)</span><br><span class="line">        <span class="keyword">return</span> root</span><br></pre></td></tr></table></figure>
+<p>序列化和反序列化二叉树步骤之一，通过前序遍历和中序遍历构造二叉树。要点在于通过前序序列知道根节点，通过中序序列知道左子树和右子树是哪些。 边界点：递归约束，叶节点的子节点None停止递归，通过判断preorder是否为空判断该节点是否为None。</p>
+<h4 id="对称二叉树"><a href="https://leetcode-cn.com/problems/symmetric-tree/" target="_blank" rel="noopener">101. 对称二叉树</a></h4>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSymmetric</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">return</span> check(root.left, root.right);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">check</span><span class="params">(TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> &amp;&amp; q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> || q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (p.val == q.val) &amp;&amp; check(p.left, q.right) &amp;&amp; check(p.right, q.left);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>时间复杂度：<span class="math inline">\(O(N)\)</span> 空间复杂度：<span class="math inline">\(O(N)\)</span> 原因在于虽然我们只需要递归<span class="math inline">\(O(\log N)\)</span>层但是我们每层都要创建2个栈空间，所以我们的空间复杂度为<span class="math inline">\(O(2^{\log N})=O(N)\)</span> 难点：注意镜像，所以我们需要 <code>check(p.left, q.right) &amp;&amp; check(p.right, q.left);</code></p>
+<h4 id="验证二叉搜索树"><a href="https://leetcode-cn.com/problems/validate-binary-search-tree/" target="_blank" rel="noopener">98. 验证二叉搜索树</a></h4>
+<p>题目简单，但是LC给的边界值实在恶心。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValidBST</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> verify(root, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">verify</span><span class="params">(TreeNode root, TreeNode maximum, TreeNode minimum)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) &#123; <span class="keyword">return</span> <span class="keyword">true</span>; &#125;</span><br><span class="line">        <span class="keyword">if</span> (maximum != <span class="keyword">null</span> &amp;&amp; root.val &gt;= maximum.val) &#123; <span class="keyword">return</span> <span class="keyword">false</span>; &#125;</span><br><span class="line">        <span class="keyword">if</span> (minimum != <span class="keyword">null</span> &amp;&amp; root.val &lt;= minimum.val) &#123; <span class="keyword">return</span> <span class="keyword">false</span>; &#125;</span><br><span class="line">        <span class="keyword">return</span> verify(root.left, root, minimum) &amp;&amp; verify(root.right, maximum, root); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>解决边界值问题可以用<code>Long.MAX_VALUE</code>来代替<code>Integer.MAX_VALUE</code> , 或者就像labuladong这样传递节点而不是边界值，至于为什么传递节点，因为null是不可以转换为int的。该问题的主要关键点在于bst的性质在于左子树全点小于父节点而不是左子点小于父节点。</p>
+<h3 id="完全二叉树的节点数">完全二叉树的节点数</h3>
+<p>普通二叉树： <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countNodes</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> + countNodes(root.left) + countNodes(root.right);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>满二叉树：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countNodes</span><span class="params">(TreeNode root)</span> </span>&#123; </span><br><span class="line">	<span class="keyword">int</span> h = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">while</span> (root != <span class="keyword">null</span>) &#123;</span><br><span class="line">    root = root.left;</span><br><span class="line">    h++;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> (<span class="keyword">int</span>)Math.pow(<span class="number">2</span>, h)-<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>完全二叉树： <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countNodes</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (root == <span class="keyword">null</span>) &#123; <span class="keyword">return</span> <span class="number">0</span>; &#125;</span><br><span class="line">  <span class="keyword">int</span> h_left = <span class="number">0</span>, h_right = <span class="number">0</span>;</span><br><span class="line">  TreeNode left = root, right = root;</span><br><span class="line">  <span class="keyword">while</span> (left != <span class="keyword">null</span>) &#123;</span><br><span class="line">    left = left.left;</span><br><span class="line">    h_left++;</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="keyword">while</span> (right != <span class="keyword">null</span>) &#123;</span><br><span class="line">    right = right.right;</span><br><span class="line">    h_right++;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (h_left == h_right) &#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">int</span>)Math.pow(<span class="number">2</span>, h_left)-<span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line"> 	<span class="keyword">return</span> countNodes(root.left)+countNodes(root.right)+<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure> 时间复杂度: <span class="math inline">\(O(\log(N) * \log(N))\)</span> 原因: <strong>一棵完全二叉树的左子树和右子树中至少有一棵是满二叉树</strong></p>
+<img src="/2020/06/02/Tree/complete_tree_cnt_nodes.png" class="">
+<p>算法的递归深度就是树的高度<span class="math inline">\(O(logN)\)</span>，每次递归所花费的时间就是 while 循环，需要<span class="math inline">\(O(logN)\)</span>，所以总体的时间复杂度是<span class="math inline">\(O(\log{N}*\log{N})\)</span>。</p>
+]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>tree</tag>
       </tags>
   </entry>
   <entry>
@@ -917,72 +946,6 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
       </categories>
       <tags>
         <tag>MySQL</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>《JavaScript DOM编程艺术》第三章读书笔记</title>
-    <url>/2020/06/02/jsdom3/</url>
-    <content><![CDATA[<h2 id="dom解释">DOM解释</h2>
-<ul>
-<li>D: 网页文档</li>
-<li>O：对象，自足的数据集合。JS里的对象可以分为三种类型
-<ol type="1">
-<li>用户定义对象(user-defined object): 由程序员自行创建的对象</li>
-<li>内建对象(native object): 内建的js对象，如Array，Math</li>
-<li>宿主对象(host object): 由浏览器提供的对象</li>
-</ol></li>
-<li>M： (X)HTML所代表的节点树模型 <a id="more"></a> ## 元素节点 元素节点时DOM中的原子，其包含文本节点和属性节点。<code>&lt;P&gt;</code>为元素节点，<code>&lt;p&gt;xxx&lt;/p&gt;</code>包含的xxx为文本节点，<code>&lt;p title='x'&gt;&lt;/p&gt;</code>中的title为属性节点</li>
-</ul>
-<h2 id="获取元素节点">获取元素节点</h2>
-<ol type="1">
-<li>getElementById <code>document.getElementById("&lt;id&gt;")</code></li>
-<li>getElementsByTagName 返回一个<code>对象数组</code>，每个对象分别对应这文档里给定标签的一个元素。 <code>document.getElementsByTagName("li")</code> 如果你想知道某份文档里共有多少个元素节点，可以使用通配符 <code>document.getElementsByTagName("*").length</code> 话可以将<code>getElementById</code>和<code>getElementsByTagName</code>结合起来， <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> shopping = <span class="built_in">document</span>.getElementById(<span class="string">"purchases"</span>);</span><br><span class="line"><span class="keyword">var</span> items = shopping.getElementsByTagName(<span class="string">"*"</span>);</span><br></pre></td></tr></table></figure></li>
-<li>getElementsByClassName 返回一个具有相同类名的元素的数组。 <code>document.getElementsByClassName("sale);</code></li>
-</ol>
-<h2 id="获取和设置属性">获取和设置属性</h2>
-<ol type="1">
-<li>getAttribute 该方法不属于<code>document</code>对象，所以不能通过其调用，它只能通过元素节点对象吊桶。 <code>object.get.Attribute(attribute);</code></li>
-<li>setAttribute <code>object.setAttribute(attribute, value);</code></li>
-</ol>
-<p><strong>通过setAttribute()方法对文档作出的改变，但这张改变并未反映到源代码中，也就是说，源代码中属性值仍旧是原来的属性值。这种“表里不一”的现象缘于DOM的工作模式：先加载文档的静态内容，再以动态方式对它们进行刷新，动态刷新不改变文档的静态内容，而对页面内容的刷新，不需要用户在他们的浏览器里执行刷新操作就可以实现。</strong></p>
-<p>个人对这句话的理解时，你在console中运行setAttribute的DOM操作不会影响静态的html源代码，但是浏览器已经将你的修改运行到了渲染中。比如你在console中修改attribute <code>href</code>, 源代码不会改变，但是你点击的那个超链接已经发生了改变。</p>
-]]></content>
-      <categories>
-        <category>Frontend</category>
-        <category>JavaScript</category>
-      </categories>
-      <tags>
-        <tag>DOM</tag>
-        <tag>DOM Scripting Notes</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>树相关问题集</title>
-    <url>/2020/06/02/Tree/</url>
-    <content><![CDATA[<p><em>二叉树，永远的神。</em> <a id="more"></a></p>
-<h4 id="从前序与中序遍历序列构造二叉树"><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/" target="_blank" rel="noopener">105. 从前序与中序遍历序列构造二叉树</a></h4>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">buildTree</span><span class="params">(self, preorder: List[int], inorder: List[int])</span> -&gt; TreeNode:</span></span><br><span class="line">        <span class="keyword">if</span> len(preorder) == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">        root = TreeNode(preorder[<span class="number">0</span>])</span><br><span class="line">        root_index = inorder.index(root.val)</span><br><span class="line">        left_inorder = inorder[:root_index]</span><br><span class="line">        right_inorder = inorder[root_index+<span class="number">1</span>:]</span><br><span class="line">        left_preorder = preorder[<span class="number">1</span>:<span class="number">1</span>+len(left_inorder)]</span><br><span class="line">        right_preorder = preorder[<span class="number">1</span>+len(left_inorder):]</span><br><span class="line">        root.left = self.buildTree(left_preorder, left_inorder)</span><br><span class="line">        root.right = self.buildTree(right_preorder, right_inorder)</span><br><span class="line">        <span class="keyword">return</span> root</span><br></pre></td></tr></table></figure>
-<p>序列化和反序列化二叉树步骤之一，通过前序遍历和中序遍历构造二叉树。要点在于通过前序序列知道根节点，通过中序序列知道左子树和右子树是哪些。 边界点：递归约束，叶节点的子节点None停止递归，通过判断preorder是否为空判断该节点是否为None。</p>
-<h4 id="对称二叉树"><a href="https://leetcode-cn.com/problems/symmetric-tree/" target="_blank" rel="noopener">101. 对称二叉树</a></h4>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSymmetric</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">return</span> check(root.left, root.right);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">check</span><span class="params">(TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> &amp;&amp; q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> || q == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (p.val == q.val) &amp;&amp; check(p.left, q.right) &amp;&amp; check(p.right, q.left);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>时间复杂度：<span class="math inline">\(O(N)\)</span> 空间复杂度：<span class="math inline">\(O(N)\)</span> 原因在于虽然我们只需要递归<span class="math inline">\(O(\log N)\)</span>层但是我们每层都要创建2个栈空间，所以我们的空间复杂度为<span class="math inline">\(O(2^{\log N})=O(N)\)</span> 难点：注意镜像，所以我们需要 <code>check(p.left, q.right) &amp;&amp; check(p.right, q.left);</code></p>
-<h4 id="验证二叉搜索树"><a href="https://leetcode-cn.com/problems/validate-binary-search-tree/" target="_blank" rel="noopener">98. 验证二叉搜索树</a></h4>
-<p>题目简单，但是LC给的边界值实在恶心。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValidBST</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> verify(root, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">verify</span><span class="params">(TreeNode root, TreeNode maximum, TreeNode minimum)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) &#123; <span class="keyword">return</span> <span class="keyword">true</span>; &#125;</span><br><span class="line">        <span class="keyword">if</span> (maximum != <span class="keyword">null</span> &amp;&amp; root.val &gt;= maximum.val) &#123; <span class="keyword">return</span> <span class="keyword">false</span>; &#125;</span><br><span class="line">        <span class="keyword">if</span> (minimum != <span class="keyword">null</span> &amp;&amp; root.val &lt;= minimum.val) &#123; <span class="keyword">return</span> <span class="keyword">false</span>; &#125;</span><br><span class="line">        <span class="keyword">return</span> verify(root.left, root, minimum) &amp;&amp; verify(root.right, maximum, root); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>解决边界值问题可以用<code>Long.MAX_VALUE</code>来代替<code>Integer.MAX_VALUE</code> , 或者就像labuladong这样传递节点而不是边界值，至于为什么传递节点，因为null是不可以转换为int的。该问题的主要关键点在于bst的性质在于左子树全点小于父节点而不是左子点小于父节点。</p>
-<h3 id="完全二叉树的节点数">完全二叉树的节点数</h3>
-<p>普通二叉树： <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countNodes</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> + countNodes(root.left) + countNodes(root.right);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>满二叉树：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countNodes</span><span class="params">(TreeNode root)</span> </span>&#123; </span><br><span class="line">	<span class="keyword">int</span> h = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">while</span> (root != <span class="keyword">null</span>) &#123;</span><br><span class="line">    root = root.left;</span><br><span class="line">    h++;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> (<span class="keyword">int</span>)Math.pow(<span class="number">2</span>, h)-<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>完全二叉树： <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countNodes</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (root == <span class="keyword">null</span>) &#123; <span class="keyword">return</span> <span class="number">0</span>; &#125;</span><br><span class="line">  <span class="keyword">int</span> h_left = <span class="number">0</span>, h_right = <span class="number">0</span>;</span><br><span class="line">  TreeNode left = root, right = root;</span><br><span class="line">  <span class="keyword">while</span> (left != <span class="keyword">null</span>) &#123;</span><br><span class="line">    left = left.left;</span><br><span class="line">    h_left++;</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="keyword">while</span> (right != <span class="keyword">null</span>) &#123;</span><br><span class="line">    right = right.right;</span><br><span class="line">    h_right++;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (h_left == h_right) &#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">int</span>)Math.pow(<span class="number">2</span>, h_left)-<span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line"> 	<span class="keyword">return</span> countNodes(root.left)+countNodes(root.right)+<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure> 时间复杂度: <span class="math inline">\(O(\log(N) * \log(N))\)</span> 原因: <strong>一棵完全二叉树的左子树和右子树中至少有一棵是满二叉树</strong></p>
-<img src="/2020/06/02/Tree/complete_tree_cnt_nodes.png" class="">
-<p>算法的递归深度就是树的高度<span class="math inline">\(O(logN)\)</span>，每次递归所花费的时间就是 while 循环，需要<span class="math inline">\(O(logN)\)</span>，所以总体的时间复杂度是<span class="math inline">\(O(\log{N}*\log{N})\)</span>。</p>
-]]></content>
-      <categories>
-        <category>Algorithm</category>
-      </categories>
-      <tags>
-        <tag>tree</tag>
       </tags>
   </entry>
   <entry>
@@ -1563,6 +1526,116 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
       </categories>
   </entry>
   <entry>
+    <title>《JavaScript DOM编程艺术》第三章读书笔记</title>
+    <url>/2020/06/02/jsdom3/</url>
+    <content><![CDATA[<h2 id="dom解释">DOM解释</h2>
+<ul>
+<li>D: 网页文档</li>
+<li>O：对象，自足的数据集合。JS里的对象可以分为三种类型
+<ol type="1">
+<li>用户定义对象(user-defined object): 由程序员自行创建的对象</li>
+<li>内建对象(native object): 内建的js对象，如Array，Math</li>
+<li>宿主对象(host object): 由浏览器提供的对象</li>
+</ol></li>
+<li>M： (X)HTML所代表的节点树模型 <a id="more"></a> ## 元素节点 元素节点时DOM中的原子，其包含文本节点和属性节点。<code>&lt;P&gt;</code>为元素节点，<code>&lt;p&gt;xxx&lt;/p&gt;</code>包含的xxx为文本节点，<code>&lt;p title='x'&gt;&lt;/p&gt;</code>中的title为属性节点</li>
+</ul>
+<h2 id="获取元素节点">获取元素节点</h2>
+<ol type="1">
+<li>getElementById <code>document.getElementById("&lt;id&gt;")</code></li>
+<li>getElementsByTagName 返回一个<code>对象数组</code>，每个对象分别对应这文档里给定标签的一个元素。 <code>document.getElementsByTagName("li")</code> 如果你想知道某份文档里共有多少个元素节点，可以使用通配符 <code>document.getElementsByTagName("*").length</code> 话可以将<code>getElementById</code>和<code>getElementsByTagName</code>结合起来， <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> shopping = <span class="built_in">document</span>.getElementById(<span class="string">"purchases"</span>);</span><br><span class="line"><span class="keyword">var</span> items = shopping.getElementsByTagName(<span class="string">"*"</span>);</span><br></pre></td></tr></table></figure></li>
+<li>getElementsByClassName 返回一个具有相同类名的元素的数组。 <code>document.getElementsByClassName("sale);</code></li>
+</ol>
+<h2 id="获取和设置属性">获取和设置属性</h2>
+<ol type="1">
+<li>getAttribute 该方法不属于<code>document</code>对象，所以不能通过其调用，它只能通过元素节点对象吊桶。 <code>object.get.Attribute(attribute);</code></li>
+<li>setAttribute <code>object.setAttribute(attribute, value);</code></li>
+</ol>
+<p><strong>通过setAttribute()方法对文档作出的改变，但这张改变并未反映到源代码中，也就是说，源代码中属性值仍旧是原来的属性值。这种“表里不一”的现象缘于DOM的工作模式：先加载文档的静态内容，再以动态方式对它们进行刷新，动态刷新不改变文档的静态内容，而对页面内容的刷新，不需要用户在他们的浏览器里执行刷新操作就可以实现。</strong></p>
+<p>个人对这句话的理解时，你在console中运行setAttribute的DOM操作不会影响静态的html源代码，但是浏览器已经将你的修改运行到了渲染中。比如你在console中修改attribute <code>href</code>, 源代码不会改变，但是你点击的那个超链接已经发生了改变。</p>
+]]></content>
+      <categories>
+        <category>Frontend</category>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>DOM</tag>
+        <tag>DOM Scripting Notes</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《JavaScript DOM编程艺术》第五章读书笔记</title>
+    <url>/2020/06/02/jsdom5/</url>
+    <content><![CDATA[<p>JavaScript平稳退化，兼容和性能问题(tips)。 <a id="more"></a></p>
+<h1 id="js平稳退化">JS平稳退化</h1>
+<p>Javascript作为一种前端脚本语言，主要功能是用于改善前端的用户体验。我们看见一些网页的显示效果，比方说菜单显示隐藏，图标移动和文字滚动大多是基于JS来实现的。作为改善用户体验的存在，通俗的讲就是起个锦上添花的表现效果，而不能影响正常的后台逻辑和最基本功能的实现。</p>
+<p>通俗地讲，javascript平稳退化就是如果一个浏览器完全不支持js或者禁用js的时候，它的正常功能不会受到任何影响。</p>
+<h3 id="打开新窗口">打开新窗口</h3>
+<p><code>window.open(url,name,features)</code> - 第一个参数是想在新窗口里打开的网页的URL地址。如果省略这个参数，屏幕上将弹出一个空白的浏览器窗口。 - 第二个参数是新窗口的名字。可以在代码里通过这个名字和新窗口进行通信。 - 最后一个参数是一个以都好分隔的字符串，其内容是新窗口的各种属性。这些属性包括新窗口的尺寸（宽度和高度）以及新窗口被启用或禁用的各种浏览功能（工具条，菜单条，初始先是位置等)。对于这个桉树应该掌握以下原则：新窗口的浏览功能要少而精。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">popUp</span>(<span class="params">winURL</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">window</span>.open(winURL, <span class="string">"popup"</span>, <span class="string">"width=320,height=480"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="javascript-伪协议">Javascript 伪协议</h4>
+<p><code>javascript:</code>伪协议让我们通过一个链接来调用JavaScript函数。 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:popUp('http://www.example.com/');"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure> 这条语句在支持"javascript:"伪协议的浏览器中运行正常，较老的浏览器则会取尝试打开那个链接但失败，支持这种协议单禁用了javascript功能的浏览器会什么也不做。</p>
+<h4 id="内嵌事件处理函数">内嵌事件处理函数</h4>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">onclick</span>=<span class="string">"popUp('http://www.example.com/'); return false;"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>所有操作由onclick属性负责完成，无法平稳退化。</p>
+<h4 id="需要平稳退化的原因">需要平稳退化的原因</h4>
+<p>如果用户是一个<strong>搜索机器人</strong>，一种自动化程序，它们浏览Web的目的是为了把各种网页添加到搜索引擎的数据库里。各大搜索引擎都有类似的程序。目前。只有极少数搜索机器人能够理解js代码。所以，如果js网页不能平稳退化，它们在搜索引擎上的排名就可能受到损害。</p>
+<p>所以我们最好修改成如下 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.example.com/"</span> <span class="attr">onclick</span>=<span class="string">"popUp(this.href);return false;"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="分离javascript">分离JavaScript</h3>
+<p>HTML Document: <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.example.com/"</span> <span class="attr">class</span>=<span class="string">"popup"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure> 我们可以在外部把一个事件添加到html文档中的某个元素上： <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">element.event = action...</span><br></pre></td></tr></table></figure> 比如： <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">getElementById(id).event = action;</span><br></pre></td></tr></table></figure> 如果事件涉及多个元素，我们可以用getElementsByTagName和getAttribute把事件添加到有着特定属性的一组元素上。 具体步骤：</p>
+<ol type="1">
+<li>把文档里所有的链接全放入一个数组里</li>
+<li>遍历数组</li>
+<li>如果某个链接的class属性等于popup，就表示这个链接在被点击时应该调用popUp()函数。</li>
+</ol>
+<p>还有一个问题是必须让这种连接的代码在html文档全部加载到浏览器后再开始执行。文档将被加载到一个浏览器窗口里，document对象又是window对象的一个属性。当window对象触发onload事件时，document对象已经存在。 所以我们在外部的js文件里这样写 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = preparelinks;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">prepareLinks</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> links = <span class="built_in">document</span>.getElementsByTagName(<span class="string">"a"</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;links.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (links[i].getAttribute(<span class="string">"class"</span>) == <span class="string">"popup"</span>) &#123;</span><br><span class="line">            links[i].onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                popUp(<span class="keyword">this</span>.getAttribute(<span class="string">"href));</span></span><br><span class="line"><span class="string">                return false;</span></span><br><span class="line"><span class="string">            &#125;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">function popUp(winURL) &#123;</span></span><br><span class="line"><span class="string">    window.open(winURL, "</span>popup<span class="string">", "</span>width=<span class="number">800</span>,height=<span class="number">600</span><span class="string">");</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="向后兼容">向后兼容</h3>
+<h4 id="对象检测">对象检测</h4>
+<p>检测浏览器对js的支持程度 比如 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure></p>
+<h3 id="性能考虑">性能考虑</h3>
+<ol type="1">
+<li>介绍不必要的DOM访问</li>
+<li>合并多个js文件到一个文件里</li>
+<li>压缩脚本，去掉不必要的字节如空格和注释 多数情况下，你应该有两个版本，一个是工作副本，可以修改代码并添加注释；另一个时精简副本，用于放在站点上。通常，为了与非精简版本区分开，最好在精简副本的文件名中加上min字样： <code>&lt;script src="scripts/scriptName.min.js"&gt;&lt;/script&gt;</code></li>
+</ol>
+<p>可以通过以下几个有代表性的代码压缩工具完成：</p>
+<ul>
+<li><a href="http://lisperator.net/uglifyjs/" target="_blank" rel="noopener">Uglify</a></li>
+<li><a href="http://developer.yahoo.com/yui/compressor/" target="_blank" rel="noopener">YUI Compressor</a></li>
+<li><a href="https://developers.google.com/closure/compiler/" target="_blank" rel="noopener">Google Closure Compiler</a></li>
+<li><a href="https://tool.oschina.net/jscompress/" target="_blank" rel="noopener">oschina 在线js压缩</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Frontend</category>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>DOM</tag>
+        <tag>DOM Scripting Notes</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《JavaScript DOM编程艺术》第六章读书笔记</title>
+    <url>/2020/06/21/jsdom6/</url>
+    <content><![CDATA[<h3 id="分离js和html">分离JS和HTML</h3>
+<p>作为一条原则，如果想用JavaScript给某哥网页添加一些行为，就不应该让JavaScript代码对这个网页的结构有任何依赖。</p>
+<a id="more"></a>
+<p>比如加上如下的检测，来探测浏览器是否支持这些DOM。 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementById) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementById(<span class="string">"imagegallery"</span>)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure></p>
+<h3 id="共享onload事件">共享onload事件</h3>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addLoadEvent</span>(<span class="params">func</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oldonload = <span class="built_in">window</span>.onload;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="built_in">window</span>.onload != <span class="string">'function'</span>) &#123;</span><br><span class="line">    <span class="built_in">window</span>.onload = func;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      oldonload();</span><br><span class="line">      func();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">addLoadEvent(firstFunction);</span><br><span class="line">addLoadEvent(secondFunction);</span><br></pre></td></tr></table></figure> 取代</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = firstFunction;</span><br><span class="line"><span class="built_in">window</span>.onload = secondFunction;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Frontend</category>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>DOM</tag>
+        <tag>DOM Scripting Notes</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>《JavaScript DOM编程艺术》第四章读书笔记</title>
     <url>/2020/06/02/jsdom4/</url>
     <content><![CDATA[<p>这里我们主要谈的是html上对用户事件的处理。</p>
@@ -1601,24 +1674,60 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
       </tags>
   </entry>
   <entry>
-    <title>《JavaScript DOM编程艺术》第六章读书笔记</title>
-    <url>/2020/06/21/jsdom6/</url>
-    <content><![CDATA[<h3 id="分离js和html">分离JS和HTML</h3>
-<p>作为一条原则，如果想用JavaScript给某哥网页添加一些行为，就不应该让JavaScript代码对这个网页的结构有任何依赖。</p>
+    <title>最后一投--2021春招总结</title>
+    <url>/2021/07/16/%E6%9C%80%E5%90%8E%E4%B8%80%E6%8A%95/</url>
+    <content><![CDATA[<p>之前觉得人总是在回过头看的时候才会发现自己走了这么长的一段不得了的路，但是实际上回头看的时候只会觉得当时多么困难的事情并没有什么值得骄傲的。在今年春招的时候总是想着结束后要写一个总结来记录这多么不容易的过程，但当现在真正拿到offer后似乎又没啥动力去写了。我觉得我总是在不过不管怎样，大学生涯的最后一个学期里干的最主要的事情，也许还是有值得纪念和分享的价值吧。</p>
 <a id="more"></a>
-<p>比如加上如下的检测，来探测浏览器是否支持这些DOM。 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementById) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementById(<span class="string">"imagegallery"</span>)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure></p>
-<h3 id="共享onload事件">共享onload事件</h3>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addLoadEvent</span>(<span class="params">func</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> oldonload = <span class="built_in">window</span>.onload;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="built_in">window</span>.onload != <span class="string">'function'</span>) &#123;</span><br><span class="line">    <span class="built_in">window</span>.onload = func;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      oldonload();</span><br><span class="line">      func();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>用 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">addLoadEvent(firstFunction);</span><br><span class="line">addLoadEvent(secondFunction);</span><br></pre></td></tr></table></figure> 取代</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = firstFunction;</span><br><span class="line"><span class="built_in">window</span>.onload = secondFunction;</span><br></pre></td></tr></table></figure>
+<p>本文其实没有什么干货，大部分都是我关于这段求职之路的心路历程，碎碎念居多，纪念性比实用性可能更强一点。所以不好意思，奔着笔经和面经的朋友们可能要失望了。</p>
+<h2 id="背景">背景</h2>
+<p>其实我毕业后的主去向是海外申研我在进入新年来，差不多结束申请的时候就有过想要defer找工的打算。一月份的时候各大使馆还没有开，美国的疫情和Asian Hate还很严重，所以就有想要defer一年然后去个厂打工积累些经验的打算。后来到三月份，拿到了莱斯大学的offer，并且咨询了一下确定可以defer，于是心里就暗自打算春招一定要找到一份工作，或者如果真的有好的美校offer就去大厂的暑期实习。因此我在这个阶段实习和全职是都有去投的。</p>
+<p>其实我的简历是比较拉垮的，GPA在一个中等的水平，只有一个小厂实习，没有很多meaty project，大部分的project都是龙大里上课用来水分数的。钟老师的课的作业我也列上了，但是其实有很多作业只知道表层的东西并不懂底层的逻辑。其实这个背景去找工还是挺吃亏的，因为我想走的是Java的开发岗，但是我却从来没有跟着做完哪怕一个大的web project，Java的核心像多线程，容器，反射，内部类之类的也是到五月份才学的差不多。Spring的技术栈和其他中间件是一窍不通，设计模式只知道单例，redis也没有接触过，mysql只会增删改查。我想我这样的背景也能找到几份还算可以的工作，正在读的朋友如果要找工作的话真的可以不用那么焦虑（如果不考虑大厂的话）。</p>
+<p>至于刷题的话，我从一月份开始坚持每天至少刷一两题，主要是跟着labuladong的公众号文章来刷，个人感觉这位博主的刷题方法和解题思路还是很适合我的。所以如果想要参考刷题的路线，可以试一试labuladong的线路。</p>
+<p>至于学Java的话，主要是看《Java 核心技术 I》和B站上的视频，刷面试题看的是Java Guide和CyC2018，这两本互相借鉴。然后同时我买了一本《计算机网络：自顶向下》中文版开始学，《自顶向下》是我看过讲的最深入浅出的教材之一，写的非常好，看的时候真的有醍醐灌顶的感觉。</p>
+<p>还有一点可能比较特殊的是，我大四下只上一门课，还是一门比较水的课。为了好好准备春招，我退了老钟的compiler（顺便做了第一个作业），退了强化学习，所以我的求职之路可能比较特殊，属于临时抱佛脚，所以朋友们，找工的准备还是越早越好。</p>
+<p>接下来的话我就用流水账的方式记录下我投的公司和岗位吧。</p>
+<h2 id="时间轴">时间轴</h2>
+<h3 id="腾讯留学生实习-一面挂">腾讯留学生实习 一面挂</h3>
+<p>三月初的时候我投了一波腾讯的留学生实习后端，百度Java开发，华为的通用软件开发。腾讯面的早，当时刷题初现成效，但其实还有很多Java的面试题没有接触，因此没有意外地挂了腾讯PCG的留学生实习。我个人感觉，留学生暑期实习和秋招向的暑期实习差别并不大，他们还是想找实习干好能留任的人，所以表明想要留任而不是什么锻炼自己的态度还是挺重要的。当时的面试我记得问了一个最大连续乘积的问题，是最大连续和变种，然后我就按最大连续和来写了，甚至状态转移方程也只是将加号改成乘号，没有考虑负负得正的情况。所以在做最大连续乘积的时候，dp列表不仅要记最大值，也要记最小值也就是负值。这题我印象贼深刻，是因为我用错误的方法做了出来，然后自己写了几个测试例子都通过了（没有负数），然后面试官看了一眼没有指出来然后直接让我问有什么问题了。搞得我以为自己要过了呢。</p>
+<p>后来我又投了腾讯的全职啊以及其他岗位的实习什么的，就再也没被捞上来了。</p>
+<h3 id="百度java开发-笔试挂">百度Java开发 笔试挂</h3>
+<p>百度笔试只AC了一道，挂了。</p>
+<h3 id="华为通用软件开发-综测挂">华为通用软件开发 综测挂</h3>
+<p>华为的应聘过程真是记忆犹新。我参加了1次笔试，2次综合测试（性格测试），4次技术面试外加1次所谓综合测试澄清面试，然后因为性格测试挂了。这一趟下来我的微信列表里多了4个华为HR，我不得不给他们打上标签，以免以后吐槽华为的时候给他们看到（比如现在）。我笔试满分，三道编程题做完还有40分钟，交卷稳AC，所以当时有点期待又有点自豪。结果盲目的自信导致第一次的面试很糟糕，面的似乎是终端开发的部门，我竟然倒在了一个小小的删除链表的中间节点上。好吧其实快慢指针甚至解决环状链表东哥（labuladong）的公众号都有讲，但是我没看。后面问了几个八股文的题又没怎么答的上来。好在我最后态度诚恳，问面试官有什么不足之处我可以改改，面试官也很耐心地和我说了很多。本来我以为会挂的，后面竟然被换到了另外一个部门，好像是做鸿蒙生态智能云的。我记得非常清楚，但是第一面是在周三，然后挂了之后换部门， HR说这周部门结束全部春招面试，就周日一起一二三面大冲关。我周日在TB三楼订了一天，重读八股文，上午一二面，下午主管面。非常有意思的是我二面做的题是最长回文子串，然后我用最长子序列的套路去做了，然后因为有一些测试用例是可以过的，面试官竟然没有发现，就又这么蒙混过关了。我写的时候就感觉不太对，但又不知道在哪里，后面再去搜原题的时候才发现自己写错了。下午三面的是主管，人感觉很友善，问了我的一个项目并以此考了一道场景题，问提高我们那种靠Wi-Fi数据算的到课率有什么比较好的解决方案，就是不仅仅是算法上的改进，我说了加传感器或者有计划地设置路由器。感觉大佬对这个答案还挺满意，然后给我讲到华为作为硬件厂的解决方案可能更多还是设计传感器和人机交互的方面，不像互联网大厂更擅长大数据算法。我听完后赞不绝口，自以为面试场上逢伯乐，相谈甚欢，被问到想做终端还是做云端，我说做云端，云计算我上过，铠哥还给我写过推荐信呢。offer未下，我已芳心暗许。唯一的内鬼想法就是怕美签ban我华为的工作经历。真好真好，还没进华为就想着为华为抛弃美帝了，然后没想到综测给我整了那么大一幺蛾子。</p>
+<p>我原本以为综测只是走个流程，可没想到菊厂真的认为能够从几道性格题里找到狼性文化。我第一次综测，没过，第二次的时候还没意识到事情的严重性，又瞎做。后来问HR咋还没来offer呢，然后对面说我综测没过要补一轮澄清面试。澄清面试？老人，地铁，手机，jpg。这个所谓的澄清面试就是华为找第三方来给你做个面试，问你几个性格题，比如遇到过的困难，你同事对你不好你该咋整，公司给你象征251天的定向休假手环的时候你该先伸哪只手之类的。然后我又挂了，我不太明白，但是大受震撼。我3月初投的华为，到后面彻底被拒这一套下来至少4月3号后了，因为我生日的时候还是笑呵呵地发朋友圈拿面试通过当offer。</p>
+<h3 id="美团测试开发-一面挂">美团测试开发 一面挂</h3>
+<p>“等华为offer”这期间呢我就隐约感觉这事要凉，所以期间还投了美团的测试开发和通过学长的内推投了阿里淘系的可转正实习。美团笔试，AC两道，测开加了一道专门的题。一面的面试官比较典型的秃头程序员形象，听完我的自我介绍后觉得我投测试有退而求其次之嫌，典型八股题加两道算法题。第一道竟然是atoi，还让我自己想输入输出，真的整吐了，力扣上的atoi输入输出明明白白，这面试官给的题就一个描述还不带测试用例，写了半天没写明白跳到第二道题。第二道题好像是个dp，忘了，没做出来。一个星期后收到拒信，意料之内。</p>
+<h3 id="阿里java开发实习-三面挂">阿里Java开发实习 三面挂</h3>
+<p>阿里经典一小时笔试，一道背包，一道石子游戏II。背包十五分钟解决，石子游戏想用骚的结果边界条件太多，好吧其实思路也是错的，只过了10%。学长说有内推，笔试不太差基本能面试。然后一面，一个超温柔的小哥哥，电话面试，面得很开心，八股文都踩到了，Java题也着调了，算法题口头思路稳过，芳心暗许阿里爸爸。二面，Java题变难，多线程细考，操作系统也问得比较细，计网问到TCP的ARQ，算法题口头思路，感觉自己只答出了一半多一点，心里已经做好挂的准备了。意外有三面，我以为阿里三面是HR面，觉得阿里offer已是囊中之物，结果三面不仅不是HR面，还不是主管面，是交叉面，问了很多技术细节。我说我会Java，但简历上还写了C++，被问了C++，一问三不知。三面难度比二面还大，这回是一半都没有答上来，面试一半我就知道这次铁定要悲剧了。结果不出意外，三天后，流程终止，重新投递。有意思的是，第二次投递后又有部门来找我面试，那时候大概是4月底吧，我问实习能转正否，对面支支吾吾说如果表现好的话还是有转正几率的，大伙儿在电话线里相视一笑，没问算法题也没问八股文就问项目，我觉得这回对面是真心找实习，专门实习的那种实习，可惜我当时又芳心暗许携程，所以决定不做阿里的舔狗。面试结束后第二天，流程终止，重新投递，Pick Up Art YYDS。</p>
+<h3 id="字节java开发-一面挂">字节Java开发 一面挂</h3>
+<p>看到这里可能有人会问为啥不投宇宙节。其实字节我也有投，一开始都在投实习，不管日常还是实习都是秒拒。后来比较迟的时候，大概四月中旬吧才转投字节北京企业应用的Java开发全职，两个星期后才有笔试通知。笔试四道AC了一道半。面试正常八股文加算法题。算法问了接雨水，我十分钟做了出来，面试官突然发现我之前面试做过，我本想装傻当不知道最后还是承认之前面试做过，结果面试官也没换题。感觉有点刷KPI的味道。之前字节实习面试第二天甚至当天就能知道结果，然而这次我是一个星期后去官网刷的时候才发现流程终止，并且这个部门的岗位介绍已经没了。</p>
+<h3 id="滴滴网易b站小米猿辅导特斯拉-投递无果">滴滴、网易、B站、小米、猿辅导、特斯拉 投递无果</h3>
+<p>在被通知华为综测挂了之后呢，我连忙开始了新的一轮的投递。这时候我的海外研究生的offer基本是定了，即defer一年去Rice的CS Master项目。NYU Tandon的还先交了400刀的占位费，最后想想，纽约的生活还是太紧张了，纽约人民可不像《心灵奇旅》里那样那么淳朴，所以还是决定去休斯顿，至少莱斯有校园。</p>
+<p>新投的公司有很多，大小厂都有。总的来说，后端开放的难度在终端厂是要比互联网厂低一些的。也许终端厂的主营业务不是软件，所以他们招人门槛会低一些，只要你写过代码就行，八股文不会深入问。蓝绿厂我二选一挑了蓝厂，倒不是因为多喜欢Vivo，只是扔硬币选中罢了。投小米是因为室友录了秋招，让他帮我内推，但是小米结束的早，和雷总做不成朋友。网易投了杭研院，无果。滴滴投北京Java，无果。其实四月中旬的时候，大部分大厂都差不多结束春招了。网传的金三银四，其实只有金三，四月份只是开始发offer的时候。此时再录，近乎于捡漏中的捡漏了。当时的心态说实话还是挺焦虑的，我真的很想再defer的这一年去工作积累下经验。联想到NUS 3+1+1的经历，感觉自己想要做成的事一件都不会做成。特斯拉是他们来学校弄讲座的时候我去投的，其实他们来学校搞宣传找的就只是销售而已，真正的研发在上海。后来学校弄了一个大湾区的招聘会，我和我的室友带着简历去参加了，一路上我投了六七家吧。有消息的就三家，金蝶，闻泰和证通电子，其他的小厂没消息我也不记得了。要我说实话，学校这个招聘会帮助其实并不是那么大，唯一我觉得靠谱的是深圳市税务局的实习，其他的你当面和HR聊得再开心，背后也不一定会有你的机会。</p>
+<h3 id="闻泰科技-笔试挂">闻泰科技 笔试挂</h3>
+<p>闻泰投的上海的Java开发，比较快的来了笔试。笔试都是选择题，没有大的编程题，大多选择题关于数据结构和Java。个人感觉难度还行，做完没有很吃力，但是就是一直没消息，没给面试。因为当时在面的有携程，Vivo和Shopee，所以闻泰没有太放在心上。</p>
+<h3 id="证通电子-迷之无消息">证通电子 迷之无消息</h3>
+<p>体验最差的应聘。倒不是因为面试官多么不堪，而是这个人力资源部和研发部门的脱节让我感觉这个公司管理上非常混乱。HR打电话来让我准备线下的面试，研发有两个工作地点，一个是宝安总部，一个是南山科技园边上的软件园。因为这个是线下的面试。一般的线下面试都会一天之内一套下来给你答复。过完所有面试，然后现场决定给不给offer或者进不进池子。所以我还满怀期待的去准备这个面试，觉得自己的第一份offer终于要来了。我选了南山软件园，心想这个地方我之前实习的时候常去，体验还不错，离学校也更近一点。结果到了那个地方才发现这软件园的分部就是半层楼，那里的工作环境和中科大厦真的差了十万八千里。工位旧得我觉得可以在这里拍古早港片。到了楼上前台没有人，打了HR的电话才叫人来给我开门。好吧，其实这些都还不是重点。也许其实能在中科大厦租得起的公司才是少数，真实的码农就应该在这种地方工作。面试官似乎是这个分部的主管，聊了半天竟然好像不知道我今天回来应聘似的。看完了我的简历表示我可能更适合后端，他们这儿主要是做终端，有个小部门做后端，当时那个部门的主管不在，表示他可以帮忙转交简历推荐。还说下次我可能还要再来一趟线下。我嘴上好的好的，心里已经开始吐槽了。我大老远地从龙岗跑到南山就是让你给我转交一下简历？HR没给你简历吗，你事先不会看一下吗，这明明用电话面试就能解决的事情都2021年了还在疫情尚未解除的情况下让我跑这么远跟你唠嗑呢。</p>
+<p>好在那天下午阳光明媚，深圳尚未上40度，我骑上共享单车，耳机里放着VV的《Fly》，我因为没有offer仍旧怀着一颗资本家万岁的舔狗心理，所以没有太埋怨这家公司，倒是为有这样奇葩的体验，能够为后来者揭露这样SB的公司还颇有几分光荣和自豪。</p>
+<h3 id="金蝶后端-拒笔试">金蝶后端 拒笔试</h3>
+<p>金蝶我4月17号就弄了网申，结果他5月11号才让我做笔试。那时候我已经拿到了Vivo的offer，在面携程的HR面，就直接放弃笔试了。说实话，真不知道金蝶怎么想的，四月份的网申，一个月后才发笔试，五月份大伙儿基本都定了，龙大都快毕业典礼了，想招谁呢。</p>
+<h3 id="shopee-后端-二面挂">Shopee 后端 二面挂</h3>
+<p>因为之前有想去NUS嘛，就关注了一下新加坡这边的互联网公司。虾皮是一家做东南亚电商的新加坡公司，美股节节高的Sea Limited，然后他的研发中心是在深圳。虾皮的口碑还是挺好的，基本能work life balance，薪资尚可，企业氛围也不错，技术力也不差，因此当时还是挺想去虾厂的，然后过了笔试和一面，最后倒在了二面上。虾皮的笔试不难，是选择题加编程题，leetcode easy题，但是面试还是有点难度的。个人感觉虾皮的面试是可以感受到分层的，一面基本就是常规八股文加leetcode middle题，二面会开始细问项目和技术栈。二面的时候考了一个场景题，不会，问了一些中间件接触过吗，不害意思没有，好那你有什么问题想问我吗，GG。说实话，其实自己临时起意找工抱佛脚，没有什么靠谱的项目做过，真的还是挺心虚的。虽然我面过的绝大多数都不会问到中间件和框架，还是基础知识偏多一点，但是如果问到就回不知道，还真是挺尴尬的。</p>
+<h3 id="vivo-java开发-oc">VIVO Java开发 OC</h3>
+<p>VIVO是在差不多四月中旬的时候投的网申，然后四月底的时候过了技术面，五一回来后面了HR面，然后一个星期后就offer call了，三天之内做决定，因为当时是第一个offer，就没有想太多就签了两方，工作地点估计是在深圳宝安。VIVO的招聘流程是相当比较简单的，没有笔试，只有一个技术面，基本就是和你聊天谈谈职业计划，简历也不会问很深，算法题最多写一个排序；然后HR面就是正常问一些规划和大学生活之类的问题这样，也是不会超纲。然后后面有了携程的offer就想解约，解约金要5k。其实当时我可以凭研究生offer免解约金解约的，我比较老实，我怕万一这一年再遇上被发现然后拿小本本记上，然后就乖乖交了解约金，真就初入社会交个学费。个人感觉，华为被打压后，VIVO这两年开始起色，今夏还到欧洲杯上打广告，确实有一定的扩招。但是低难度的过关也意味着相对较低的薪水。不过也还好，VIVO基本上是能给终端厂的平均水平的，这个薪水还是能吊打招聘会上90%的企业。更何况这样的终端厂的work life balance基本还是可以的。当时签了后加了VIVO的群，也是了解了一下VIVO的情况。VIVO的工作环境，福利，配套设施还是挺不错的，入职后也会有比较大规模的那种培训活动，类似于那种夏令营吧，也可以结交一些工作上的朋友。个人影响流觉得VIVO，OPPO，小米的面试都不会太难，当然薪资也很难会有高的突破，但他们体量大，很多大城市里都有分公司，在意城市的话很推荐投一投做个保底。</p>
+<h3 id="携程-服务端开发-oc">携程 服务端开发 OC</h3>
+<p>当初没offer的时候最想去的就是携程，而且携程给的也基本够得上互联网大厂平均位，比VIVO略高一点。公司大楼漂亮，氛围不错，福利也多，楼下的网鱼网咖环境很好，还有猫。之前去上海玩错过动车回家的时候就和基友在携程总部楼下的网鱼网咖熬夜打古墓丽影，想起来就肝痛。HR面被问到在手上有offer的几家里最想去哪个，我也说了携程。结果最后没有选择去，真是渣男行为哈哈。携程其实也不错，笔试全AC，两轮技术面也不难，主要是面试用的赛码网我怎么也无法连上视频，结果我的面试都是用电话来解决的。一面的时候约的是上午11点，但是因为赛码网一直连不上视频和语音，对面的考官在消息栏说他先退出在登进来，结果就一直没登进来了。因为我笔试满分过后就十分想要携程的offer，给我急的直接发邮件给携程的校园招聘邮箱。好在她们回的及时，就在差不多12点的时候又帮我把面试官给喊回来了开始了这场尴尬的面试。这面试官声音听上去有点无精打采，随便问了几个八股文之后就匆匆结束了，甚至给我反问的时间都没有。我以为一面挂了，结果惊喜地收到二面的通知。二面的面试官还比较和善，虽然只聊了一些项目和规划问题，比如为什么不读研。我不敢说我就在贵司干一年然后再去读，我就说我考研失败了，然后他还进一步问我考哪个学校，我过了一下大脑一时不知道说哪个学校比较合我校和面携程的人该有的定位，就说了中山大学。好在他信了。然后他还反复问我一面有没有问我基础题，我说有，然而他半信半疑地又给我出了道easy题写，题目是啥忘了，好像也是连续最长子数组，因为我记得这道题似乎面了两次，最终平稳降落。</p>
+<p>后来的HR就打电话来发了口头offer，就是谈了一下薪资，福利，公司状况之类的。携程有点奇怪的是她是先给你一个offer call问你接不接，如果你说接才会给你正式的纸质offer，我催多多的时候和HR说了携程的情况她还说携程的流程是不对的哈哈。因为当时还在面拼多多，而且已经过了二面，我想等多多这边出来再给携程答复（不想再交违约金了）。本来是说好下星期答复的，结果多多这边还有HR面就拖了两个星期，然后第三个星期携程HR小姐姐再来找我我实在不好意思再拖了我就转头催多多给offer。催完当晚就给了offer，给的比携程高了“亿点点”。第二天早上携程HR小姐姐打来电话，其实我当时还是没想好哪个但是有点倾向多多，然后我想她等了这么长时间直接这么一问实在不好意思再拖了就脑子一热，选了多多拒了携程。说实话感觉有点对不起那个HR的，小姐姐声音听上去很好听也很耐心（多多的HR感觉有点强势），即使我拒了她们家也还祝我未来顺利，担心多多太卷，如果想跳槽的话可以再联系她，虽然可能心里面已经在骂娘了哈哈。</p>
+<h3 id="拼多多-服务端开发-oc">拼多多 服务端开发 OC</h3>
+<p>多多是我拿到的最后一个offer，也是最终选择要去的offer。说实话，我在开始准备春招的时候可从来没想过我要去拼多多。本来看不上觉得电商太卷了，奈何他们给的实在太多了。多多的笔试略难，但容易进面试，我的面试不怎么考八股文，就问算法题或者场景题，考了IP地址查询和整数反转，但好像有听其他同学有说Java考的还挺深的。可能看组吧，我面的是搜索组，感觉两个面试官都挺好的，让我惊讶的是第一个面试官感觉非常精神，完全不像11116的样子哈哈，然后第二个面试官花名叫劳尔，搞得我都想在面试最后问一句是不是皇马球迷了。三面是HR面，又问到了经典问题为什么不读研，然后又问到了考了哪所学校，这时我觉得中大已经满足不了我了，我应该考浙大，表示想回江浙沪做孝子，以表忠心。多多的福利的话就我目前所知到的就是第一年住宿都免费然后公司包三餐。然后会有签字费，不过签字费是要随着第一年的年终奖发的，估计我是捞不到了。至于为啥选择拼多多，我心想就干一年，只要不丢命，应该问题不大。明年要继续出国读书，11116积累一下工作经验就当是体验生活吧。因为我感觉我自己是那种有压力才会有动力的，所以也想挑战下也许是全世界最卷的厂的生活，当然最终目的还是摆脱卷拥抱wlb。</p>
+<h2 id="总结">总结</h2>
+<p>因为疫情，很多事情变得不确定起来，不管是海外申请还是找工实习，我的很多决定都是在我的计划之外的。从本来信心满满的NUS 3+1+1到美校DDL三个月前开始撒钱找中介和托福培训，再到最后决定defer准备找工。我感觉我的很多事情都像是只完成了一半就要转到下一个事情了，没有哪件事是非常圆满地完成的，所有的结果都带有一点小遗憾，感觉很多事情都是意料之中的意料之外。清楚自己的能力的有限不能将每件事做到尽善尽美，但至少要完成每件事。也许就是这个想要完成的信念才让我坚持要去最后一投吧。从12月5号的第一次托福上百到五月份春招尾声才拿到第一份工作offer。有时候想想不如就这样吧。托福98分也能申个保底？没有工作这一年在家呆着也能自学？但心里总是有那一股劲感觉不服，老子都遭了这么多罪了凭啥结果就这？也许就是这一股不服劲才支撑着我永远要去最后一投。我不知道给看到这里的各位有什么样的启发能够给到。直白一点的话，那就是凡事都早准备吧，如果实在中途有了意外要改变战略也不要放弃，你要相信自己的努力配得上想要的结果。正如加缪所说，人生是荒诞的，但是人生的意义就在于反抗这荒诞。</p>
 ]]></content>
       <categories>
-        <category>Frontend</category>
-        <category>JavaScript</category>
+        <category>碎碎念</category>
       </categories>
       <tags>
-        <tag>DOM</tag>
-        <tag>DOM Scripting Notes</tag>
+        <tag>求职</tag>
       </tags>
   </entry>
   <entry>
@@ -1691,152 +1800,24 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
       </tags>
   </entry>
   <entry>
-    <title>《JavaScript DOM编程艺术》第五章读书笔记</title>
-    <url>/2020/06/02/jsdom5/</url>
-    <content><![CDATA[<p>JavaScript平稳退化，兼容和性能问题(tips)。 <a id="more"></a></p>
-<h1 id="js平稳退化">JS平稳退化</h1>
-<p>Javascript作为一种前端脚本语言，主要功能是用于改善前端的用户体验。我们看见一些网页的显示效果，比方说菜单显示隐藏，图标移动和文字滚动大多是基于JS来实现的。作为改善用户体验的存在，通俗的讲就是起个锦上添花的表现效果，而不能影响正常的后台逻辑和最基本功能的实现。</p>
-<p>通俗地讲，javascript平稳退化就是如果一个浏览器完全不支持js或者禁用js的时候，它的正常功能不会受到任何影响。</p>
-<h3 id="打开新窗口">打开新窗口</h3>
-<p><code>window.open(url,name,features)</code> - 第一个参数是想在新窗口里打开的网页的URL地址。如果省略这个参数，屏幕上将弹出一个空白的浏览器窗口。 - 第二个参数是新窗口的名字。可以在代码里通过这个名字和新窗口进行通信。 - 最后一个参数是一个以都好分隔的字符串，其内容是新窗口的各种属性。这些属性包括新窗口的尺寸（宽度和高度）以及新窗口被启用或禁用的各种浏览功能（工具条，菜单条，初始先是位置等)。对于这个桉树应该掌握以下原则：新窗口的浏览功能要少而精。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">popUp</span>(<span class="params">winURL</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">window</span>.open(winURL, <span class="string">"popup"</span>, <span class="string">"width=320,height=480"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="javascript-伪协议">Javascript 伪协议</h4>
-<p><code>javascript:</code>伪协议让我们通过一个链接来调用JavaScript函数。 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:popUp('http://www.example.com/');"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure> 这条语句在支持"javascript:"伪协议的浏览器中运行正常，较老的浏览器则会取尝试打开那个链接但失败，支持这种协议单禁用了javascript功能的浏览器会什么也不做。</p>
-<h4 id="内嵌事件处理函数">内嵌事件处理函数</h4>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">onclick</span>=<span class="string">"popUp('http://www.example.com/'); return false;"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>所有操作由onclick属性负责完成，无法平稳退化。</p>
-<h4 id="需要平稳退化的原因">需要平稳退化的原因</h4>
-<p>如果用户是一个<strong>搜索机器人</strong>，一种自动化程序，它们浏览Web的目的是为了把各种网页添加到搜索引擎的数据库里。各大搜索引擎都有类似的程序。目前。只有极少数搜索机器人能够理解js代码。所以，如果js网页不能平稳退化，它们在搜索引擎上的排名就可能受到损害。</p>
-<p>所以我们最好修改成如下 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.example.com/"</span> <span class="attr">onclick</span>=<span class="string">"popUp(this.href);return false;"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="分离javascript">分离JavaScript</h3>
-<p>HTML Document: <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.example.com/"</span> <span class="attr">class</span>=<span class="string">"popup"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure> 我们可以在外部把一个事件添加到html文档中的某个元素上： <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">element.event = action...</span><br></pre></td></tr></table></figure> 比如： <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">getElementById(id).event = action;</span><br></pre></td></tr></table></figure> 如果事件涉及多个元素，我们可以用getElementsByTagName和getAttribute把事件添加到有着特定属性的一组元素上。 具体步骤：</p>
-<ol type="1">
-<li>把文档里所有的链接全放入一个数组里</li>
-<li>遍历数组</li>
-<li>如果某个链接的class属性等于popup，就表示这个链接在被点击时应该调用popUp()函数。</li>
-</ol>
-<p>还有一个问题是必须让这种连接的代码在html文档全部加载到浏览器后再开始执行。文档将被加载到一个浏览器窗口里，document对象又是window对象的一个属性。当window对象触发onload事件时，document对象已经存在。 所以我们在外部的js文件里这样写 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = preparelinks;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">prepareLinks</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> links = <span class="built_in">document</span>.getElementsByTagName(<span class="string">"a"</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;links.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (links[i].getAttribute(<span class="string">"class"</span>) == <span class="string">"popup"</span>) &#123;</span><br><span class="line">            links[i].onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                popUp(<span class="keyword">this</span>.getAttribute(<span class="string">"href));</span></span><br><span class="line"><span class="string">                return false;</span></span><br><span class="line"><span class="string">            &#125;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">function popUp(winURL) &#123;</span></span><br><span class="line"><span class="string">    window.open(winURL, "</span>popup<span class="string">", "</span>width=<span class="number">800</span>,height=<span class="number">600</span><span class="string">");</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="向后兼容">向后兼容</h3>
-<h4 id="对象检测">对象检测</h4>
-<p>检测浏览器对js的支持程度 比如 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure></p>
-<h3 id="性能考虑">性能考虑</h3>
-<ol type="1">
-<li>介绍不必要的DOM访问</li>
-<li>合并多个js文件到一个文件里</li>
-<li>压缩脚本，去掉不必要的字节如空格和注释 多数情况下，你应该有两个版本，一个是工作副本，可以修改代码并添加注释；另一个时精简副本，用于放在站点上。通常，为了与非精简版本区分开，最好在精简副本的文件名中加上min字样： <code>&lt;script src="scripts/scriptName.min.js"&gt;&lt;/script&gt;</code></li>
-</ol>
-<p>可以通过以下几个有代表性的代码压缩工具完成：</p>
-<ul>
-<li><a href="http://lisperator.net/uglifyjs/" target="_blank" rel="noopener">Uglify</a></li>
-<li><a href="http://developer.yahoo.com/yui/compressor/" target="_blank" rel="noopener">YUI Compressor</a></li>
-<li><a href="https://developers.google.com/closure/compiler/" target="_blank" rel="noopener">Google Closure Compiler</a></li>
-<li><a href="https://tool.oschina.net/jscompress/" target="_blank" rel="noopener">oschina 在线js压缩</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>Frontend</category>
-        <category>JavaScript</category>
-      </categories>
-      <tags>
-        <tag>DOM</tag>
-        <tag>DOM Scripting Notes</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>最后一投--2021春招总结</title>
-    <url>/2021/07/12/%E6%9C%80%E5%90%8E%E4%B8%80%E6%8A%95/</url>
-    <content><![CDATA[<p>之前觉得人总是在回过头看的时候才会发现自己走了这么长的一段不得了的路，但是实际上回头看的时候只会觉得当时多么困难的事情并没有什么值得骄傲的。在今年春招的时候总是想着结束后要写一个总结来记录这多么不容易的过程，但当现在真正拿到offer后似乎又没啥动力去写了。我觉得我总是在不过不管怎样，大学生涯的最后一个学期里干的最主要的事情，也许还是有值得纪念和分享的价值吧。</p>
+    <title>阿里笔试20210322</title>
+    <url>/2021/03/22/%E9%98%BF%E9%87%8C%E7%AC%94%E8%AF%9520210322/</url>
+    <content><![CDATA[<p>Java实习生 笔试</p>
 <a id="more"></a>
-<p>本文其实没有什么干货，大部分都是我关于这段求职之路的心路历程，碎碎念居多，纪念性比实用性可能更强一点。所以不好意思，奔着笔经和面经的朋友们可能要失望了。</p>
-<h2 id="背景">背景</h2>
-<p>其实我毕业后的主去向是海外申研我在进入新年来，差不多结束申请的时候就有过想要defer找工的打算。一月份的时候各大使馆还没有开，美国的疫情和Asian Hate还很严重，所以就有想要defer一年然后去个厂打工积累些经验的打算。后来到三月份，拿到了莱斯大学的offer，并且咨询了一下确定可以defer，于是心里就暗自打算春招一定要找到一份工作，或者如果真的有好的美校offer就去大厂的暑期实习。因此我在这个阶段实习和全职是都有去投的。</p>
-<p>其实我的简历是比较拉垮的，GPA在一个中等的水平，只有一个小厂实习，没有很多meaty project，大部分的project都是龙大里上课用来水分数的。钟老师的课的作业我也列上了，但是其实有很多作业只知道表层的东西并不懂底层的逻辑。其实这个背景去找工还是挺吃亏的，因为我想走的是Java的开发岗，但是我却从来没有跟着做完哪怕一个大的web project，Java的核心像多线程，容器，反射，内部类之类的也是到五月份才学的差不多。Spring的技术栈和其他中间件是一窍不通，设计模式只知道单例，redis也没有接触过，mysql只会增删改查。我想我这样的背景也能找到几份还算可以的工作，正在读的朋友如果要找工作的话真的可以不用那么焦虑（如果不考虑大厂的话）。</p>
-<p>至于刷题的话，我从一月份开始坚持每天至少刷一两题，主要是跟着labuladong的公众号文章来刷，个人感觉这位博主的刷题方法和解题思路还是很适合我的。所以如果想要参考刷题的路线，可以试一试labuladong的线路。</p>
-<p>至于学Java的话，主要是看《Java 核心技术 I》和B站上的视频，刷面试题看的是Java Guide和CyC2018，这两本互相借鉴。然后同时我买了一本《计算机网络：自顶向下》中文版开始学，《自顶向下》是我看过讲的最深入浅出的教材之一，写的非常好，看的时候真的有醍醐灌顶的感觉。</p>
-<p>还有一点可能比较特殊的是，我大四下只上一门课，还是一门比较水的课。为了好好准备春招，我退了老钟的compiler（顺便做了第一个作业），退了强化学习，所以我的求职之路可能比较特殊，属于临时抱佛脚，所以朋友们，找工的准备还是越早越好。</p>
-<p>接下来的话我就用流水账的方式记录下我投的公司和岗位吧。</p>
-<h2 id="时间轴">时间轴</h2>
-<h3 id="腾讯留学生实习-一面挂">腾讯留学生实习 一面挂</h3>
-<p>三月初的时候我投了一波腾讯的留学生实习后端，百度Java开发，华为的通用软件开发。腾讯面的早，当时刷题初现成效，但其实还有很多Java的面试题没有接触，因此没有意外地挂了腾讯PCG的留学生实习。我个人感觉，留学生暑期实习和秋招向的暑期实习差别并不大，他们还是想找实习干好能留任的人，所以表明想要留任而不是什么锻炼自己的态度还是挺重要的。当时的面试我记得问了一个最大连续乘积的问题，是最大连续和变种，然后我就按最大连续和来写了，甚至状态转移方程也只是将加号改成乘号，没有考虑负负得正的情况。所以在做最大连续乘积的时候，dp列表不仅要记最大值，也要记最小值也就是负值。这题我印象贼深刻，是因为我用错误的方法做了出来，然后自己写了几个测试例子都通过了（没有负数），然后面试官看了一眼没有指出来然后直接让我问有什么问题了。搞得我以为自己要过了呢。</p>
-<p>后来我又投了腾讯的全职啊以及其他岗位的实习什么的，就再也没被捞上来了。</p>
-<h3 id="百度java开发-笔试挂">百度Java开发 笔试挂</h3>
-<p>百度笔试只AC了一道，挂了。</p>
-<h3 id="华为通用软件开发-综测挂">华为通用软件开发 综测挂</h3>
-<p>华为的应聘过程真是记忆犹新。我参加了1次笔试，2次综合测试（性格测试），4次技术面试外加1次所谓综合测试澄清面试，然后因为性格测试挂了。这一趟下来我的微信列表里多了4个华为HR，我不得不给他们打上标签，以免以后吐槽华为的时候给他们看到（比如现在）。我笔试满分，三道编程题做完还有40分钟，交卷稳AC，所以当时有点期待又有点自豪。结果盲目的自信导致第一次的面试很糟糕，面的似乎是终端开发的部门，我竟然倒在了一个小小的删除链表的中间节点上。好吧其实快慢指针甚至解决环状链表东哥（labuladong）的公众号都有讲，但是我没看。后面问了几个八股文的题又没怎么答的上来。好在我最后态度诚恳，问面试官有什么不足之处我可以改改，面试官也很耐心地和我说了很多。本来我以为会挂的，后面竟然被换到了另外一个部门，好像是做鸿蒙生态智能云的。我记得非常清楚，但是第一面是在周三，然后挂了之后换部门， HR说这周部门结束全部春招面试，就周日一起一二三面大冲关。我周日在TB三楼订了一天，重读八股文，上午一二面，下午主管面。非常有意思的是我二面做的题是最长回文子串，然后我用最长子序列的套路去做了，然后因为有一些测试用例是可以过的，面试官竟然没有发现，就又这么蒙混过关了。我写的时候就感觉不太对，但又不知道在哪里，后面再去搜原题的时候才发现自己写错了。下午三面的是主管，人感觉很友善，问了我的一个项目并以此考了一道场景题，问提高我们那种靠Wi-Fi数据算的到课率有什么比较好的解决方案，就是不仅仅是算法上的改进，我说了加传感器或者有计划地设置路由器。感觉大佬对这个答案还挺满意，然后给我讲到华为作为硬件厂的解决方案可能更多还是设计传感器和人机交互的方面，不像互联网大厂更擅长大数据算法。我听完后赞不绝口，自以为面试场上逢伯乐，相谈甚欢，被问到想做终端还是做云端，我说做云端，云计算我上过，铠哥还给我写过推荐信呢。offer未下，我已芳心暗许。唯一的内鬼想法就是怕美签ban我华为的工作经历。真好真好，还没进华为就想着为华为抛弃美帝了，然后没想到综测给我整了那么大一幺蛾子。</p>
-<p>我原本以为综测只是走个流程，可没想到菊厂真的认为能够从几道性格题里找到狼性文化。我第一次综测，没过，第二次的时候还没意识到事情的严重性，又瞎做。后来问HR咋还没来offer呢，然后对面说我综测没过要补一轮澄清面试。澄清面试？老人，地铁，手机，jpg。这个所谓的澄清面试就是华为找第三方来给你做个面试，问你几个性格题，比如遇到过的困难，你同事对你不好你该咋整，公司给你象征251天的定向休假手环的时候你该先伸哪只手之类的。然后我又挂了，我不太明白，但是大受震撼。我3月初投的华为，到后面彻底被拒这一套下来至少4月3号后了，因为我生日的时候还是笑呵呵地发朋友圈拿面试通过当offer。</p>
-<h3 id="美团测试开发-一面挂">美团测试开发 一面挂</h3>
-<p>“等华为offer”这期间呢我就隐约感觉这事要凉，所以期间还投了美团的测试开发和通过学长的内推投了阿里淘系的可转正实习。美团笔试，AC两道，测开加了一道专门的题。一面的面试官比较典型的秃头程序员形象，听完我的自我介绍后觉得我投测试有退而求其次之嫌，典型八股题加两道算法题。第一道竟然是atoi，还让我自己想输入输出，真的整吐了，力扣上的atoi输入输出明明白白，这面试官给的题就一个描述还不带测试用例，写了半天没写明白跳到第二道题。第二道题好像是个dp，忘了，没做出来。一个星期后收到拒信，意料之内。</p>
-<h3 id="阿里java开发实习-三面挂">阿里Java开发实习 三面挂</h3>
-<p>阿里经典一小时笔试，一道背包，一道石子游戏II。背包十五分钟解决，石子游戏想用骚的结果边界条件太多，好吧其实思路也是错的，只过了10%。学长说有内推，笔试不太差基本能面试。然后一面，一个超温柔的小哥哥，电话面试，面得很开心，八股文都踩到了，Java题也着调了，算法题口头思路稳过，芳心暗许阿里爸爸。二面，Java题变难，多线程细考，操作系统也问得比较细，计网问到TCP的ARQ，算法题口头思路，感觉自己只答出了一半多一点，心里已经做好挂的准备了。意外有三面，我以为阿里三面是HR面，觉得阿里offer已是囊中之物，结果三面不仅不是HR面，还不是主管面，是交叉面，问了很多技术细节。我说我会Java，但简历上还写了C++，被问了C++，一问三不知。三面难度比二面还大，这回是一半都没有答上来，面试一半我就知道这次铁定要悲剧了。结果不出意外，三天后，流程终止，重新投递。有意思的是，第二次投递后又有部门来找我面试，那时候大概是4月底吧，我问实习能转正否，对面支支吾吾说如果表现好的话还是有转正几率的，大伙儿在电话线里相视一笑，没问算法题也没问八股文就问项目，我觉得这回对面是真心找实习，专门实习的那种实习，可惜我当时又芳心暗许携程，所以决定不做阿里的舔狗。面试结束后第二天，流程终止，重新投递，Pick Up Art YYDS。</p>
-<h3 id="字节java开发-一面挂">字节Java开发 一面挂</h3>
-<p>看到这里可能有人会问为啥不投宇宙节。其实字节我也有投，一开始都在投实习，不管日常还是实习都是秒拒。后来比较迟的时候，大概四月中旬吧才转投字节北京企业应用的Java开发全职，两个星期后才有笔试通知。笔试四道AC了一道半。面试正常八股文加算法题。算法问了接雨水，我十分钟做了出来，面试官突然发现我之前面试做过，我本想装傻当不知道最后还是承认之前面试做过，结果面试官也没换题。感觉有点刷KPI的味道。之前字节实习面试第二天甚至当天就能知道结果，然而这次我是一个星期后去官网刷的时候才发现流程终止，并且这个部门的岗位介绍已经没了。</p>
-<h3 id="滴滴网易b站小米猿辅导特斯拉-投递无果">滴滴、网易、B站、小米、猿辅导、特斯拉 投递无果</h3>
-<p>在被通知华为综测挂了之后呢，我连忙开始了新的一轮的投递。这时候我的海外研究生的offer基本是定了，即defer一年去Rice的CS Master项目。NYU Tandon的还先交了400刀的占位费，最后想想，纽约的生活还是太紧张了，纽约人民可不像《心灵奇旅》里那样那么淳朴，所以还是决定去休斯顿，至少莱斯的校园有围墙。</p>
-<p>新投的公司有很多，大小厂都有。总的来说，后端开放的难度在终端厂是要比互联网厂低一些的。也许终端厂的主营业务不是软件，所以他们招人门槛会低一些，只要你写过代码就行，八股文不会深入问。蓝绿厂我二选一挑了蓝厂，倒不是因为多喜欢Vivo，只是扔硬币选中罢了。投小米是因为室友录了秋招，让他帮我内推，但是小米结束的早，和雷总做不成朋友。网易投了杭研院，无果。滴滴投北京Java，无果。其实四月中旬的时候，大部分大厂都差不多结束春招了。网传的金三银四，其实只有金三，四月份只是开始发offer的时候。此时再录，近乎于捡漏中的捡漏了。当时的心态说实话还是挺焦虑的，我真的很想再defer的这一年去工作积累下经验。联想到NUS 3+1+1的经历，感觉自己想要做成的事一件都不会做成。特斯拉是他们来学校弄讲座的时候我去投的，其实他们来学校搞宣传找的就只是销售而已，真正的研发在上海。后来学校弄了一个大湾区的招聘会，我和我的室友带着简历去参加了，一路上我投了六七家吧。有消息的就三家，金蝶，闻泰和证通电子，其他的小厂没消息我也不记得了。要我说实话，学校这个招聘会帮助其实并不是那么大，唯一我觉得靠谱的是深圳市税务局的实习，其他的你当面和HR聊得再开心，背后也不一定会有你的机会。</p>
-<h3 id="闻泰科技-笔试挂">闻泰科技 笔试挂</h3>
-<p>闻泰投的上海的Java开发，比较快的来了笔试。笔试都是选择题，没有大的编程题，大多选择题关于数据结构和Java。个人感觉难度还行，做完没有很吃力，但是就是一直没消息，没给面试。因为当时在面的有携程，Vivo和Shopee，所以闻泰没有太放在心上。</p>
-<h3 id="证通电子-迷之无消息">证通电子 迷之无消息</h3>
-<p>体验最差的应聘。倒不是因为面试官多么不堪，而是这个人力资源部和研发部门的脱节让我感觉这个公司管理上非常混乱。HR打电话来让我准备线下的面试，研发有两个工作地点，一个是宝安总部，一个是南山科技园边上的软件园。因为这个是线下的面试。一般的线下面试都会一天之内一套下来给你答复。过完所有面试，然后现场决定给不给offer或者进不进池子。所以我还满怀期待的去准备这个面试，觉得自己的第一份offer终于要来了。我选了南山软件园，心想这个地方我之前实习的时候常去，体验还不错，离学校也更近一点。结果到了那个地方才发现这软件园的分部就是半层楼，那里的工作环境和中科大厦真的差了十万八千里。工位旧得我觉得可以在这里拍古早港片。到了楼上前台没有人，打了HR的电话才叫人来给我开门。好吧，其实这些都还不是重点。也许其实能在中科大厦租得起的公司才是少数，真实的码农就应该在这种地方工作。面试官似乎是这个分部的主管，聊了半天竟然好像不知道我今天回来应聘似的。看完了我的简历表示我可能更适合后端，他们这儿主要是做终端，有个小部门做后端，当时那个部门的主管不在，表示他可以帮忙转交简历推荐。还说下次我可能还要再来一趟线下。我嘴上好的好的，心里已经开始吐槽了。我大老远地从龙岗跑到南山就是让你给我转交一下简历？HR没给你简历吗，你事先不会看一下吗，这明明用电话面试就能解决的事情都2021年了还在疫情尚未解除的情况下让我跑这么远跟你唠嗑呢。</p>
-<p>好在那天下午阳光明媚，深圳尚未上40度，我骑上共享单车，耳机里放着VV的《Fly》，我因为没有offer仍旧怀着一颗资本家万岁的舔狗心理，所以没有太埋怨这家公司，倒是为有这样奇葩的体验，能够为后来者揭露这样SB的公司还颇有几分光荣和自豪。</p>
-<h3 id="金蝶后端-拒笔试">金蝶后端 拒笔试</h3>
-<p>金蝶我4月17号就弄了网申，结果他5月11号才让我做笔试。那时候我已经拿到了Vivo的offer，在面携程的HR面，就直接放弃笔试了。说实话，真不知道金蝶怎么想的，四月份的网申，一个月后才发笔试，五月份大伙儿基本都定了，龙大都快毕业典礼了，想招谁呢。</p>
-<h3 id="shopee-后端-二面挂">Shopee 后端 二面挂</h3>
-<p>因为之前有想去NUS嘛，就关注了一下新加坡这边的互联网公司。虾皮是一家做东南亚电商的新加坡公司，美股节节高的Sea Limited，然后他的研发中心是在深圳。虾皮的口碑还是挺好的，基本能work life balance，薪资尚可，企业氛围也不错，技术力也不差，因此当时还是挺想去虾厂的，然后过了笔试和一面，最后倒在了二面上。虾皮的笔试不难，是选择题加编程题，leetcode easy题，但是面试还是有点难度的。个人感觉虾皮的面试是可以感受到分层的，一面基本就是常规八股文加leetcode middle题，二面会开始细问项目和技术栈。二面的时候考了一个场景题，不会，问了一些中间件接触过吗，不害意思没有，好那你有什么问题想问我吗，GG。说实话，其实自己临时起意找工抱佛脚，没有什么靠谱的项目做过，真的还是挺心虚的。虽然我面过的绝大多数都不会问到中间件和框架，还是基础知识偏多一点，但是如果问到就回不知道，还真是挺尴尬的。</p>
-<h4 id="vivo-java开发-oc">VIVO Java开发 OC</h4>
-<p>VIVO是在差不多四月中旬的时候投的网申，然后四月底的时候过了技术面，五一回来后面了HR面，然后一个星期后就offer call了，三天之内做决定，因为当时是第一个offer，就没有想太多就签了两方，工作地点估计是在深圳宝安。VIVO的招聘流程是相当比较简单的，没有笔试，只有一个技术面，基本就是和你聊天谈谈职业计划，简历也不会问很深，算法题最多写一个排序；然后HR面就是正常问一些规划和大学生活之类的问题这样，也是不会超纲。个人感觉，华为被打压后，VIVO这两年开始起色，今夏还到欧洲杯上打广告，确实有一定的扩招。但是低难度的过关也意味着相对较低的薪水。不过也还好，VIVO基本上是能给终端厂的平均水平的，这个薪水还是能吊打招聘会上90%的企业。更何况这样的终端厂的work life balance基本还是可以的。当时签了后加了VIVO的群，也是了解了一下VIVO的情况。VIVO的工作环境，福利，配套设施还是挺不错的，入职后也会有比较大规模的那种培训活动，类似于那种夏令营吧，也可以结交一些工作上的朋友。个人影响流觉得VIVO，OPPO，小米的面试都不会太难，当然薪资也很难会有高的突破，但他们体量大，很多大城市里都有分公司，在意城市的话很推荐投一投做个保底。</p>
-<h3 id="携程-服务端开发-oc">携程 服务端开发 OC</h3>
-<p>当初没offer的时候最想去的就是携程，HR面被问到在手上有offer的几家里最想去哪个，我也说了携程。结果最后没有选择去，真是渣男行为哈哈。携程其实也不错，笔试全AC，两轮技术面也不难，主要是面试用的赛码网我怎么也无法连上视频，结果我的面试都是用电话来解决的，算是一个不大不小的波折吧。携程给的也基本够得上互联网大厂平均位，比VIVO略高一点。公司大楼漂亮，氛围不错，福利也多，楼下的网鱼网咖环境很好，还有猫。之前去上海玩错过动车回家的时候就和基友在携程总部楼下的网鱼网咖熬夜打古墓丽影，想起来就肝痛。</p>
-<h3 id="拼多多-服务端开发-oc">拼多多 服务端开发 OC</h3>
-<p>多多是我拿到的最后一个offer，也是最终选择要去的offer。说实话，我在开始准备春招的时候可从来没想过我要去拼多多。本来看不上觉得电商太卷了，奈何他们给的实在太多了。多多的笔试略难，但容易进面试，我的面试不怎么考八股文，就问算法题或者场景题，考了IP地址查询和整数反转，但好像有听其他同学有说Java考的还挺深的。可能看组吧，我面的是搜索组，感觉两个面试官都挺好的，让我惊讶的是第一个面试官感觉非常精神，完全不像11116的样子哈哈，然后第二个面试官花名叫劳尔，搞得我都想在面试最后问一句是不是皇马球迷了。多多的福利的话就我目前所知到的就是第一年住宿都免费然后公司包三餐。然后会有签字费，不过签字费是要随着第一年的年终奖发的，估计我是捞不到了。至于为啥选择拼多多，我心想就干一年，只要不丢命，应该问题不大。明年要继续出国读书，11116积累一下工作经验就当是体验生活吧。因为我感觉我自己是那种有压力才会有动力的，所以也想挑战下也许是全世界最卷的厂的生活，当然最终目的还是摆脱卷拥抱wlb。</p>
-<h2 id="总结">总结</h2>
-<p>因为疫情，很多事情变得不确定起来，不管是海外申请还是找工实习，我的很多决定都是在我的计划之外的。从本来信心满满的NUS 3+1+1到美校DDL三个月前开始撒钱找中介和托福培训，再到最后决定defer准备找工。我感觉我的很多事情都像是只完成了一半就要转到下一个事情了，没有哪件事是非常圆满地完成的，所有的结果都带有一点小遗憾，感觉很多事情都是意料之中的意料之外。清楚自己的能力的有限不能将每件事做到尽善尽美，但至少要完成每件事。也许就是这个想要完成的信念才让我坚持要去最后一投吧。从12月5号的第一次托福上百到五月份春招尾声才拿到第一份工作offer。有时候想想不如就这样吧。托福98分也能申个保底？没有工作这一年在家呆着也能自学？但心里总是有那一股劲感觉不服，老子都遭了这么多罪了凭啥结果就这？也许就是这一股不服劲才支撑着我永远要去最后一投。我不知道给看到这里的各位有什么样的启发能够给到。直白一点的话，那就是凡事都早准备吧，如果实在中途有了意外要改变战略也不要放弃，你要相信自己的努力配得上想要的结果。正如加缪所说，人生是荒诞的，但是人生的意义就在于反抗这荒诞。</p>
-]]></content>
-      <categories>
-        <category>碎碎念</category>
-      </categories>
-      <tags>
-        <tag>招聘</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>字节校招凉经20200804</title>
-    <url>/2020/08/04/%E5%AD%97%E8%8A%82%E6%A0%A1%E6%8B%9B%E5%87%89%E7%BB%8F20200804/</url>
-    <content><![CDATA[<p>字节跳动 飞书后端开发</p>
-<p>校招 一面 提前批 <a id="more"></a></p>
-<ol type="1">
-<li><p>自我介绍</p></li>
-<li><p>线程与进程的区别</p></li>
-<li><p>线程如何实现并行</p></li>
-<li><p>死锁产生的原因</p></li>
-<li><p>如何解开死锁</p></li>
-<li><p>为什么会出现乱码</p></li>
-<li><p>什么场景会出现乱码</p></li>
-<li><p>有哪些编码规则</p></li>
-</ol>
+<h3 id="背包装满问题">01背包装满问题</h3>
+<p>花里胡哨讲了一大堆就是问，<span class="math inline">\(n\)</span>个物品，限重<span class="math inline">\(m\)</span>, 每个物品<span class="math inline">\(w_i\)</span>, 从这几个物品中任选几个问是否能恰好装满。 也可说是01换零钱。</p>
+<p>全AC，<span class="math inline">\(O(mn)\)</span> <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">knapsack</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n, <span class="keyword">int</span>[] weights)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span>[] dp = <span class="keyword">new</span> <span class="keyword">boolean</span>[m+<span class="number">1</span>];</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> v=m; v &gt;= weights[i]; v--) &#123;</span><br><span class="line">            dp[v] = dp[v] || dp[v-weights[i]];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(dp[m]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="石子游戏-v"><a href="https://leetcode-cn.com/problems/stone-game-v/" target="_blank" rel="noopener">1563. 石子游戏 V</a></h3>
+<p>一排球，每个球都有各自的值，每轮在中间划分两排（保持顺序不变），哪排球的总分值多，哪排球抛弃，剩下的那一排算入游戏总分，如果分值相同任选一个抛弃。 求问能够得到的最高分数。 例子：{6,2,4,4,5,5}</p>
+<p>第一轮：{6,2,4};{4,5,5} 总分=6+2+4=12 去掉{4,5,5}</p>
+<p>第二轮：{6};{2,4} 总分=12+2+4=18 去掉{6}</p>
+<p>第三轮：{2};{4} 总分=18+2=20 去掉{4} 返回20</p>
+<p><strong>第一种方法（笔试时的思路）：二分法+贪心（错误解法🙅）</strong> <span class="math inline">\(O(N^2)\)</span> <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">ball</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (head &gt;= rear) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> index = head;</span><br><span class="line">    <span class="keyword">int</span> total = sum(a, head, rear);</span><br><span class="line">    <span class="keyword">int</span> rightSum = total;</span><br><span class="line">    <span class="keyword">int</span> leftSum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> minDelta = total;</span><br><span class="line">    <span class="keyword">int</span> points;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=index; i &lt; rear; i++) &#123;</span><br><span class="line">        leftSum += a[i];</span><br><span class="line">        rightSum -= a[i];</span><br><span class="line">        <span class="keyword">int</span> delta = Math.abs(rightSum-leftSum);</span><br><span class="line">        <span class="keyword">if</span> (delta &lt; minDelta) &#123;</span><br><span class="line">            minDelta = delta;</span><br><span class="line">            index=i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    leftSum = sum(a, head, index);</span><br><span class="line">    rightSum = sum(a, index+<span class="number">1</span>, rear);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (leftSum &gt; rightSum) &#123;</span><br><span class="line">        points = rightSum + ball(a, index+<span class="number">1</span>, rear);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (leftSum &lt; rightSum) &#123;</span><br><span class="line">        points = leftSum + ball(a, head, index);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">//  等于情况取高值</span></span><br><span class="line">        points = leftSum + Math.max(ball(a, head, index), ball(a, index+<span class="number">1</span>, rear));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> points;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=head; i &lt;= rear; i++) &#123;</span><br><span class="line">        ret += nums[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <blockquote>
-<p>字符集：像Unicode 是为所有字符安排一个编号(ID), 如“知”的unicode为0x77e5 编码: 一种双射规则将这个ID转换成二进制序列方便存储和传输</p>
+<p>写的时候没想好，找leftSum和rightSum差最小的index的时候搞得太麻烦了，什么单调递增递减的，全搜就完事了，也不影响复杂度，真的给一些边缘情况搞得心态爆炸，45分钟的做题时间最后只通了5%，真是作死啊。</p>
 </blockquote>
-<ol start="9" type="1">
-<li>UTF-8是怎样的</li>
-</ol>
-<blockquote>
-<p>UTF-8是这样做的： 1. 单字节的字符，字节的第一位设为0，对于英语文本，UTF-8码只占用一个字节，和ASCII码完全相同； 2. n个字节的字符(n&gt;1)，第一个字节的前n位设为1，第n+1位设为0，后面字节的前两位都设为10，这n个字节的其余空位填充该字符unicode码，高位用0补足。</p>
-</blockquote>
-<ol start="10" type="1">
-<li><p>Python 如何充分利用多核cpu实现并行 (说了自己比较熟悉python，结果那2个月一直在写go)</p></li>
-<li><p>了解过redis或memcache 吗 （无）</p></li>
-<li><p>在浏览器输入url后拿到页面的过程中发生了什么</p></li>
-<li><p>HTTP 的请求头有哪些</p></li>
-<li><p>GET方法和POST方法的区别</p></li>
-<li><p>GET方法可以传BODY吗 （可）</p></li>
-<li><p>DNS 的功能</p></li>
-<li><p>TCP三次握手，四次挥手</p></li>
-<li><p>为什么要三次握手和四次挥手</p></li>
-<li><p>四次挥手后，主动关闭端处于怎样的状态</p></li>
-<li><p><a href="https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/" target="_blank" rel="noopener">无重复字符的最长子串</a> 6个月前做过啊，现场没写出来，后面重新写出来的解答</p></li>
-</ol>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lengthOfLongestSubstring</span><span class="params">(s: str)</span> -&gt; int:</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    j = <span class="number">0</span></span><br><span class="line">    hashMap = &#123;&#125;</span><br><span class="line">    max_len = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> j &lt; len(s):</span><br><span class="line">        <span class="keyword">if</span> hashMap.get(s[j], <span class="number">-1</span>) == <span class="number">-1</span>:</span><br><span class="line">            hashMap[s[j]] = j</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            next_i = hashMap[s[j]] + <span class="number">1</span></span><br><span class="line">            <span class="keyword">while</span> i &lt; next_i:</span><br><span class="line">                hashMap[s[i]] = <span class="number">-1</span></span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">            hashMap[s[j]] = j</span><br><span class="line">        max_len = max(max_len, j-i+<span class="number">1</span>)</span><br><span class="line">        j += <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> max_len</span><br></pre></td></tr></table></figure>
-<p>虽然没有把重心放在秋招上，但还是记录一下这份无知，希望明年这时候看到这篇面筋的我能够不再对面试感到害怕。</p>
+<p><strong>第二种方法：暴力递归+Memo</strong> <span class="math inline">\(O(N^3)\)</span></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span>[][] memo;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">stoneGameV</span><span class="params">(<span class="keyword">int</span>[] stoneValue)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> N = stoneValue.length;</span><br><span class="line">        memo = <span class="keyword">new</span> <span class="keyword">int</span>[N][N];</span><br><span class="line">        <span class="keyword">return</span> ball(stoneValue, <span class="number">0</span>, N-<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">ball</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (head &gt;= rear) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (memo[head][rear] != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> memo[head][rear];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> total = sum(a, head, rear);</span><br><span class="line">        <span class="keyword">int</span> leftSum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> rightSum = total;</span><br><span class="line">        <span class="keyword">int</span> points = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=head; i &lt; rear; i++) &#123;</span><br><span class="line">            leftSum += a[i];</span><br><span class="line">            rightSum -= a[i];</span><br><span class="line">            <span class="keyword">if</span> (leftSum &lt; rightSum) &#123;</span><br><span class="line">                points = Math.max(points, leftSum+ball(a, head, i));</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (leftSum &gt; rightSum) &#123;</span><br><span class="line">                points = Math.max(points, rightSum+ball(a, i+<span class="number">1</span>, rear));</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                points = Math.max(points, leftSum+Math.max(ball(a, head, i), ball(a, i+<span class="number">1</span>, rear)));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        memo[head][rear] = points;</span><br><span class="line">        <span class="keyword">return</span> points;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=head; i &lt;= rear; i++) &#123;</span><br><span class="line">            ret += nums[i];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <tags>
         <tag>面筋</tag>
@@ -1897,24 +1878,44 @@ F[i,v] = \max (F[i,v-C_i]-1,F[i,v])
       </tags>
   </entry>
   <entry>
-    <title>阿里笔试20210322</title>
-    <url>/2021/03/22/%E9%98%BF%E9%87%8C%E7%AC%94%E8%AF%9520210322/</url>
-    <content><![CDATA[<p>Java实习生 笔试</p>
-<a id="more"></a>
-<h3 id="背包装满问题">01背包装满问题</h3>
-<p>花里胡哨讲了一大堆就是问，<span class="math inline">\(n\)</span>个物品，限重<span class="math inline">\(m\)</span>, 每个物品<span class="math inline">\(w_i\)</span>, 从这几个物品中任选几个问是否能恰好装满。 也可说是01换零钱。</p>
-<p>全AC，<span class="math inline">\(O(mn)\)</span> <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">knapsack</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n, <span class="keyword">int</span>[] weights)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span>[] dp = <span class="keyword">new</span> <span class="keyword">boolean</span>[m+<span class="number">1</span>];</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> v=m; v &gt;= weights[i]; v--) &#123;</span><br><span class="line">            dp[v] = dp[v] || dp[v-weights[i]];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(dp[m]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="石子游戏-v"><a href="https://leetcode-cn.com/problems/stone-game-v/" target="_blank" rel="noopener">1563. 石子游戏 V</a></h3>
-<p>一排球，每个球都有各自的值，每轮在中间划分两排（保持顺序不变），哪排球的总分值多，哪排球抛弃，剩下的那一排算入游戏总分，如果分值相同任选一个抛弃。 求问能够得到的最高分数。 例子：{6,2,4,4,5,5}</p>
-<p>第一轮：{6,2,4};{4,5,5} 总分=6+2+4=12 去掉{4,5,5}</p>
-<p>第二轮：{6};{2,4} 总分=12+2+4=18 去掉{6}</p>
-<p>第三轮：{2};{4} 总分=18+2=20 去掉{4} 返回20</p>
-<p><strong>第一种方法（笔试时的思路）：二分法+贪心（错误解法🙅）</strong> <span class="math inline">\(O(N^2)\)</span> <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">ball</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (head &gt;= rear) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> index = head;</span><br><span class="line">    <span class="keyword">int</span> total = sum(a, head, rear);</span><br><span class="line">    <span class="keyword">int</span> rightSum = total;</span><br><span class="line">    <span class="keyword">int</span> leftSum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> minDelta = total;</span><br><span class="line">    <span class="keyword">int</span> points;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=index; i &lt; rear; i++) &#123;</span><br><span class="line">        leftSum += a[i];</span><br><span class="line">        rightSum -= a[i];</span><br><span class="line">        <span class="keyword">int</span> delta = Math.abs(rightSum-leftSum);</span><br><span class="line">        <span class="keyword">if</span> (delta &lt; minDelta) &#123;</span><br><span class="line">            minDelta = delta;</span><br><span class="line">            index=i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    leftSum = sum(a, head, index);</span><br><span class="line">    rightSum = sum(a, index+<span class="number">1</span>, rear);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (leftSum &gt; rightSum) &#123;</span><br><span class="line">        points = rightSum + ball(a, index+<span class="number">1</span>, rear);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (leftSum &lt; rightSum) &#123;</span><br><span class="line">        points = leftSum + ball(a, head, index);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">//  等于情况取高值</span></span><br><span class="line">        points = leftSum + Math.max(ball(a, head, index), ball(a, index+<span class="number">1</span>, rear));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> points;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=head; i &lt;= rear; i++) &#123;</span><br><span class="line">        ret += nums[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+    <title>字节校招凉经20200804</title>
+    <url>/2020/08/04/%E5%AD%97%E8%8A%82%E6%A0%A1%E6%8B%9B%E5%87%89%E7%BB%8F20200804/</url>
+    <content><![CDATA[<p>字节跳动 飞书后端开发</p>
+<p>校招 一面 提前批 <a id="more"></a></p>
+<ol type="1">
+<li><p>自我介绍</p></li>
+<li><p>线程与进程的区别</p></li>
+<li><p>线程如何实现并行</p></li>
+<li><p>死锁产生的原因</p></li>
+<li><p>如何解开死锁</p></li>
+<li><p>为什么会出现乱码</p></li>
+<li><p>什么场景会出现乱码</p></li>
+<li><p>有哪些编码规则</p></li>
+</ol>
 <blockquote>
-<p>写的时候没想好，找leftSum和rightSum差最小的index的时候搞得太麻烦了，什么单调递增递减的，全搜就完事了，也不影响复杂度，真的给一些边缘情况搞得心态爆炸，45分钟的做题时间最后只通了5%，真是作死啊。</p>
+<p>字符集：像Unicode 是为所有字符安排一个编号(ID), 如“知”的unicode为0x77e5 编码: 一种双射规则将这个ID转换成二进制序列方便存储和传输</p>
 </blockquote>
-<p><strong>第二种方法：暴力递归+Memo</strong> <span class="math inline">\(O(N^3)\)</span></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span>[][] memo;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">stoneGameV</span><span class="params">(<span class="keyword">int</span>[] stoneValue)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> N = stoneValue.length;</span><br><span class="line">        memo = <span class="keyword">new</span> <span class="keyword">int</span>[N][N];</span><br><span class="line">        <span class="keyword">return</span> ball(stoneValue, <span class="number">0</span>, N-<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">ball</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (head &gt;= rear) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (memo[head][rear] != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> memo[head][rear];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> total = sum(a, head, rear);</span><br><span class="line">        <span class="keyword">int</span> leftSum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> rightSum = total;</span><br><span class="line">        <span class="keyword">int</span> points = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=head; i &lt; rear; i++) &#123;</span><br><span class="line">            leftSum += a[i];</span><br><span class="line">            rightSum -= a[i];</span><br><span class="line">            <span class="keyword">if</span> (leftSum &lt; rightSum) &#123;</span><br><span class="line">                points = Math.max(points, leftSum+ball(a, head, i));</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (leftSum &gt; rightSum) &#123;</span><br><span class="line">                points = Math.max(points, rightSum+ball(a, i+<span class="number">1</span>, rear));</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                points = Math.max(points, leftSum+Math.max(ball(a, head, i), ball(a, i+<span class="number">1</span>, rear)));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        memo[head][rear] = points;</span><br><span class="line">        <span class="keyword">return</span> points;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> head, <span class="keyword">int</span> rear)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=head; i &lt;= rear; i++) &#123;</span><br><span class="line">            ret += nums[i];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="9" type="1">
+<li>UTF-8是怎样的</li>
+</ol>
+<blockquote>
+<p>UTF-8是这样做的： 1. 单字节的字符，字节的第一位设为0，对于英语文本，UTF-8码只占用一个字节，和ASCII码完全相同； 2. n个字节的字符(n&gt;1)，第一个字节的前n位设为1，第n+1位设为0，后面字节的前两位都设为10，这n个字节的其余空位填充该字符unicode码，高位用0补足。</p>
+</blockquote>
+<ol start="10" type="1">
+<li><p>Python 如何充分利用多核cpu实现并行 (说了自己比较熟悉python，结果那2个月一直在写go)</p></li>
+<li><p>了解过redis或memcache 吗 （无）</p></li>
+<li><p>在浏览器输入url后拿到页面的过程中发生了什么</p></li>
+<li><p>HTTP 的请求头有哪些</p></li>
+<li><p>GET方法和POST方法的区别</p></li>
+<li><p>GET方法可以传BODY吗 （可）</p></li>
+<li><p>DNS 的功能</p></li>
+<li><p>TCP三次握手，四次挥手</p></li>
+<li><p>为什么要三次握手和四次挥手</p></li>
+<li><p>四次挥手后，主动关闭端处于怎样的状态</p></li>
+<li><p><a href="https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/" target="_blank" rel="noopener">无重复字符的最长子串</a> 6个月前做过啊，现场没写出来，后面重新写出来的解答</p></li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lengthOfLongestSubstring</span><span class="params">(s: str)</span> -&gt; int:</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    j = <span class="number">0</span></span><br><span class="line">    hashMap = &#123;&#125;</span><br><span class="line">    max_len = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> j &lt; len(s):</span><br><span class="line">        <span class="keyword">if</span> hashMap.get(s[j], <span class="number">-1</span>) == <span class="number">-1</span>:</span><br><span class="line">            hashMap[s[j]] = j</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            next_i = hashMap[s[j]] + <span class="number">1</span></span><br><span class="line">            <span class="keyword">while</span> i &lt; next_i:</span><br><span class="line">                hashMap[s[i]] = <span class="number">-1</span></span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">            hashMap[s[j]] = j</span><br><span class="line">        max_len = max(max_len, j-i+<span class="number">1</span>)</span><br><span class="line">        j += <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> max_len</span><br></pre></td></tr></table></figure>
+<p>虽然没有把重心放在秋招上，但还是记录一下这份无知，希望明年这时候看到这篇面筋的我能够不再对面试感到害怕。</p>
 ]]></content>
       <tags>
         <tag>面筋</tag>
