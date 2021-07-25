@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"zavierlyu.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"zavierlyu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":2,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="JavaScript平稳退化，兼容和性能问题(tips)。">
@@ -105,6 +105,7 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
@@ -119,16 +120,58 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
 
   </li>
-        <li class="menu-item menu-item-archives">
+        <li class="menu-item menu-item-cv">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+    <a href="/cv/ZhewenLyu-CUHKSZ-eng.pdf" rel="section"><i class="fa fa-user fa-fw"></i>cv</a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">8</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">17</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
   </ul>
 </nav>
 
 
 
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
 
 </div>
     </header>
@@ -138,6 +181,9 @@
     <i class="fa fa-arrow-up"></i>
     <span>0%</span>
   </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/ZavierLyu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
 
 
     <main class="main">
@@ -155,7 +201,7 @@
     <link itemprop="mainEntityOfPage" href="http://zavierlyu.github.io/2020/06/02/jsdom5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Zhewen Lyu">
       <meta itemprop="description" content="">
     </span>
@@ -209,44 +255,57 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>JavaScript平稳退化，兼容和性能问题(tips)。 <a id="more"></a></p>
-<h1 id="js平稳退化">JS平稳退化</h1>
-<p>Javascript作为一种前端脚本语言，主要功能是用于改善前端的用户体验。我们看见一些网页的显示效果，比方说菜单显示隐藏，图标移动和文字滚动大多是基于JS来实现的。作为改善用户体验的存在，通俗的讲就是起个锦上添花的表现效果，而不能影响正常的后台逻辑和最基本功能的实现。</p>
+        <p>JavaScript平稳退化，兼容和性能问题(tips)。</p>
+<span id="more"></span>
+
+<h1 id="JS平稳退化"><a href="#JS平稳退化" class="headerlink" title="JS平稳退化"></a>JS平稳退化</h1><p>Javascript作为一种前端脚本语言，主要功能是用于改善前端的用户体验。我们看见一些网页的显示效果，比方说菜单显示隐藏，图标移动和文字滚动大多是基于JS来实现的。作为改善用户体验的存在，通俗的讲就是起个锦上添花的表现效果，而不能影响正常的后台逻辑和最基本功能的实现。</p>
 <p>通俗地讲，javascript平稳退化就是如果一个浏览器完全不支持js或者禁用js的时候，它的正常功能不会受到任何影响。</p>
-<h3 id="打开新窗口">打开新窗口</h3>
-<p><code>window.open(url,name,features)</code> - 第一个参数是想在新窗口里打开的网页的URL地址。如果省略这个参数，屏幕上将弹出一个空白的浏览器窗口。 - 第二个参数是新窗口的名字。可以在代码里通过这个名字和新窗口进行通信。 - 最后一个参数是一个以都好分隔的字符串，其内容是新窗口的各种属性。这些属性包括新窗口的尺寸（宽度和高度）以及新窗口被启用或禁用的各种浏览功能（工具条，菜单条，初始先是位置等)。对于这个桉树应该掌握以下原则：新窗口的浏览功能要少而精。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">popUp</span>(<span class="params">winURL</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">window</span>.open(winURL, <span class="string">"popup"</span>, <span class="string">"width=320,height=480"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="javascript-伪协议">Javascript 伪协议</h4>
-<p><code>javascript:</code>伪协议让我们通过一个链接来调用JavaScript函数。 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:popUp('http://www.example.com/');"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure> 这条语句在支持"javascript:"伪协议的浏览器中运行正常，较老的浏览器则会取尝试打开那个链接但失败，支持这种协议单禁用了javascript功能的浏览器会什么也不做。</p>
-<h4 id="内嵌事件处理函数">内嵌事件处理函数</h4>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">onclick</span>=<span class="string">"popUp('http://www.example.com/'); return false;"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="打开新窗口"><a href="#打开新窗口" class="headerlink" title="打开新窗口"></a>打开新窗口</h3><p><code>window.open(url,name,features)</code></p>
+<ul>
+<li>第一个参数是想在新窗口里打开的网页的URL地址。如果省略这个参数，屏幕上将弹出一个空白的浏览器窗口。</li>
+<li>第二个参数是新窗口的名字。可以在代码里通过这个名字和新窗口进行通信。</li>
+<li>最后一个参数是一个以都好分隔的字符串，其内容是新窗口的各种属性。这些属性包括新窗口的尺寸（宽度和高度）以及新窗口被启用或禁用的各种浏览功能（工具条，菜单条，初始先是位置等)。对于这个桉树应该掌握以下原则：新窗口的浏览功能要少而精。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">popUp</span>(<span class="params">winURL</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">window</span>.open(winURL, <span class="string">&quot;popup&quot;</span>, <span class="string">&quot;width=320,height=480&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Javascript-伪协议"><a href="#Javascript-伪协议" class="headerlink" title="Javascript 伪协议"></a>Javascript 伪协议</h4><p><code>javascript:</code>伪协议让我们通过一个链接来调用JavaScript函数。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;javascript:popUp(&#x27;http://www.example.com/&#x27;);&quot;</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这条语句在支持”javascript:”伪协议的浏览器中运行正常，较老的浏览器则会取尝试打开那个链接但失败，支持这种协议单禁用了javascript功能的浏览器会什么也不做。</p>
+<h4 id="内嵌事件处理函数"><a href="#内嵌事件处理函数" class="headerlink" title="内嵌事件处理函数"></a>内嵌事件处理函数</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;#&quot;</span> <span class="attr">onclick</span>=<span class="string">&quot;popUp(&#x27;http://www.example.com/&#x27;); return false;&quot;</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>所有操作由onclick属性负责完成，无法平稳退化。</p>
-<h4 id="需要平稳退化的原因">需要平稳退化的原因</h4>
-<p>如果用户是一个<strong>搜索机器人</strong>，一种自动化程序，它们浏览Web的目的是为了把各种网页添加到搜索引擎的数据库里。各大搜索引擎都有类似的程序。目前。只有极少数搜索机器人能够理解js代码。所以，如果js网页不能平稳退化，它们在搜索引擎上的排名就可能受到损害。</p>
-<p>所以我们最好修改成如下 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.example.com/"</span> <span class="attr">onclick</span>=<span class="string">"popUp(this.href);return false;"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="分离javascript">分离JavaScript</h3>
-<p>HTML Document: <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.example.com/"</span> <span class="attr">class</span>=<span class="string">"popup"</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure> 我们可以在外部把一个事件添加到html文档中的某个元素上： <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">element.event = action...</span><br></pre></td></tr></table></figure> 比如： <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getElementById(id).event = action;</span><br></pre></td></tr></table></figure> 如果事件涉及多个元素，我们可以用getElementsByTagName和getAttribute把事件添加到有着特定属性的一组元素上。 具体步骤：</p>
-<ol type="1">
+<h4 id="需要平稳退化的原因"><a href="#需要平稳退化的原因" class="headerlink" title="需要平稳退化的原因"></a>需要平稳退化的原因</h4><p>如果用户是一个<strong>搜索机器人</strong>，一种自动化程序，它们浏览Web的目的是为了把各种网页添加到搜索引擎的数据库里。各大搜索引擎都有类似的程序。目前。只有极少数搜索机器人能够理解js代码。所以，如果js网页不能平稳退化，它们在搜索引擎上的排名就可能受到损害。</p>
+<p>所以我们最好修改成如下</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;http://www.example.com/&quot;</span> <span class="attr">onclick</span>=<span class="string">&quot;popUp(this.href);return false;&quot;</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="分离JavaScript"><a href="#分离JavaScript" class="headerlink" title="分离JavaScript"></a>分离JavaScript</h3><p>HTML Document:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;http://www.example.com/&quot;</span> <span class="attr">class</span>=<span class="string">&quot;popup&quot;</span>&gt;</span>Example<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>我们可以在外部把一个事件添加到html文档中的某个元素上：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">element.event = action...</span><br></pre></td></tr></table></figure>
+<p>比如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getElementById(id).event = action;</span><br></pre></td></tr></table></figure>
+<p>如果事件涉及多个元素，我们可以用getElementsByTagName和getAttribute把事件添加到有着特定属性的一组元素上。<br>具体步骤：</p>
+<ol>
 <li>把文档里所有的链接全放入一个数组里</li>
 <li>遍历数组</li>
 <li>如果某个链接的class属性等于popup，就表示这个链接在被点击时应该调用popUp()函数。</li>
 </ol>
-<p>还有一个问题是必须让这种连接的代码在html文档全部加载到浏览器后再开始执行。文档将被加载到一个浏览器窗口里，document对象又是window对象的一个属性。当window对象触发onload事件时，document对象已经存在。 所以我们在外部的js文件里这样写 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = preparelinks;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">prepareLinks</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> links = <span class="built_in">document</span>.getElementsByTagName(<span class="string">"a"</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;links.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (links[i].getAttribute(<span class="string">"class"</span>) == <span class="string">"popup"</span>) &#123;</span><br><span class="line">            links[i].onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                popUp(<span class="keyword">this</span>.getAttribute(<span class="string">"href));</span></span><br><span class="line"><span class="string">                return false;</span></span><br><span class="line"><span class="string">            &#125;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">function popUp(winURL) &#123;</span></span><br><span class="line"><span class="string">    window.open(winURL, "</span>popup<span class="string">", "</span>width=<span class="number">800</span>,height=<span class="number">600</span><span class="string">");</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="向后兼容">向后兼容</h3>
-<h4 id="对象检测">对象检测</h4>
-<p>检测浏览器对js的支持程度 比如 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure></p>
-<h3 id="性能考虑">性能考虑</h3>
-<ol type="1">
+<p>还有一个问题是必须让这种连接的代码在html文档全部加载到浏览器后再开始执行。文档将被加载到一个浏览器窗口里，document对象又是window对象的一个属性。当window对象触发onload事件时，document对象已经存在。<br>所以我们在外部的js文件里这样写</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = preparelinks;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">prepareLinks</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> links = <span class="built_in">document</span>.getElementsByTagName(<span class="string">&quot;a&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;links.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (links[i].getAttribute(<span class="string">&quot;class&quot;</span>) == <span class="string">&quot;popup&quot;</span>) &#123;</span><br><span class="line">            links[i].onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                popUp(<span class="built_in">this</span>.getAttribute(<span class="string">&quot;href));</span></span><br><span class="line"><span class="string">                return false;</span></span><br><span class="line"><span class="string">            &#125;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">function popUp(winURL) &#123;</span></span><br><span class="line"><span class="string">    window.open(winURL, &quot;</span>popup<span class="string">&quot;, &quot;</span>width=<span class="number">800</span>,height=<span class="number">600</span><span class="string">&quot;);</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="向后兼容"><a href="#向后兼容" class="headerlink" title="向后兼容"></a>向后兼容</h3><h4 id="对象检测"><a href="#对象检测" class="headerlink" title="对象检测"></a>对象检测</h4><p>检测浏览器对js的支持程度<br>比如</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">document</span>.getElementsByTagName) <span class="keyword">return</span> <span class="literal">false</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="性能考虑"><a href="#性能考虑" class="headerlink" title="性能考虑"></a>性能考虑</h3><ol>
 <li>介绍不必要的DOM访问</li>
 <li>合并多个js文件到一个文件里</li>
-<li>压缩脚本，去掉不必要的字节如空格和注释 多数情况下，你应该有两个版本，一个是工作副本，可以修改代码并添加注释；另一个时精简副本，用于放在站点上。通常，为了与非精简版本区分开，最好在精简副本的文件名中加上min字样： <code>&lt;script src="scripts/scriptName.min.js"&gt;&lt;/script&gt;</code></li>
+<li>压缩脚本，去掉不必要的字节如空格和注释<br>多数情况下，你应该有两个版本，一个是工作副本，可以修改代码并添加注释；另一个时精简副本，用于放在站点上。通常，为了与非精简版本区分开，最好在精简副本的文件名中加上min字样：<br><code>&lt;script src=&quot;scripts/scriptName.min.js&quot;&gt;&lt;/script&gt;</code></li>
 </ol>
 <p>可以通过以下几个有代表性的代码压缩工具完成：</p>
 <ul>
-<li><a href="http://lisperator.net/uglifyjs/" target="_blank" rel="noopener">Uglify</a></li>
-<li><a href="http://developer.yahoo.com/yui/compressor/" target="_blank" rel="noopener">YUI Compressor</a></li>
-<li><a href="https://developers.google.com/closure/compiler/" target="_blank" rel="noopener">Google Closure Compiler</a></li>
-<li><a href="https://tool.oschina.net/jscompress/" target="_blank" rel="noopener">oschina 在线js压缩</a></li>
+<li><a target="_blank" rel="noopener" href="http://lisperator.net/uglifyjs/">Uglify</a></li>
+<li><a target="_blank" rel="noopener" href="http://developer.yahoo.com/yui/compressor/">YUI Compressor</a></li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/closure/compiler/">Google Closure Compiler</a></li>
+<li><a target="_blank" rel="noopener" href="https://tool.oschina.net/jscompress/">oschina 在线js压缩</a></li>
 </ul>
 
     </div>
@@ -332,12 +391,14 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#js%E5%B9%B3%E7%A8%B3%E9%80%80%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">JS平稳退化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%BC%80%E6%96%B0%E7%AA%97%E5%8F%A3"><span class="nav-number">1.0.1.</span> <span class="nav-text">打开新窗口</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#javascript-%E4%BC%AA%E5%8D%8F%E8%AE%AE"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">Javascript 伪协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E5%B5%8C%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">内嵌事件处理函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9C%80%E8%A6%81%E5%B9%B3%E7%A8%B3%E9%80%80%E5%8C%96%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.0.1.3.</span> <span class="nav-text">需要平稳退化的原因</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E7%A6%BBjavascript"><span class="nav-number">1.0.2.</span> <span class="nav-text">分离JavaScript</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%91%E5%90%8E%E5%85%BC%E5%AE%B9"><span class="nav-number">1.0.3.</span> <span class="nav-text">向后兼容</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E6%A3%80%E6%B5%8B"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">对象检测</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E8%80%83%E8%99%91"><span class="nav-number">1.0.4.</span> <span class="nav-text">性能考虑</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JS%E5%B9%B3%E7%A8%B3%E9%80%80%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">JS平稳退化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%BC%80%E6%96%B0%E7%AA%97%E5%8F%A3"><span class="nav-number">1.0.1.</span> <span class="nav-text">打开新窗口</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Javascript-%E4%BC%AA%E5%8D%8F%E8%AE%AE"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">Javascript 伪协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E5%B5%8C%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">内嵌事件处理函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9C%80%E8%A6%81%E5%B9%B3%E7%A8%B3%E9%80%80%E5%8C%96%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.0.1.3.</span> <span class="nav-text">需要平稳退化的原因</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E7%A6%BBJavaScript"><span class="nav-number">1.0.2.</span> <span class="nav-text">分离JavaScript</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%91%E5%90%8E%E5%85%BC%E5%AE%B9"><span class="nav-number">1.0.3.</span> <span class="nav-text">向后兼容</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E6%A3%80%E6%B5%8B"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">对象检测</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E8%80%83%E8%99%91"><span class="nav-number">1.0.4.</span> <span class="nav-text">性能考虑</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zhewen Lyu"
+      src="/images/avatar.jpg">
   <p class="site-author-name" itemprop="name">Zhewen Lyu</p>
   <div class="site-description" itemprop="description"></div>
 </div>
@@ -352,16 +413,26 @@
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
+          
         <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
+          
         <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
 </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZavierLyu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZavierLyu" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xzavierlv@outlook.com" title="E-Mail → mailto:xzavierlv@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
 
 
 
@@ -390,7 +461,10 @@
   </span>
   <span class="author" itemprop="copyrightHolder">Zhewen Lyu</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-60f13baaa3c3f1ad" async="async"></script>
   </div>
 
         
@@ -408,6 +482,7 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 
@@ -416,11 +491,70 @@
 <script src="/js/motion.js"></script>
 
 
-<script src="/js/schemes/muse.js"></script>
+<script src="/js/schemes/pisces.js"></script>
 
 
 <script src="/js/next-boot.js"></script>
 
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
 
 
 
@@ -429,6 +563,8 @@
 
 
 
+  
+<script src="/js/local-search.js"></script>
 
 
 
@@ -440,9 +576,68 @@
 
 
 
+
+
+    <div id="pjax">
   
 
   
+      
 
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+    </div>
 </body>
 </html>
