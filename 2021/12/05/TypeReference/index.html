@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"zavierlyu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":2,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="敲crud代码的时候，想要建一个包含特定key的map，但是这个key所对应的value可能是不一样的类型。因此最原始的解决方案就是给所有类型的value都写一个相应的函数来生成这个map。突发奇想，是否可以写一个函数，通过泛型之类的方法，在函数的参数中指明要生成的类型呢。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="泛型、反射、匿名内部类与TypeReference、TypeToken">
+<meta property="og:url" content="http://zavierlyu.github.io/2021/12/05/TypeReference/index.html">
+<meta property="og:site_name" content="Garden of Sinners">
+<meta property="og:description" content="敲crud代码的时候，想要建一个包含特定key的map，但是这个key所对应的value可能是不一样的类型。因此最原始的解决方案就是给所有类型的value都写一个相应的函数来生成这个map。突发奇想，是否可以写一个函数，通过泛型之类的方法，在函数的参数中指明要生成的类型呢。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-12-05T15:50:50.000Z">
+<meta property="article:modified_time" content="2021-12-05T17:03:47.321Z">
+<meta property="article:author" content="Zhewen Lyu">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://zavierlyu.github.io/2021/12/05/TypeReference/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>泛型、反射、匿名内部类与TypeReference、TypeToken | Garden of Sinners</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Garden of Sinners</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-cv">
+
+    <a href="/cv/ZhewenLyu-CUHKSZ-eng.pdf" rel="section"><i class="fa fa-user fa-fw"></i>cv</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">19</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/ZavierLyu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://zavierlyu.github.io/2021/12/05/TypeReference/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Zhewen Lyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Garden of Sinners">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          泛型、反射、匿名内部类与TypeReference、TypeToken
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-12-05 23:50:50" itemprop="dateCreated datePublished" datetime="2021-12-05T23:50:50+08:00">2021-12-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-12-06 01:03:47" itemprop="dateModified" datetime="2021-12-06T01:03:47+08:00">2021-12-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Backend/" itemprop="url" rel="index"><span itemprop="name">Backend</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Backend/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>敲crud代码的时候，想要建一个包含特定key的map，但是这个key所对应的value可能是不一样的类型。因此最原始的解决方案就是给所有类型的value都写一个相应的函数来生成这个map。突发奇想，是否可以写一个函数，通过泛型之类的方法，在函数的参数中指明要生成的类型呢。</p>
+<span id="more"></span>
+<p>原代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Map&lt;String, List&lt;String&gt;&gt; setUpListMap() &#123;</span><br><span class="line">    Map&lt;String, List&lt;String&gt;&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    map.put(<span class="string">&quot;A&quot;</span>, <span class="keyword">new</span> ArrayList&lt;&gt;());</span><br><span class="line">    map.put(<span class="string">&quot;B&quot;</span>, <span class="keyword">new</span> ArrayList&lt;&gt;());</span><br><span class="line">    <span class="keyword">return</span> map;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Map&lt;String, String&gt; <span class="title">setUpStrMap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Map&lt;String, String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    map.put(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">    map.put(<span class="string">&quot;B&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> map;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>希望实现的方式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> &lt;T&gt; <span class="function">Map&lt;String, T&gt; <span class="title">setUpMap</span><span class="params">(Class&lt;T&gt; clazz)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样<code>setUpMap</code>就能代替<code>setUpArrMap</code>和<code>setUpStrMap</code>，如果有新的类需要作为value值生成实例的时候就不用再写一个函数了。</p>
+<h2 id="解决方案一：原始类型的反射构造"><a href="#解决方案一：原始类型的反射构造" class="headerlink" title="解决方案一：原始类型的反射构造"></a>解决方案一：原始类型的反射构造</h2><p>一开始的想法就是通过传递类的class对象来创造该类的实例，代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> &lt;T&gt; <span class="function">Map&lt;String, T&gt; <span class="title">setUpMap</span><span class="params">(Class&lt;T&gt; clazz)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">	HashMap&lt;String, T&gt; hashMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    hashMap.put(<span class="string">&quot;A&quot;</span>, clazz.getDeclaredConstructor().newInstance());</span><br><span class="line">    hashMap.put(<span class="string">&quot;B&quot;</span>, clazz.getDeclaredConstructor().newInstance());</span><br><span class="line">    <span class="keyword">return</span> hashMap;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样的实现方式只适合原始类型以及不实用泛型的自定义类型，但不适合如List这样的嵌套泛型的类型（ParameterizedType）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; stringMap = setUpMap(String.class); <span class="comment">// 编译无问题</span></span><br><span class="line">Map&lt;String, List&lt;String&gt;&gt; stringListMap = setUpMap(List.class); <span class="comment">// 编译报错，IDE直接标红</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="解决方案二：Guava-TypeToken"><a href="#解决方案二：Guava-TypeToken" class="headerlink" title="解决方案二：Guava TypeToken"></a>解决方案二：Guava TypeToken</h2><p>在尝试了第一个方案后发现解决不了这个问题，以为Java不支持这种泛型，但是后来看到fastjson的TypeReference反序列化代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, Integer&gt; map = JSON.parseObject(text, <span class="keyword">new</span> TypeReference&lt;Map&lt;String, Integer&gt;&gt;() &#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>在这里，fastjson就通过了TypeReference拿到了Map以及它所包含的泛型类型，在构造Map实例的时候就可以通过所获得的这些参数反射构造。</p>
+<p>所以如果写的丑一点，我们想要实现的函数可以这样写，也就是通过生成一个目标实例来获取其json格式再用反序列化构造多个同类型的实例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> &lt;T&gt; <span class="function">Map&lt;String, T&gt; <span class="title">setUpMap</span><span class="params">(String text, TypeReference&lt;T&gt; tp)</span> </span>&#123;</span><br><span class="line">	HashMap&lt;String, T&gt; hashMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    hashMap.put(<span class="string">&quot;A&quot;</span>, JSON.parseObject(text, tp));</span><br><span class="line">    hashMap.put(<span class="string">&quot;B&quot;</span>, JSON.parseObject(text, tp));</span><br><span class="line">    <span class="keyword">return</span> hashMap;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用的时候</span></span><br><span class="line">Map&lt;String, List&lt;String&gt;&gt; stringListMap = setUpMap(JSON.toJSONString(<span class="keyword">new</span> List&lt;String&gt;()), <span class="keyword">new</span> TypeReference&lt;List&lt;String&gt;&gt;()&#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>其实看到这里，就可以想到我们的问题是可解的，各json序列化器在反序列化的必然要拿到类型中的所有嵌套类然后再依次去做实例化。那么我们的问题就是是这一套反序列化中必不可少的一步。然而，fastjson的反序列化对于解决我们的问题还是太重了，我们想要的只是它在构造实例时用的一些方法而不是真的要parseObj。</p>
+<p>在进一步探索后，发现了Google的Java工具包Guava就有一个非常好的实现：<a target="_blank" rel="noopener" href="https://guava.dev/releases/19.0/api/docs/com/google/common/reflect/TypeToken.html">TypeToken</a>来解决泛型擦拭的问题</p>
+<p>在使用了TypeToken之后我们的代码就会变成这样</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> &lt;T&gt; <span class="function">Map&lt;String, T&gt; <span class="title">setUpMap</span><span class="params">(TypeToken&lt;T&gt; typeToken)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    HashMap&lt;String, T&gt; hashMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    hashMap.put(<span class="string">&quot;A&quot;</span>, createInstance(typeToken));</span><br><span class="line">    hashMap.put(<span class="string">&quot;B&quot;</span>, createInstance(typeToken));</span><br><span class="line">    <span class="keyword">return</span> hashMap;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> &lt;T&gt; <span class="function">T <span class="title">createInstance</span><span class="params">(TypeToken&lt;T&gt; typeToken)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> (T) type.getRawType().getDeclaredConstructor().newInstance();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用的时候</span></span><br><span class="line">Map&lt;String, ArrayList&lt;String&gt;&gt; stringListMap = setUpMap(<span class="keyword">new</span> TypeToken&lt;ArrayList&lt;String&gt;&gt;() &#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>此时，代码就变的简单了许多，和JSON反序列化传入TypeReference似乎还有异曲同工之妙。</p>
+<blockquote>
+<p>可能会有细心的同学发现我们这里用的是ArrayList而不是List，似乎还是有些差距，这是由于List是接口不能直接实例化必须通过实现类构造。但其实这个可以通过我们后期封装，将TypeToken封装在我们自定的一个类比如TypeToken里，然后指定List接口用ArrayList实现，Map接口用HashMap实现等等。</p>
+</blockquote>
+<h2 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h2><p>虽然已经解决了这个编程问题，但是背后的原理值得深究，最关键的问题在于TypeReference/TypeToken是如何获取到<code>List&lt;Map&lt;String, String&gt;&gt;</code>这种嵌套类型的各层class的。</p>
+<p>在看TypeToken/TypeReference的源代码之前还是先简单介绍一些背景知识（我在查的过程中也顺便补习了一下Java基础知识😓）</p>
+<p>有基础的同学可以跳过概念直看<a href="#jump">源码分析</a></p>
+<h3 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h3><h4 id="翻译翻译，什么叫类型"><a href="#翻译翻译，什么叫类型" class="headerlink" title="翻译翻译，什么叫类型"></a>翻译翻译，什么叫类型</h4><p>类型这个概念在Java中被抽象为一个标记接口Type，这个接口本身除了默认获取类型名称不包含任何方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Type</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">default</span> String <span class="title">getTypeName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而继承它的接口和类们才是我们在代码中真实需要区分的类型。</p>
+<pre class="mermaid">classDiagram
+
+    class Type {
+        interface
+    }
+
+     class GenericArrayType {
+         interface
+     }
+    class ParameterizedType {
+        interface
+    }
+    class WildcardType {
+        interface
+    }
+    class TypeVariable {
+        interface
+    }
+    class Class
+
+    Type <|-- GenericArrayType
+    Type <|-- ParameterizedType
+    Type <|-- WildcardType
+    Type <|-- TypeVariable
+    Type <|.. Class</pre>
+
+<ul>
+<li><code>Class</code>（原始/基本类型，也叫<code>raw type</code>）：包含我们平常所指的类、枚举、数组、注解，和基本类型int、float等等<ul>
+<li>正例：String, int, String[], int[]</li>
+</ul>
+</li>
+<li><code>TypeVariable</code>（类型变量）：比如<code>List&lt;T&gt;</code>中的T，表明该类型为泛型<ul>
+<li>正例：<code>class Group&lt;T extends Student &amp; Man&gt;</code> 中的<code>T</code>(上界包含Student和Man)，类中定义Field<code>private T person;</code>那么这个域的类型就是TypeVariable</li>
+</ul>
+</li>
+<li><code>WildcardType</code>（ 通配符表达式类型）：例如<ul>
+<li>正例：Map&lt;? extends String, ? super Number&gt; 中的 <code>? extends String</code> 和<code>? super Number</code>，<code>List&lt;? extends Number&gt;</code>中的<code>? extends Number</code></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>List&lt;?&gt; 本身是ParameterizedType，而通过ParameterizedType::getActualTypeArguments可以获取到作为WildcardType声明的?。默认上界(upperBounds)都是Object</p>
+</blockquote>
+<ul>
+<li><code>ParameterizedType</code>（参数化类型）：就是我们平常所用到带泛型的List、Map<ul>
+<li>正例：Map&lt;String, Integer&gt;, List&lt;Integer&gt;, Class&lt;?&gt;, Map.Entry&lt;String, String&gt; (ownerType=Map)</li>
+<li>反例：Map, List</li>
+</ul>
+</li>
+<li><code>GenericArrayType</code>（泛型数组类型）：<strong>并不是我们工作中所使用的数组</strong>String[] 、byte[]（这种都属于Class），而是带有泛型的数组<ul>
+<li>正例：List&lt;String&gt;[], T[], Map&lt;T,T&gt;[]</li>
+<li>反例：List[]</li>
+</ul>
+</li>
+</ul>
+<p>那这和我们所要解决的问题有什么关系呢？我们要将一个类型实例化必须首先要知道这个Type的实现类到底是什么。在我们的第一个解决方案中，我们实际上只实现了原始类型(Class)的实例化，但比如List&lt;String&gt;这样的ParameterizedType这样的是无法在方案一中实现的。因此我们引入TypeToken就是为了兼容ParamterizedType，Class这两种类型的实例化。</p>
+<h4 id="翻译翻译，什么叫擦拭法泛型"><a href="#翻译翻译，什么叫擦拭法泛型" class="headerlink" title="翻译翻译，什么叫擦拭法泛型"></a>翻译翻译，什么叫擦拭法泛型</h4><p>大伙儿都知道Java的泛型是通过擦拭法实现的伪泛型。因为Java在编译期间，所有的泛型信息都会被擦掉，所有的泛型类型都会变为Object，只有在执行的时候在需要转换成特定类型的时候才会进行强转。</p>
+<p>简单来说就是（当然实际上可能并没有这么简单）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Pair</span>&lt;<span class="title">T</span>, <span class="title">K</span>&gt; </span>&#123;    </span><br><span class="line">    T first;    </span><br><span class="line">    K second;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在编译器眼中几乎等价于</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Pair</span>&lt;<span class="title">Object</span>, <span class="title">Object</span>&gt; </span>&#123;    </span><br><span class="line">    Object first;    </span><br><span class="line">    Object second;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因此就会出现一些经典的例子来证实擦拭的现象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; l1 = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">List&lt;Integer&gt; l2 = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">System.out.println(l1.getClass() == l2.getClass()); <span class="comment">// true</span></span><br><span class="line">l2 = (List&lt;Integer&gt;) l1; <span class="comment">// not allowed</span></span><br><span class="line">l2 = (List) l1; <span class="comment">// allowed</span></span><br><span class="line">l1.add(<span class="string">&quot;A&quot;</span>); l2.add(<span class="number">1</span>); System.out.println(l2); <span class="comment">// [&quot;A&quot;, 1]</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Number</span>&gt; // <span class="title">is</span> <span class="title">allowed</span>, <span class="title">JVM</span> <span class="title">erases</span> <span class="title">it</span> <span class="title">into</span> <span class="title">Number</span> </span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">B</span>&lt;<span class="title">T</span> <span class="title">super</span> <span class="title">Integer</span>&gt; // <span class="title">is</span> <span class="title">not</span> <span class="title">allowed</span>, <span class="title">JVM</span> <span class="title">erases</span> <span class="title">it</span> <span class="title">into</span> <span class="title">Object</span>, <span class="title">the</span> <span class="title">super</span> <span class="title">class</span> <span class="title">of</span> <span class="title">all</span></span></span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/37411256/why-super-keyword-in-generics-is-not-allowed-at-class-level">Why super keyword in generics is not allowed at class level?</a></p>
+<p>那这和我们要解决的问题有什么关系呢？正是因为擦拭法的存在解决方案中以传入Class&lt;T&gt;才无法获得T中嵌套类型的信息。在编译器看来不管你传的是Class&lt;Map&lt;Integer, Integer&gt;&gt;还是Class&lt;Map&lt;String, String&gt;&gt;，统统都看作为Object（返回时强转Map），ParameterizedType中的actualTypeArguments信息便会丢失，无法将其创建。</p>
+<h4 id="翻译翻译，什么叫匿名内部类"><a href="#翻译翻译，什么叫匿名内部类" class="headerlink" title="翻译翻译，什么叫匿名内部类"></a>翻译翻译，什么叫匿名内部类</h4><p>匿名内部类的主要解决的问题是有时候我们想要创建某一个类的子类并重写父类的方法，但是这个子类我们只会使用一次，如果我们按照传统的创建子类的方式去定义会显得过于冗杂，而使用匿名内部类可以免去这些冗杂的代码之间在你的匿名内部类里重写需要的方法即可。</p>
+<p>最简单的例子就是启用线程调用Runnable</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable()&#123;</span><br><span class="line">    <span class="keyword">private</span> String name = <span class="string">&quot;Runnable-0&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(Thread.currentThread().getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name + <span class="string">&quot;:&quot;</span> + <span class="keyword">super</span>.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;).start();</span><br></pre></td></tr></table></figure>
+
+<p>因此本质上，<strong>匿名内部类是一个简化版的子类/实现类</strong>。我们可以decompile一下.class字节码来验证这一点</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Integer[] nums = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>&#125;;</span><br><span class="line">        Arrays.sort(nums, <span class="keyword">new</span> Comparator&lt;&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Integer o1, Integer o2)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> o2.compareTo(o1);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        System.out.println(Arrays.toString(nums));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用<em>javac</em>将<code>Test.java</code>编译成字节码<code>Test.class</code>和<code>Test$1.class</code>，再用万能的IDE查看<code>Test$1.class</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Decompiled Test$1.class</span></span><br><span class="line"><span class="keyword">import</span> java.util.Comparator;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">null</span> <span class="keyword">extends</span> <span class="title">Object</span> <span class="keyword">implements</span> <span class="title">Comparator</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Integer paramInteger1, Integer paramInteger2)</span> </span>&#123; <span class="keyword">return</span> paramInteger1.compareTo(paramInteger2); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以非常清楚地看到匿名内部类在编译过程中产生了自己的字节码文件，并且实现了所对应的接口，还拿到了接口里的泛型类型信息。一个小小的匿名类竟然拿到了这么多有用的信息，这为我们获取泛型实现中被擦拭的ParameterizedType信息埋下了伏笔。</p>
+<blockquote>
+<p> <strong>注意！</strong>：请仔细区分匿名内部类和函数式接口，详情请看<a target="_blank" rel="noopener" href="https://www.geeksforgeeks.org/difference-between-anonymous-inner-class-and-lambda-expression/">二者对比</a>和<a target="_blank" rel="noopener" href="https://softwareengineering.stackexchange.com/questions/195081/is-a-lambda-expression-something-more-than-an-anonymous-inner-class-with-a-singl">函数式接口与匿名内部类是同一个东西吗?</a></p>
+</blockquote>
+<p>哦对了，有些朋友可能喜欢这么创建List(你说的这个朋友是不是你自己)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;()&#123;&#123;add(<span class="number">1</span>); add(<span class="number">2</span>); add(<span class="number">3</span>);&#125;&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+<p>然而这样的写法都是有坑的。第一种写法用了匿名内部类，但是我们知道这个匿名内部类其实是一个子类而不是父类本身，这个实例也是这个子类的实例而不是ArrayList的实例，因此在搭配Spring/Mockito的使用过程中可能会遇到意向不到的情况；第二种写法用了Arrays.asList，乍一看似乎返回了ArrayList实例，但实际上它返回的是java.util.Arrays.ArrayList，<strong>是Arrays的静态内部类</strong>而不是java.util.ArrayList，这个静态内部类里的数组是被final修饰的，也就是无法实现增加和删除，因此对于Arrays.asList所返回的实例来讲，add()和remove()是会抛UnsupportedOperationException。</p>
+<p>因此，个人推荐的懒人写法是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;(Arrays.asList(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>));</span><br></pre></td></tr></table></figure>
+
+<p>纯正嫡系ArrayList实例，目前还没遇到有啥坑，就是有两次构造还要拷贝，开销比较大。</p>
+<h3 id="Fastjson中的TypeReference"><a href="#Fastjson中的TypeReference" class="headerlink" title="Fastjson中的TypeReference"></a><span id="jump">Fastjson中的TypeReference</span></h3><p>相信在使用TypeReference的过程中大家已经发现每次创建的TypeReference都是匿名内部类而不是其类型本身的实例。那么为什么我们在parseObject的时候传入的不是TypeReference的实例而必须是其匿名内部类的实例呢？答案就在于我们之前所提到的，匿名内部类实质上是一个子类，而这个子类在继承其父类的时候同样继承了父类的泛型信息。</p>
+<p>比如一个匿名内部类的实例<code>new Pair&lt;String&gt;&#123;&#125;;</code>被创建后，它就会生成一个自己的字节码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">null</span> <span class="keyword">extends</span> <span class="title">Pair</span>&lt;<span class="title">String</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">null</span>(String paramString1, String paramString2) &#123; <span class="keyword">super</span>(paramString1, paramString2); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>非常清楚的记录了自己的父类是什么类型，嵌套的<code>String</code>也被记录了下来。这些信息就可以通过<code>getGenericSuperclass()</code>来获取到。TypeReference就是通过这样的方式来获取我们传入ParameterizedType的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * Constructs a new type literal. Derives represented class from type</span></span><br><span class="line"><span class="comment">  * parameter.</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  * &lt;p&gt;Clients create an empty anonymous subclass. Doing so embeds the type</span></span><br><span class="line"><span class="comment">  * parameter in the anonymous class&#x27;s type hierarchy so we can reconstitute it</span></span><br><span class="line"><span class="comment">  * at runtime despite erasure.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="title">TypeReference</span><span class="params">()</span></span>&#123;</span><br><span class="line">    Type superClass = getClass().getGenericSuperclass();</span><br><span class="line"></span><br><span class="line">    Type type = ((ParameterizedType) superClass).getActualTypeArguments()[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    Type cachedType = classTypeCache.get(type);</span><br><span class="line">    <span class="keyword">if</span> (cachedType == <span class="keyword">null</span>) &#123;</span><br><span class="line">        classTypeCache.putIfAbsent(type, type);</span><br><span class="line">        cachedType = classTypeCache.get(type);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.type = cachedType;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以非常清楚地看到TypeReference中最重要地属性type就是这样得到的。非常有意思的是，TypeReference的所有的构造函数都是protected的，也就是说我们根本无法创建TypeReference的实例，我们只能创建其子类的实例，那么最简单创建其子类的实例的方法就是匿名内部类。</p>
+<p>获得到我们想要传入的ParameterizedType的所有信息后，只要递归地去一一进行实例化就可以了，至于parseObject是怎么实现的就不在本篇的讨论范围之内了，因为这还涉及了json的解析。我们倒是可以往下看下Guava是如何递归地解析ParameterizedType所有的嵌套类型并且相应地进行实例化。</p>
+<h3 id="TypeToken源码"><a href="#TypeToken源码" class="headerlink" title="TypeToken源码"></a>TypeToken源码</h3><p>首先我们看TypeToken的构造函数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// TypeToken.java  </span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="title">TypeToken</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.runtimeType = capture();</span><br><span class="line">    checkState(</span><br><span class="line">        !(runtimeType <span class="keyword">instanceof</span> TypeVariable),</span><br><span class="line">        <span class="string">&quot;Cannot construct a TypeToken for a type variable.\n&quot;</span></span><br><span class="line">            + <span class="string">&quot;You probably meant to call new TypeToken&lt;%s&gt;(getClass()) &quot;</span></span><br><span class="line">            + <span class="string">&quot;that can resolve the type variable for you.\n&quot;</span></span><br><span class="line">            + <span class="string">&quot;If you do need to create a TypeToken of a type variable, &quot;</span></span><br><span class="line">            + <span class="string">&quot;please use TypeToken.of() instead.&quot;</span>,</span><br><span class="line">        runtimeType);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ---------------------------</span></span><br><span class="line"><span class="comment">// TypeCapture.java</span></span><br><span class="line">  <span class="comment">/** Returns the captured type. */</span></span><br><span class="line">  <span class="function"><span class="keyword">final</span> Type <span class="title">capture</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Type superclass = getClass().getGenericSuperclass();</span><br><span class="line">    checkArgument(superclass <span class="keyword">instanceof</span> ParameterizedType, <span class="string">&quot;%s isn&#x27;t parameterized&quot;</span>, superclass);</span><br><span class="line">    <span class="keyword">return</span> ((ParameterizedType) superclass).getActualTypeArguments()[<span class="number">0</span>];</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>TypeToken继承了TypeCapture，并用其的方法<code>capture()</code>以匿名内部类的身份获取到参数化类型的信息，这步和TypeReference异曲同工。TypeToken里的<code>runtimeType</code>和TypeReference的<code>type</code>是等价的。</p>
+<p>接下来我们看TypeToken是如何解析这个<code>runtimeType</code>，在解决方案二中最重要的一行代码是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">private</span> &lt;T&gt; <span class="function">T <span class="title">createInstance</span><span class="params">(TypeToken&lt;T&gt; typeToken)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (T) typeToken.getRawType().getDeclaredConstructor().newInstance();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中最重要的函数就是<code>getRawType</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Returns the raw type of &#123;<span class="doctag">@code</span> T&#125;. Formally speaking, if &#123;<span class="doctag">@code</span> T&#125; is returned by &#123;<span class="doctag">@link</span></span></span><br><span class="line"><span class="comment"> * java.lang.reflect.Method#getGenericReturnType&#125;, the raw type is what&#x27;s returned by &#123;<span class="doctag">@link</span></span></span><br><span class="line"><span class="comment"> * java.lang.reflect.Method#getReturnType&#125; of the same method object. Specifically:</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * &lt;ul&gt;</span></span><br><span class="line"><span class="comment"> *   &lt;li&gt;If &#123;<span class="doctag">@code</span> T&#125; is a &#123;<span class="doctag">@code</span> Class&#125; itself, &#123;<span class="doctag">@code</span> T&#125; itself is returned.</span></span><br><span class="line"><span class="comment"> *   &lt;li&gt;If &#123;<span class="doctag">@code</span> T&#125; is a &#123;<span class="doctag">@link</span> ParameterizedType&#125;, the raw type of the parameterized type is</span></span><br><span class="line"><span class="comment"> *       returned.</span></span><br><span class="line"><span class="comment"> *   &lt;li&gt;If &#123;<span class="doctag">@code</span> T&#125; is a &#123;<span class="doctag">@link</span> GenericArrayType&#125;, the returned type is the corresponding array</span></span><br><span class="line"><span class="comment"> *       class. For example: &#123;<span class="doctag">@code</span> List&lt;Integer&gt;[] =&gt; List[]&#125;.</span></span><br><span class="line"><span class="comment"> *   &lt;li&gt;If &#123;<span class="doctag">@code</span> T&#125; is a type variable or a wildcard type, the raw type of the first upper bound</span></span><br><span class="line"><span class="comment"> *       is returned. For example: &#123;<span class="doctag">@code</span> &lt;X extends Foo&gt; =&gt; Foo&#125;.</span></span><br><span class="line"><span class="comment"> * &lt;/ul&gt;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> Class&lt;? <span class="keyword">super</span> T&gt; getRawType() &#123;</span><br><span class="line">  <span class="comment">// For wildcard or type variable, the first bound determines the runtime type.</span></span><br><span class="line">  Class&lt;?&gt; rawType = getRawTypes().iterator().next();</span><br><span class="line">  <span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span> <span class="comment">// raw type is |T|</span></span><br><span class="line">  Class&lt;? <span class="keyword">super</span> T&gt; result = (Class&lt;? <span class="keyword">super</span> T&gt;) rawType;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后我们再往里翻<code>getRawTypes</code>可以找到</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> ImmutableSet&lt;Class&lt;? <span class="keyword">super</span> T&gt;&gt; getRawTypes() &#123;</span><br><span class="line">    <span class="keyword">final</span> ImmutableSet.Builder&lt;Class&lt;?&gt;&gt; builder = ImmutableSet.builder();</span><br><span class="line">    <span class="keyword">new</span> TypeVisitor() &#123;</span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">void</span> <span class="title">visitTypeVariable</span><span class="params">(TypeVariable&lt;?&gt; t)</span> </span>&#123;</span><br><span class="line">          <span class="comment">// 和擦拭法一样，用上界代替改泛型，默认上界为Object</span></span><br><span class="line">        visit(t.getBounds());</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">void</span> <span class="title">visitWildcardType</span><span class="params">(WildcardType t)</span> </span>&#123;</span><br><span class="line">        visit(t.getUpperBounds());</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">void</span> <span class="title">visitParameterizedType</span><span class="params">(ParameterizedType t)</span> </span>&#123;</span><br><span class="line">          <span class="comment">// ArrayList&lt;Map&lt;String, String&gt;&gt; 就取 interface java.util.ArrayList</span></span><br><span class="line">        builder.add((Class&lt;?&gt;) t.getRawType());</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">void</span> <span class="title">visitClass</span><span class="params">(Class&lt;?&gt; t)</span> </span>&#123;</span><br><span class="line">        builder.add(t);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">void</span> <span class="title">visitGenericArrayType</span><span class="params">(GenericArrayType t)</span> </span>&#123;</span><br><span class="line">        builder.add(Types.getArrayClass(of(t.getGenericComponentType()).getRawType()));</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;.visit(runtimeType);</span><br><span class="line">    <span class="comment">// Cast from ImmutableSet&lt;Class&lt;?&gt;&gt; to ImmutableSet&lt;Class&lt;? super T&gt;&gt;</span></span><br><span class="line">    <span class="meta">@SuppressWarnings(&#123;&quot;unchecked&quot;, &quot;rawtypes&quot;&#125;)</span></span><br><span class="line">    ImmutableSet&lt;Class&lt;? <span class="keyword">super</span> T&gt;&gt; result = (ImmutableSet) builder.build();</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以发现getRawTypes中非常巧妙地使用了TypeVisitor来实现一种类似于DFS的递归方式，这个TypeVisitor可以通过visit不同类型的Type来针对性地采取不同的方法。用官方原话来说就是<em>Based on what a <strong>Type</strong> is, dispatch it to the corresponding <strong>visit</strong> method.</em> 并且通过自定义的重写<code>visitTypeVariable(TypeVariable&lt;?&gt; t)</code>, <code>visitWildcardType(WildcardType t)</code>等方法我们可以决定什么时候递归。继续细看<code>visit</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">visit</span><span class="params">(<span class="meta">@Nullable</span> Type... types)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (Type type : types) &#123;</span><br><span class="line">    <span class="keyword">if</span> (type == <span class="keyword">null</span> || !visited.add(type)) &#123;</span><br><span class="line">      <span class="comment">// null owner type, or already visited;</span></span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">boolean</span> succeeded = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (type <span class="keyword">instanceof</span> TypeVariable) &#123;</span><br><span class="line">        visitTypeVariable((TypeVariable&lt;?&gt;) type);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (type <span class="keyword">instanceof</span> WildcardType) &#123;</span><br><span class="line">        visitWildcardType((WildcardType) type);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (type <span class="keyword">instanceof</span> ParameterizedType) &#123;</span><br><span class="line">        visitParameterizedType((ParameterizedType) type);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (type <span class="keyword">instanceof</span> Class) &#123;</span><br><span class="line">        visitClass((Class&lt;?&gt;) type);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (type <span class="keyword">instanceof</span> GenericArrayType) &#123;</span><br><span class="line">        visitGenericArrayType((GenericArrayType) type);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">&quot;Unknown type: &quot;</span> + type);</span><br><span class="line">      &#125;</span><br><span class="line">      succeeded = <span class="keyword">true</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (!succeeded) &#123; <span class="comment">// When the visitation failed, we don&#x27;t want to ignore the second.</span></span><br><span class="line">        visited.remove(type);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其实可以看出visit就是为了标记访问过的类型以及将相应的类型分配到相应的处理方法。</p>
+<p>从源代码里不难看出TypeToken的getRawType和加持TypeReference的JSON.parseObject的目标还是不一样的，对于ArrayList&lt;Map&lt;String, String&gt;&gt; 这样的类型，getRawType其实只取最上层的类型也就是<code>java.util.ArrayList</code>，而<code>JSON.parseObject(text, new TypeReference&lt;&gt;()&#123;&#125;)</code>则需要递归地去取List,Map,String并且在相应地层级实例化并填入json文本中所对应的值。</p>
+<p>因此就我们的问题而言，实际上我们只需要实例化一个最上层的类型，那么通过<code>getRawType.getDeclaredConstructor().newInstance()</code>就可以满足需求。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/11/27/Dubbo%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%AE%97%E6%B3%95/" rel="prev" title="Dubbo负载均衡算法">
+      <i class="fa fa-chevron-left"></i> Dubbo负载均衡算法
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E4%B8%80%EF%BC%9A%E5%8E%9F%E5%A7%8B%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%8F%8D%E5%B0%84%E6%9E%84%E9%80%A0"><span class="nav-number">1.</span> <span class="nav-text">解决方案一：原始类型的反射构造</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E4%BA%8C%EF%BC%9AGuava-TypeToken"><span class="nav-number">2.</span> <span class="nav-text">解决方案二：Guava TypeToken</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">原理分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">3.1.</span> <span class="nav-text">核心概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BF%BB%E8%AF%91%E7%BF%BB%E8%AF%91%EF%BC%8C%E4%BB%80%E4%B9%88%E5%8F%AB%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.1.1.</span> <span class="nav-text">翻译翻译，什么叫类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BF%BB%E8%AF%91%E7%BF%BB%E8%AF%91%EF%BC%8C%E4%BB%80%E4%B9%88%E5%8F%AB%E6%93%A6%E6%8B%AD%E6%B3%95%E6%B3%9B%E5%9E%8B"><span class="nav-number">3.1.2.</span> <span class="nav-text">翻译翻译，什么叫擦拭法泛型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BF%BB%E8%AF%91%E7%BF%BB%E8%AF%91%EF%BC%8C%E4%BB%80%E4%B9%88%E5%8F%AB%E5%8C%BF%E5%90%8D%E5%86%85%E9%83%A8%E7%B1%BB"><span class="nav-number">3.1.3.</span> <span class="nav-text">翻译翻译，什么叫匿名内部类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fastjson%E4%B8%AD%E7%9A%84TypeReference"><span class="nav-number">3.2.</span> <span class="nav-text">Fastjson中的TypeReference</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TypeToken%E6%BA%90%E7%A0%81"><span class="nav-number">3.3.</span> <span class="nav-text">TypeToken源码</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zhewen Lyu"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Zhewen Lyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZavierLyu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZavierLyu" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xzavierlv@outlook.com" title="E-Mail → mailto:xzavierlv@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhewen Lyu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-60f13baaa3c3f1ad" async="async"></script>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script data-pjax>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'default',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+    <div id="pjax">
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+    </div>
+</body>
+</html>
