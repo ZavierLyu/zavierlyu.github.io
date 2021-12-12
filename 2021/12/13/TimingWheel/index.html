@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"zavierlyu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":2,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="背景：大规模延时任务、周期性任务、定时任务的存储和处理 例子：支付订单在30分钟内如果没有完成就应该取消；Kafka中在acks&#x3D;all的情况下处理生产者请求，在一定时间内如果没能达成所有的同步副本写入消息就返回异常；Dubbo中调用失败，延时重试等 需求：设计一个合理的数据结构存储这些等待中的请求，使得整个系统能够高效地插入、检查、清理和执行这些任务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Timing Wheels时间轮详解">
+<meta property="og:url" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/index.html">
+<meta property="og:site_name" content="Garden of Sinners">
+<meta property="og:description" content="背景：大规模延时任务、周期性任务、定时任务的存储和处理 例子：支付订单在30分钟内如果没有完成就应该取消；Kafka中在acks&#x3D;all的情况下处理生产者请求，在一定时间内如果没能达成所有的同步副本写入消息就返回异常；Dubbo中调用失败，延时重试等 需求：设计一个合理的数据结构存储这些等待中的请求，使得整个系统能够高效地插入、检查、清理和执行这些任务">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/v2-598b34649422af1de1a720e95d37a9b3_b.webp">
+<meta property="og:image" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/v2-480d1f3a2ddea9a5ccbc87235accc5d0_b.webp">
+<meta property="og:image" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/image-20211210005152798.png">
+<meta property="og:image" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/v2-f649b5f166c55a3c6b340cdd670b5229_b.webp">
+<meta property="og:image" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/v2-32981874757256e8b1bff6841f60a2cf_b.webp">
+<meta property="og:image" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/v2-4ee2f4769d584a342b4d52641ea649f8_720w.jpg">
+<meta property="article:published_time" content="2021-12-12T16:16:21.000Z">
+<meta property="article:modified_time" content="2021-12-12T16:22:45.405Z">
+<meta property="article:author" content="Zhewen Lyu">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/v2-598b34649422af1de1a720e95d37a9b3_b.webp">
+
+<link rel="canonical" href="http://zavierlyu.github.io/2021/12/13/TimingWheel/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Timing Wheels时间轮详解 | Garden of Sinners</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Garden of Sinners</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-cv">
+
+    <a href="/cv/ZhewenLyu-CUHKSZ-eng.pdf" rel="section"><i class="fa fa-user fa-fw"></i>cv</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">20</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/ZavierLyu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://zavierlyu.github.io/2021/12/13/TimingWheel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Zhewen Lyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Garden of Sinners">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Timing Wheels时间轮详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-12-13 00:16:21 / Modified: 00:22:45" itemprop="dateCreated datePublished" datetime="2021-12-13T00:16:21+08:00">2021-12-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>背景：大规模延时任务、周期性任务、定时任务的存储和处理</p>
+<p>例子：支付订单在30分钟内如果没有完成就应该取消；Kafka中在acks=all的情况下处理生产者请求，在一定时间内如果没能达成所有的同步副本写入消息就返回异常；Dubbo中调用失败，延时重试等</p>
+<p>需求：设计一个合理的数据结构存储这些等待中的请求，使得整个系统能够高效地插入、检查、清理和执行这些任务</p>
+<span id="more"></span>
+<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><table>
+<thead>
+<tr>
+<th></th>
+<th>优先队列（最小堆）</th>
+<th>简单时间轮</th>
+<th>哈希时间轮</th>
+<th>哈希分层时间轮</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>插入Timeout</td>
+<td>O(log n)</td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>O(m)</td>
+</tr>
+<tr>
+<td>删除Timeout</td>
+<td>O(log n)</td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td>超时检查</td>
+<td>O(n)</td>
+<td>O(1)</td>
+<td>平均 O(1), 最差 O(n)</td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td>N的含义</td>
+<td>Timeout数量</td>
+<td></td>
+<td>统一时间槽内的Timeout数量</td>
+<td>m 为分层数量</td>
+</tr>
+</tbody></table>
+<h3 id="简单时间轮"><a href="#简单时间轮" class="headerlink" title="简单时间轮"></a>简单时间轮</h3><p>时间轮：本质是环形的数组</p>
+<p>时间槽(bucket)：数组中的元素，本质是双向链表</p>
+<p>双向链表中的节点：定时的任务Timeout</p>
+<p>时间单位(每个时间槽的时间跨度) tickTime：1s (kafka里1ms，netty/dubbo里1ns)</p>
+<p>整个时间轮的时间跨度：数组长度 * 时间单位 = 20s</p>
+<p><strong>插入定时任务</strong>：定时任务定于2s内完成，也就是说2s后如果这个定时任务还未返回成功将会被清楚。插入时，时间轮会根据定时任务的延时时间找到相对于当前时间的时间槽，比如：当前时间为第0s，定时任务延时为2s，那么它就会找到第2s的时间槽的链表进行插入</p>
+<p><strong>检查超时任务</strong>：当tick走到下一个时间槽时，就把这个时间槽下的双向链表里的<strong>所有</strong>定时任务进行超时处理</p>
+<p><strong>定时任务的最大延时</strong>：时间轮的时间跨度，20s</p>
+<img src="/2021/12/13/TimingWheel/v2-598b34649422af1de1a720e95d37a9b3_b.webp" class="">
+
+<p>复用走过的时间槽，使得任何时间插入的Timeout定时任务的延时都可以在一个时间轮的时间跨度内任意定义。</p>
+<img src="/2021/12/13/TimingWheel/v2-480d1f3a2ddea9a5ccbc87235accc5d0_b.webp" class="">
+
+<p>复杂度分析：</p>
+<ul>
+<li>插入O(1)：插入时只需 延时时间+当前时间 找到对应的时间槽插入即可</li>
+<li>删除O(1)：在双向链表中删除Timeout节点即可</li>
+<li>超时检查O(1)：当前时间槽下的双向链表里的所有Timeout都是超时任务，不用一一检查，直接清空</li>
+<li>空间复杂度O(u)：时间槽个数，取决于最大时间跨度</li>
+</ul>
+<p>优点：复杂度低，所有操作都是O(1)</p>
+<p>缺点：时间轮的空间复杂度过高/定时任务时延受限。如果我要插入一个延时为1000s的定时任务，我必须创建一个至少有1000个时间槽的时间轮，即使我只是为了跑这一个任务却要浪费剩下999个时间槽；并且时间轮的指针要遍历这999个时间槽才执行到这个任务。</p>
+<h3 id="哈希时间轮"><a href="#哈希时间轮" class="headerlink" title="哈希时间轮"></a>哈希时间轮</h3><p><strong>解决的问题</strong>：简单时间轮中的定时任务时延受限，空间复杂度过高</p>
+<p>比如此时定义这个时间轮的时间跨度为8s，那么所有的定时任务都会被存储在这8个时间槽中</p>
+<p><strong>插入定时任务</strong>：定时任务定义延时为11s后完成，插入时根据当前时间计算出过期时间，将过期时间对时间轮的时间跨度取余（11 % 8 = 3），因此该任务便会被插入到第3s的时间槽中的队列后面</p>
+<p><strong>检查超时任务</strong>：当指针推进到下一个时间槽时，就遍历时间槽下的双向链表里的所有定时任务进行超时检查并删除</p>
+<p><strong>定时任务的最大延时</strong>：任意</p>
+<img src="/2021/12/13/TimingWheel/image-20211210005152798.png" class="">
+
+<p>复杂度分析：</p>
+<ul>
+<li>插入O(1)：插入时只需 延时时间+当前时间 找到对应的时间槽的链表末尾插入即可</li>
+<li>删除O(1)：在双向链表中删除Timeout节点即可</li>
+<li>超时检查平均O(1)最坏O(n)：最坏的情况，所有的定时任务都放在一个时间槽上</li>
+<li>空间复杂度O(u)：时间槽个数</li>
+</ul>
+<p>优点：空间复杂度为常量；定时任务延时不受限制</p>
+<p>缺点：如果有频繁的哈希冲突就会使得超时检查的复杂度上升，变得和使用队列的方式没有区别</p>
+<h3 id="哈希分层时间轮"><a href="#哈希分层时间轮" class="headerlink" title="哈希分层时间轮"></a>哈希分层时间轮</h3><p>从某种角度讲，哈希分层时间轮是多级哈希表的变种。对于哈希时间轮来说，如果时间轮的时间跨度较小，load factor过大，哈希冲突变多，增删改查的操作的复杂度就会上升，所以我们希望再牺牲一些空间复杂度来使得更多定时任务的增删改查能够在O(1)复杂度内完成。</p>
+<p>比如我们此时增加一个时间轮，每个时间槽的时间跨度为20s，整个时间轮的时间跨度就有400s。第二层的时间轮的指针只有在第一层的指针绕完一圈之后才会走一格，就像水表一样。</p>
+<img src="/2021/12/13/TimingWheel/v2-f649b5f166c55a3c6b340cdd670b5229_b.webp" class="">
+
+<p><strong>插入定时任务：</strong>当前时间为第2s，插入一个延时22s的定时任务，根据第一个时间轮的指针位置计算出过期时间点为第24s，发现在第一个时间轮里无法装下；转换到第2个时间轮，根据第2个时间轮的指针位置计算出定时时间应该被放在[20,39]的时间槽里，于是将该定时任务插入到第二个时间轮的[20,39]时间槽的双向链表后。</p>
+<p><strong>检查超时任务</strong>：第一个时间轮的指针每走过一个周期，第二个时间轮走一个时间槽。第二个时间轮每走1个时间槽，会把这个时间槽下所有的定时任务去除重新放入第一个时间轮中。比如，我们有一个在第24s超时的任务，当前时间为第20s，第一个时间轮已经走完一个周期，第二个时间轮的指针来到了[20,39]的时间槽上把里面所有在[20,39]范围内的定时任务取出对第一个时间轮的时间跨度取余插入相应的槽中。第一个时间轮的指针再继续遍历，和前面的哈希时间轮一样去将遍历到的时间槽里的定时任务进行超时处理。</p>
+<p><strong>定时任务的最大延时</strong>：任意。在kafka中，通过动态地创建时间轮能够避免掉延时溢出地问题。比如现在我们有2层时间轮，我在第2s插入一个延时为500s的定时任务，我们发现这个延时超过了我们这个两层时间轮系统的时间跨度(400s)，就会以这个时间跨度(400s)作为时间单位创建下一层时间轮，这样就有了3层时间轮，整个系统的时间跨度也到了8000s。</p>
+<img src="/2021/12/13/TimingWheel/v2-32981874757256e8b1bff6841f60a2cf_b.webp" class="">
+
+<p>复杂度分析：</p>
+<ul>
+<li>插入O(m)：虽然插入定时任务是从最外层的时间轮开始的，但是最后都是要插入到时间跨度最小的时间轮，所以需要O(m)，m为时间轮层级</li>
+<li>删除O(1)：在双向链表中删除Timeout节点即可</li>
+<li>超时检查O(1)：对于时间跨度最效的时间轮，也就是第一层的时间轮，它走过的每个时间槽都标志着这个时间槽内的所有定时任务超时不用一一检查</li>
+<li>空间复杂度O($\sum_{i=1}^{m}{u_i}$​)：$u_i$表示第$i$​​层时间轮的时间槽个数</li>
+</ul>
+<img src="/2021/12/13/TimingWheel/v2-4ee2f4769d584a342b4d52641ea649f8_720w.jpg" class="">
+
+<p>优点：更高的空间利用率；两层时间轮只用了40个数组元素，却可以承载[0-399s]的定时任务，而三层时间轮用60个数组元素，就可以承载[0-7999s]的定时任务，相比于简单时间轮更加高效</p>
+<p>缺点：时间轮指针的空推进问题依然没有解决(稀疏时间轮)；比如说, 插入一个延时时间400s的任务, 指针就要执行399次”空推进”, 这其实是对CPU资源的浪费</p>
+<h3 id="Kafka-关于”空推进”的优化"><a href="#Kafka-关于”空推进”的优化" class="headerlink" title="Kafka 关于”空推进”的优化"></a>Kafka 关于”空推进”的优化</h3><p>Kafka通过使用DelayQueue来解决空推进的问题。</p>
+<p>DelayQueue被用来存储时间槽也就是bucket也就是双向链表。</p>
+<p>Kafka首先解耦了检查超时任务和时间轮指针推进的操作。我每10s检查有没有超时任务，但是如果检查完后发现没有超时的任务，那么时间轮的指针也不会向前推进；如果有超时任务，时间轮的指针只会推进到超时任务所在的时间槽。</p>
+<p>Kafka在Timer(可以看作时间轮类的管理类，入口，依赖TimingWheel)的设计中将指针推进(advanceClock)这个操作开放出来，也就是在这里业务方可以指定一次超时检查的最大耗时为多久，而这就是由DelayQueue实现的。DelayQueue通过<code>poll(long timeout, TimeUnit unit)</code>来获取过期的bucket，如果在timeout内没有取到就放弃获取；如果获取到的bucket不为空，就将bucket里的定时任务进行过期处理，并且在此时才会触发时间轮内的指针按照bucket的过期时间转动。</p>
+<blockquote>
+<p>可能有人会问这样和直接用DelayQueue来实现Timer有什么区别呢？区别其实就在于如果直接基于DelayQueue实现，它存的其实是一个定时任务Timeout；而在Kafka这里存的是有定时任务的时间槽bucket。bucket的数量是小于等于Timeout的数量，并且依赖于多层时间轮，层级越高的时间轮的bucket的时间跨度越大就能存越多的Timeout，所以会有一定的优化。</p>
+</blockquote>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p><strong>线程模型</strong></p>
+<ul>
+<li>用户线程：负责定时任务的注册</li>
+<li>定时任务队列轮询线程：负责扫描任务队列上符合要求的任务，如果任务的时间戳达到规定的时刻，首先从队列中取走此任务，然后将其交给异步线程池来处理</li>
+<li>异步线程池：负责定时任务的执行</li>
+</ul>
+<p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/Timer.html">java.util.Timer</a></strong></p>
+<p>数据结构：优先队列<br>单线程执行，未解耦超时检查和任务执行；未对任务的异常进行处理，单个任务异常会导致后面的任务无法执行<br>适用场景：不推荐使用</p>
+<p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledThreadPoolExecutor.html">java.util.concurrent.ScheduledThreadPoolExecutor</a></strong></p>
+<p>数据结构：优先队列<br>多线程执行，不会单线程阻塞；线程池模型处理异常，单任务出错不影响后续任务<br>适用场景：大多数场景都适用</p>
+<p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/DelayQueue.html">java.util.concurrent.DelayQueue</a></strong></p>
+<p>数据结构：优先队列<br>单纯的容器；无线程模型；线程安全；容器里的元素只有到时后才能被取出<br>适用场景：作为定时器服务的数据结构来被维护</p>
+<p><strong><a target="_blank" rel="noopener" href="https://netty.io/4.0/api/io/netty/util/HashedWheelTimer.html">io.netty.util.HashedWheelTimer</a></strong></p>
+<p>数据结构：哈希时间轮<br>多线程执行；通过位运算提高哈希效率；更低复杂度的插入和过期检查<br>适用场景：高吞吐的定时系统</p>
+<p><strong><a target="_blank" rel="noopener" href="https://github.com/apache/kafka/tree/trunk/core/src/main/scala/kafka/utils/timer">kafka.utils.timer</a></strong></p>
+<p>数据结构：哈希分层时间轮<br>无线程模型；Timer入口线程安全，TimingWheel线程不安全；通过指针连接各层时间轮；DelayQueue解决空推进<br>使用场景：高吞吐的定时系统</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><p><a target="_blank" rel="noopener" href="http://www.cs.columbia.edu/~nahum/w6998/papers/ton97-timing-wheels.pdf">Hierarchical Timing Wheels</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/HashedWheelTimer.java">Netty Hashed Wheel Timer源码</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844904110399946766">一张图理解Kafka时间轮</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://juejin.cn/post/7031020294550585374">Dubbo时间轮设计思路</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/apache/kafka/blob/trunk/core/src/main/scala/kafka/utils/timer/TimingWheel.scala">Kafka Timing Wheel源码</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.confluent.io/blog/apache-kafka-purgatory-hierarchical-timing-wheels/">Apache Kafka, Purgatory, and Hierarchical Timing Wheels</a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/12/06/TypeReference/" rel="prev" title="泛型、反射、匿名内部类与TypeReference、TypeToken">
+      <i class="fa fa-chevron-left"></i> 泛型、反射、匿名内部类与TypeReference、TypeToken
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E6%97%B6%E9%97%B4%E8%BD%AE"><span class="nav-number">1.1.</span> <span class="nav-text">简单时间轮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%97%B6%E9%97%B4%E8%BD%AE"><span class="nav-number">1.2.</span> <span class="nav-text">哈希时间轮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E5%88%86%E5%B1%82%E6%97%B6%E9%97%B4%E8%BD%AE"><span class="nav-number">1.3.</span> <span class="nav-text">哈希分层时间轮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka-%E5%85%B3%E4%BA%8E%E2%80%9D%E7%A9%BA%E6%8E%A8%E8%BF%9B%E2%80%9D%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">1.4.</span> <span class="nav-text">Kafka 关于”空推进”的优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zhewen Lyu"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Zhewen Lyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZavierLyu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZavierLyu" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xzavierlv@outlook.com" title="E-Mail → mailto:xzavierlv@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhewen Lyu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-60f13baaa3c3f1ad" async="async"></script>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script data-pjax>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'default',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+    <div id="pjax">
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+    </div>
+</body>
+</html>
