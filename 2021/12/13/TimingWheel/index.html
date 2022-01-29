@@ -34,7 +34,7 @@
 <meta property="og:image" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/v2-32981874757256e8b1bff6841f60a2cf_b.webp">
 <meta property="og:image" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/v2-4ee2f4769d584a342b4d52641ea649f8_720w.jpg">
 <meta property="article:published_time" content="2021-12-12T16:16:21.000Z">
-<meta property="article:modified_time" content="2021-12-12T16:22:45.405Z">
+<meta property="article:modified_time" content="2022-01-29T16:31:52.810Z">
 <meta property="article:author" content="Zhewen Lyu">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/v2-598b34649422af1de1a720e95d37a9b3_b.webp">
@@ -137,12 +137,12 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">9</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">11</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">20</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">21</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -225,9 +225,28 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-12-13 00:16:21 / Modified: 00:22:45" itemprop="dateCreated datePublished" datetime="2021-12-13T00:16:21+08:00">2021-12-13</time>
+              <time title="Created: 2021-12-13 00:16:21" itemprop="dateCreated datePublished" datetime="2021-12-13T00:16:21+08:00">2021-12-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-01-30 00:31:52" itemprop="dateModified" datetime="2022-01-30T00:31:52+08:00">2022-01-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Backend/" itemprop="url" rel="index"><span itemprop="name">Backend</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Backend/Kafka/" itemprop="url" rel="index"><span itemprop="name">Kafka</span></a>
+                </span>
             </span>
 
           
@@ -336,7 +355,7 @@
 <li>插入O(m)：虽然插入定时任务是从最外层的时间轮开始的，但是最后都是要插入到时间跨度最小的时间轮，所以需要O(m)，m为时间轮层级</li>
 <li>删除O(1)：在双向链表中删除Timeout节点即可</li>
 <li>超时检查O(1)：对于时间跨度最效的时间轮，也就是第一层的时间轮，它走过的每个时间槽都标志着这个时间槽内的所有定时任务超时不用一一检查</li>
-<li>空间复杂度O($\sum_{i=1}^{m}{u_i}$​)：$u_i$表示第$i$​​层时间轮的时间槽个数</li>
+<li>空间复杂度$O(\sum_{i=1}^{m}{u_i})$：$u_i$表示第$i$​​层时间轮的时间槽个数</li>
 </ul>
 <img src="/2021/12/13/TimingWheel/v2-4ee2f4769d584a342b4d52641ea649f8_720w.jpg" class="">
 
@@ -355,29 +374,14 @@
 <li>定时任务队列轮询线程：负责扫描任务队列上符合要求的任务，如果任务的时间戳达到规定的时刻，首先从队列中取走此任务，然后将其交给异步线程池来处理</li>
 <li>异步线程池：负责定时任务的执行</li>
 </ul>
-<p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/Timer.html">java.util.Timer</a></strong></p>
-<p>数据结构：优先队列<br>单线程执行，未解耦超时检查和任务执行；未对任务的异常进行处理，单个任务异常会导致后面的任务无法执行<br>适用场景：不推荐使用</p>
-<p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledThreadPoolExecutor.html">java.util.concurrent.ScheduledThreadPoolExecutor</a></strong></p>
-<p>数据结构：优先队列<br>多线程执行，不会单线程阻塞；线程池模型处理异常，单任务出错不影响后续任务<br>适用场景：大多数场景都适用</p>
-<p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/DelayQueue.html">java.util.concurrent.DelayQueue</a></strong></p>
-<p>数据结构：优先队列<br>单纯的容器；无线程模型；线程安全；容器里的元素只有到时后才能被取出<br>适用场景：作为定时器服务的数据结构来被维护</p>
-<p><strong><a target="_blank" rel="noopener" href="https://netty.io/4.0/api/io/netty/util/HashedWheelTimer.html">io.netty.util.HashedWheelTimer</a></strong></p>
-<p>数据结构：哈希时间轮<br>多线程执行；通过位运算提高哈希效率；更低复杂度的插入和过期检查<br>适用场景：高吞吐的定时系统</p>
-<p><strong><a target="_blank" rel="noopener" href="https://github.com/apache/kafka/tree/trunk/core/src/main/scala/kafka/utils/timer">kafka.utils.timer</a></strong></p>
-<p>数据结构：哈希分层时间轮<br>无线程模型；Timer入口线程安全，TimingWheel线程不安全；通过指针连接各层时间轮；DelayQueue解决空推进<br>使用场景：高吞吐的定时系统</p>
+<p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/Timer.html">java.util.Timer</a></strong><br>数据结构：优先队列<br>单线程执行，未解耦超时检查和任务执行；未对任务的异常进行处理，单个任务异常会导致后面的任务无法执行<br>适用场景：不推荐使用<br><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledThreadPoolExecutor.html">java.util.concurrent.ScheduledThreadPoolExecutor</a></strong><br>数据结构：优先队列<br>多线程执行，不会单线程阻塞；线程池模型处理异常，单任务出错不影响后续任务<br>适用场景：大多数场景都适用<br><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/DelayQueue.html">java.util.concurrent.DelayQueue</a></strong><br>数据结构：优先队列<br>单纯的容器；无线程模型；线程安全；容器里的元素只有到时后才能被取出<br>适用场景：作为定时器服务的数据结构来被维护<br><strong><a target="_blank" rel="noopener" href="https://netty.io/4.0/api/io/netty/util/HashedWheelTimer.html">io.netty.util.HashedWheelTimer</a></strong><br>数据结构：哈希时间轮<br>多线程执行；通过位运算提高哈希效率；更低复杂度的插入和过期检查<br>适用场景：高吞吐的定时系统<br><strong><a target="_blank" rel="noopener" href="https://github.com/apache/kafka/tree/trunk/core/src/main/scala/kafka/utils/timer">kafka.utils.timer</a></strong><br>数据结构：哈希分层时间轮<br>无线程模型；Timer入口线程安全，TimingWheel线程不安全；通过指针连接各层时间轮；DelayQueue解决空推进<br>使用场景：高吞吐的定时系统</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><p><a target="_blank" rel="noopener" href="http://www.cs.columbia.edu/~nahum/w6998/papers/ton97-timing-wheels.pdf">Hierarchical Timing Wheels</a></p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/HashedWheelTimer.java">Netty Hashed Wheel Timer源码</a></p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844904110399946766">一张图理解Kafka时间轮</a></p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://juejin.cn/post/7031020294550585374">Dubbo时间轮设计思路</a></p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://github.com/apache/kafka/blob/trunk/core/src/main/scala/kafka/utils/timer/TimingWheel.scala">Kafka Timing Wheel源码</a></p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://www.confluent.io/blog/apache-kafka-purgatory-hierarchical-timing-wheels/">Apache Kafka, Purgatory, and Hierarchical Timing Wheels</a></p>
-</li>
+<li><a target="_blank" rel="noopener" href="http://www.cs.columbia.edu/~nahum/w6998/papers/ton97-timing-wheels.pdf">Hierarchical Timing Wheels</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/HashedWheelTimer.java">Netty Hashed Wheel Timer源码</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844904110399946766">一张图理解Kafka时间轮</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7031020294550585374">Dubbo时间轮设计思路</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/apache/kafka/blob/trunk/core/src/main/scala/kafka/utils/timer/TimingWheel.scala">Kafka Timing Wheel源码</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.confluent.io/blog/apache-kafka-purgatory-hierarchical-timing-wheels/">Apache Kafka, Purgatory, and Hierarchical Timing Wheels</a></li>
 </ul>
 
     </div>
@@ -397,7 +401,10 @@
     <a href="/2021/12/06/TypeReference/" rel="prev" title="泛型、反射、匿名内部类与TypeReference、TypeToken">
       <i class="fa fa-chevron-left"></i> 泛型、反射、匿名内部类与TypeReference、TypeToken
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022/01/30/Kafka%E9%80%89%E4%B8%BE%E7%AE%80%E4%BB%8B/" rel="next" title="Kafka选举简介">
+      Kafka选举简介 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -472,14 +479,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-count">21</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -520,7 +527,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
