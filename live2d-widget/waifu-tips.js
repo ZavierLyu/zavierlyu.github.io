@@ -163,12 +163,23 @@ function loadWidget(config) {
 		if (modelId === null) {
 			// 首次访问加载 指定模型 的 指定材质
 			modelId = 5; // 模型 ID
-			modelTexturesId = 53; // 材质 ID
+			modelTexturesId = 1; // 材质 ID
 		}
 		loadModel(modelId, modelTexturesId);
 		fetch(waifuPath)
 			.then(response => response.json())
 			.then(result => {
+				result.seasons.forEach(({ date, text }) => {
+					const now = new Date(),
+						after = date.split("-")[0],
+						before = date.split("-")[1] || after;
+					if ((after.split("/")[0] <= now.getMonth() + 1 && now.getMonth() + 1 <= before.split("/")[0]) && (after.split("/")[1] <= now.getDate() && now.getDate() <= before.split("/")[1])) {
+						text = randomSelection(text);
+						text = text.replace("{year}", now.getFullYear());
+						showMessage(text, 7000, 9);
+						messageArray.push(text);
+					}
+				});
 				window.addEventListener("mouseover", event => {
 					for (let { selector, text } of result.mouseover) {
 						if (!event.target.matches(selector)) continue;
@@ -185,17 +196,6 @@ function loadWidget(config) {
 						text = text.replace("{text}", event.target.innerText);
 						showMessage(text, 4000, 8);
 						return;
-					}
-				});
-				result.seasons.forEach(({ date, text }) => {
-					const now = new Date(),
-						after = date.split("-")[0],
-						before = date.split("-")[1] || after;
-					if ((after.split("/")[0] <= now.getMonth() + 1 && now.getMonth() + 1 <= before.split("/")[0]) && (after.split("/")[1] <= now.getDate() && now.getDate() <= before.split("/")[1])) {
-						text = randomSelection(text);
-						text = text.replace("{year}", now.getFullYear());
-						//showMessage(text, 7000, true);
-						messageArray.push(text);
 					}
 				});
 			});

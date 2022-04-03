@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"zavierlyu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":2,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="在百度搜索关键词”可重入和线程安全”跳出来的第一篇被抄来抄去的博客堂而皇之地写道“可重入函数一定是线程安全的”，还煞有介事地画了一张图。但实际上，Wikipedia的[Reentrancy](Reentrancy (computing) - Wikipedia)词条上非常清楚地说明了二者不存在任何充分必要条件。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程安全和可重入性">
+<meta property="og:url" content="http://zavierlyu.github.io/2022/04/03/reentrancy/index.html">
+<meta property="og:site_name" content="Garden of Sinners">
+<meta property="og:description" content="在百度搜索关键词”可重入和线程安全”跳出来的第一篇被抄来抄去的博客堂而皇之地写道“可重入函数一定是线程安全的”，还煞有介事地画了一张图。但实际上，Wikipedia的[Reentrancy](Reentrancy (computing) - Wikipedia)词条上非常清楚地说明了二者不存在任何充分必要条件。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://zavierlyu.github.io/2022/04/03/reentrancy/2022-03-30-22-23-36-image.png">
+<meta property="og:image" content="http://zavierlyu.github.io/2022/04/03/reentrancy/98441541119872cd55b75ee0b3da5ed5f81793f8.png">
+<meta property="article:published_time" content="2022-04-03T14:23:28.000Z">
+<meta property="article:modified_time" content="2022-04-03T14:32:26.810Z">
+<meta property="article:author" content="Zhewen Lyu">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://zavierlyu.github.io/2022/04/03/reentrancy/2022-03-30-22-23-36-image.png">
+
+<link rel="canonical" href="http://zavierlyu.github.io/2022/04/03/reentrancy/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>线程安全和可重入性 | Garden of Sinners</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8GLBKVQMHY"></script>
+    <script data-pjax>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8GLBKVQMHY');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+  <script src="/live2d-widget/autoload.js"></script>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Garden of Sinners</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-cv">
+
+    <a href="/cv/ZhewenLyu-CUHKSZ-eng.pdf" rel="section"><i class="fa fa-user fa-fw"></i>cv</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">22</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/ZavierLyu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://zavierlyu.github.io/2022/04/03/reentrancy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Zhewen Lyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Garden of Sinners">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          线程安全和可重入性
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-04-03 22:23:28 / Modified: 22:32:26" itemprop="dateCreated datePublished" datetime="2022-04-03T22:23:28+08:00">2022-04-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Language/" itemprop="url" rel="index"><span itemprop="name">Language</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Language/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <img src="/2022/04/03/reentrancy/2022-03-30-22-23-36-image.png" class="">
+
+<p>在百度搜索关键词”可重入和线程安全”跳出来的第一篇被抄来抄去的博客堂而皇之地写道“可重入函数一定是线程安全的”，还煞有介事地画了一张图。但实际上，Wikipedia的[Reentrancy](<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Reentrancy_(computing)">Reentrancy (computing) - Wikipedia</a>)词条上非常清楚地说明了二者不存在任何充分必要条件。</p>
+<span id="more"></span>
+<blockquote>
+<p>A reentrant subroutine can achieve thread-safety, but being reentrant alone might not be sufficient to be thread-safe in all situations. Conversely, thread-safe code does not necessarily have to be reentrant.</p>
+</blockquote>
+<h2 id="辨析"><a href="#辨析" class="headerlink" title="辨析"></a>辨析</h2><p>实际上，可重入性(Reentrancy)和线程安全(Thread-safety)是针对两个不同的场景。可重入性针对的是单线程下由于中断导致临界资源发生改变而使得和不中断时的执行结果不一致；而线程安全问题更多的是强调多线程、多处理器情况下对临界资源的竞争、修改导致的每次执行结果不一致的问题。</p>
+<ul>
+<li><p>可重入的概念比线程安全的概念更早被重视，在多任务系统出现以前就被提出</p>
+</li>
+<li><p>可重入和线程安全不等价，一般情况下可重入的函数是线程安全的，但是可重入的要求会比线程安全更加严格</p>
+</li>
+<li><p>需要注意的是，二者都是对某一段代码（函数）的设计进行考虑，也就是说在不同调用者在任何时间内执行统一块代码时是否会出现超出预期的结果</p>
+</li>
+</ul>
+<p>贴下Wiki定义</p>
+<h3 id="Reentrancy"><a href="#Reentrancy" class="headerlink" title="Reentrancy"></a>Reentrancy</h3><p>A reentrant procedure can be interrupted in the middle of its execution and then safely be called again (“re-entered”) before its previous invocations complete execution. The interruption could be caused by an internal action such as a jump or call, or by an external action such as an interrupt or signal. </p>
+<p>定义可重入性最关键的就是在函数执行的过程中<strong>被打断</strong>然后能够<strong>重新调用该函数</strong>并且<strong>不会影响</strong>这次以及上一次调用的<strong>预期结果</strong>。<strong>所以什么时候我们需要考虑一个函数的可重入性？</strong> 当我们的函数被设计成允许中断并被重新执行时，我们就需要考虑这个函数的可重入性。<strong>什么样的场景会出现需要设计成可重入的函数?</strong> 我能想到的场景是当同一个执行流DAG有多个实例但却只能是单进程执行且允许中断的情况下需要考虑可重入性。</p>
+<img src="/2022/04/03/reentrancy/98441541119872cd55b75ee0b3da5ed5f81793f8.png" class="">
+
+<p>如上图同一个DAG执行流（比如处理数据要经过的步骤，或者事件流之类的），在同一时段起了两个执行实例，但是处理器（可以是进程或者线程）只有一个，当处理器在处理一个实例中的某个节点时，用户向这个实例发送了中断命令，处理器停止处理ID-01实例的Stage B节点处理，转而处理ID-02实例的Stage B节点，处理的代码都是一致的。此时我们便需要考虑这样的代码重入会不会影响两个实例各自的Stage B处理结果。</p>
+<h3 id="Thread-safety"><a href="#Thread-safety" class="headerlink" title="Thread-safety"></a>Thread-safety</h3><p>Thread-safe code only manipulates shared data structures in a manner that ensures that all threads behave properly and fulfill their design specifications without unintended interaction.</p>
+<p>在讨论线程安全之前我们需要想好我们的函数想要实现什么样的功能，多线程的引入是否会带来超出预期的结果。比如对于一个HashMap的操作，如果只有多线程的并发读那么显然不会有任何线程安全问题，但是如果各个线程中会对这个临界数据结构进行写操作，我们就必须考虑原子性、可见性、有序性等一系列会造成超出预期结果的问题。</p>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>下面用四个例子来帮助我们辨析可重入性和线程安全的差别。有一个swap函数来表示我们要考虑可重入性的函数，isr函数作为interrupt subroutine handler来处理swap被中断后的操作。考虑可重入时，要考虑第一次swap被中断后isr的第二次重新调用；考虑线程安全时，要考虑同一个函数swap被多个线程调用的场景。</p>
+<h4 id="既不是可重入又不是线程安全"><a href="#既不是可重入又不是线程安全" class="headerlink" title="既不是可重入又不是线程安全"></a>既不是可重入又不是线程安全</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> tmp;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>* x, <span class="keyword">int</span>* y)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    tmp = *x;</span><br><span class="line">    *x = *y;</span><br><span class="line">    <span class="comment">/* Hardware interrupt might invoke isr() here. */</span></span><br><span class="line">    *y = tmp;    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">isr</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">1</span>, y = <span class="number">2</span>;</span><br><span class="line">    swap(&amp;x, &amp;y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>就可重入性而言，swap使用的是全局变量tmp，但它运行被interrupt出去后，isr重新调用swap将会重新改写tmp的值而使得第一次swap的输出不再符合原来的逻辑。同时显而易见，线程不安全。</p>
+<h4 id="线程安全但不是可重入"><a href="#线程安全但不是可重入" class="headerlink" title="线程安全但不是可重入"></a>线程安全但不是可重入</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">_Thread_local <span class="keyword">int</span> tmp;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>* x, <span class="keyword">int</span>* y)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    tmp = *x;</span><br><span class="line">    *x = *y;</span><br><span class="line">    <span class="comment">/* Hardware interrupt might invoke isr() here. */</span></span><br><span class="line">    *y = tmp;    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">isr</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">1</span>, y = <span class="number">2</span>;</span><br><span class="line">    swap(&amp;x, &amp;y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>就可重入性而言，单线程情况下依然会出现初次调用的tmp被isr更改。而在多线程情况下，由于tmp是thread local，所以做到了线程安全。</p>
+<h4 id="可重入但不是线程安全"><a href="#可重入但不是线程安全" class="headerlink" title="可重入但不是线程安全"></a>可重入但不是线程安全</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> tmp;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>* x, <span class="keyword">int</span>* y)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">/* Save global variable. */</span></span><br><span class="line">    <span class="keyword">int</span> s;</span><br><span class="line">    s = tmp;</span><br><span class="line"></span><br><span class="line">    tmp = *x;</span><br><span class="line">    *x = *y;</span><br><span class="line">    *y = tmp;     <span class="comment">/* Hardware interrupt might invoke isr() here. */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Restore global variable. */</span></span><br><span class="line">    tmp = s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">isr</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">1</span>, y = <span class="number">2</span>;</span><br><span class="line">    swap(&amp;x, &amp;y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>非常有意思的例子，在wiki中的描述是somewhat contrived，但在实践上这样的函数（实现reetrant但不thread safe）基本是毫无意义的。我们可以看到在swap中将共有变量进行了一次复制，也就使得在这个函数结束的时候swap的值是保持不变的，当第一次swap被interrupt后，isr再次进入swap虽然会临时改动tmp，但是只要最后isr完成了到了最后一步将tmp恢复成原样，那么结束interrupt时第一次swap依然能正常执行并产出符合预期的结果。也就是说在这样的情况下即使递归地被interrupt，只要最后一次递归的swap完成了swap的所有操作，那么先前的swap操作都能够正常执行。因此，它是可重入的。然而如果是多线程，因为说到底是对公用变量的修改，因此不加锁是线程不安全的。</p>
+<h4 id="可重入又线程安全"><a href="#可重入又线程安全" class="headerlink" title="可重入又线程安全"></a>可重入又线程安全</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>* x, <span class="keyword">int</span>* y)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> tmp;</span><br><span class="line">    tmp = *x;</span><br><span class="line">    *x = *y;</span><br><span class="line">    *y = tmp;    <span class="comment">/* Hardware interrupt might invoke isr() here. */</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">isr</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">1</span>, y = <span class="number">2</span>;</span><br><span class="line">    swap(&amp;x, &amp;y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所有的变量都是本地变量，没有共有变量，多线程各个栈之间是隔离的，所以既是可重入又是线程安全。</p>
+<p>隔了几天，为了写这篇blog重新翻了下wiki，发现又多了几个例子来解释为啥可以thread-safe但不是reentrant，并且还被打上了multiple issues的标签。可见大伙儿对二者的区分还是有许多不同意见啊。</p>
+<h2 id="可重入锁"><a href="#可重入锁" class="headerlink" title="可重入锁"></a>可重入锁</h2><p>在这里我们直讲如何理解可重入锁中的可重入性，更细节的锁设计会在之后的博客给出（挖坑）。</p>
+<p>很多时候我们在使用锁的时候没有考虑过它的可重入性主要是因为大多场景我们都希望是可重入的。所以为了明白什么是可重入我们必须得了解什么是不可重入。</p>
+<p>假设下列伪代码是我们使用锁的场景，也就是有多个函数共用一把锁，并且会递归地对锁进行操作。现在我们要对Lock这个类进行设计。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">     Lock lock = <span class="keyword">new</span> Lock();</span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">methodA</span><span class="params">()</span></span>&#123;</span><br><span class="line">         lock.lock();</span><br><span class="line">         ...........;</span><br><span class="line">         methodB();</span><br><span class="line">         ...........;</span><br><span class="line">         lock.unlock();</span><br><span class="line">     &#125;</span><br><span class="line">  	 <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">methodB</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       lock.lock();</span><br><span class="line">       ...........;</span><br><span class="line">       lock.unlock();</span><br><span class="line">     &#125;</span><br><span class="line"><span class="comment">/*   public void isr()&#123;</span></span><br><span class="line"><span class="comment">         lock.lock();</span></span><br><span class="line"><span class="comment">         ...........;</span></span><br><span class="line"><span class="comment">         lock.unlock();</span></span><br><span class="line"><span class="comment">     &#125; */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用自旋的方式设计成不可重入的锁：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Lock</span></span>&#123;</span><br><span class="line">     <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> isLocked = <span class="keyword">false</span>;</span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException</span>&#123;</span><br><span class="line">         <span class="keyword">while</span>(isLocked)&#123;    </span><br><span class="line">             wait();</span><br><span class="line">         &#125;</span><br><span class="line">         isLocked = <span class="keyword">true</span>;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span></span>&#123;</span><br><span class="line">         isLocked = <span class="keyword">false</span>;</span><br><span class="line">         notify();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果用这样的方式去执行Test中的代码即使是单线程也同样会出现<strong>A</strong>被永远阻塞的情况。因为它递归地调用了<strong>B</strong>而<strong>B</strong>的操作需要重新进入<code>lock()</code>拿到这把锁的所有权，而这把锁却是在<strong>A</strong>手上所以<strong>B</strong>将永远拿不到形成死锁。因此，我们希望在单线程下，能够递归地对锁进行加锁和解锁的操作。</p>
+<p>可重入锁的实现方式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Lock</span></span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> isLocked = <span class="keyword">false</span>;</span><br><span class="line">    Thread  lockedBy = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">int</span> lockedCount = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException</span>&#123;</span><br><span class="line">        Thread thread = Thread.currentThread();</span><br><span class="line">        <span class="keyword">while</span>(isLocked &amp;&amp; lockedBy != thread)&#123;</span><br><span class="line">            wait();</span><br><span class="line">        &#125;</span><br><span class="line">        isLocked = <span class="keyword">true</span>;</span><br><span class="line">        lockedCount++;</span><br><span class="line">        lockedBy = thread;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(Thread.currentThread() == <span class="keyword">this</span>.lockedBy)&#123;</span><br><span class="line">            lockedCount--;</span><br><span class="line">            <span class="keyword">if</span>(lockedCount == <span class="number">0</span>)&#123;</span><br><span class="line">                isLocked = <span class="keyword">false</span>;</span><br><span class="line">                notify();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先，代码的核心在于锁已有主的情况下弄清谁在试图拿到这把锁，只有判断试图加锁的线程和目前持有该锁的线程为同一线程时才会考虑可重入。不是同一线程自然不能拿到锁权，毕竟lock的基本要求是满足线程安全。在同一线程下的所有加锁操作都不会形成阻塞，而是在<code>lockCount</code>上去进行自增来标记目前有多少个<code>lock()</code>调用，而在<code>unlock()</code>时便会去对<code>lockCount</code>进行减一，只有当这个线程下所有对锁的调用都完成之后也就是<code>lockCount</code>归位0后，才算结束改线程对这个临界资源的占用。因此，在使用这样的可重入锁时，Test的执行才不会出现死锁的情况。</p>
+<h3 id="可重入锁和可重入性到底什么关系？"><a href="#可重入锁和可重入性到底什么关系？" class="headerlink" title="可重入锁和可重入性到底什么关系？"></a>可重入锁和可重入性到底什么关系？</h3><p>可重入锁似乎和前面讲的单线程可重入性没有关系，没有地方可以看到有函数被设计成会被打断。然而实际上对锁进行<code>lock()</code>然后再执行自定义的代码然后再<code>unlock()</code>就是一种interruption。我们可以把<code>lock()</code>和<code>unlock()</code>看作是一个函数，因为对锁的任何操作都必须经过这两个步骤，而执行临界代码实际上就是在</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lock(); </span><br><span class="line"><span class="comment">/*interrupted*/</span></span><br><span class="line">unlock();</span><br></pre></td></tr></table></figure>
+
+<p>中间打断然后执行自定义的<code>isr()</code>。因此我们才需要在设计锁的时候考虑可重入性。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/01/30/Kafka%E9%80%89%E4%B8%BE%E7%AE%80%E4%BB%8B/" rel="prev" title="Kafka选举简介">
+      <i class="fa fa-chevron-left"></i> Kafka选举简介
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BE%A8%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">辨析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Reentrancy"><span class="nav-number">1.1.</span> <span class="nav-text">Reentrancy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Thread-safety"><span class="nav-number">1.2.</span> <span class="nav-text">Thread-safety</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">1.3.</span> <span class="nav-text">例子</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%A2%E4%B8%8D%E6%98%AF%E5%8F%AF%E9%87%8D%E5%85%A5%E5%8F%88%E4%B8%8D%E6%98%AF%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8"><span class="nav-number">1.3.1.</span> <span class="nav-text">既不是可重入又不是线程安全</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E4%BD%86%E4%B8%8D%E6%98%AF%E5%8F%AF%E9%87%8D%E5%85%A5"><span class="nav-number">1.3.2.</span> <span class="nav-text">线程安全但不是可重入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%AF%E9%87%8D%E5%85%A5%E4%BD%86%E4%B8%8D%E6%98%AF%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8"><span class="nav-number">1.3.3.</span> <span class="nav-text">可重入但不是线程安全</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%AF%E9%87%8D%E5%85%A5%E5%8F%88%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8"><span class="nav-number">1.3.4.</span> <span class="nav-text">可重入又线程安全</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E9%87%8D%E5%85%A5%E9%94%81"><span class="nav-number">2.</span> <span class="nav-text">可重入锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E9%87%8D%E5%85%A5%E9%94%81%E5%92%8C%E5%8F%AF%E9%87%8D%E5%85%A5%E6%80%A7%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E5%85%B3%E7%B3%BB%EF%BC%9F"><span class="nav-number">2.1.</span> <span class="nav-text">可重入锁和可重入性到底什么关系？</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zhewen Lyu"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Zhewen Lyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZavierLyu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZavierLyu" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xzavierlv@outlook.com" title="E-Mail → mailto:xzavierlv@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhewen Lyu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-60f13baaa3c3f1ad" async="async"></script>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-users"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script data-pjax>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'default',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+    <div id="pjax">
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '74d229b64975d31c09ff',
+      clientSecret: '3755bc1da8abd918232fc8cad0175172594c9edf',
+      repo        : 'blog-comments',
+      owner       : 'ZavierLyu',
+      admin       : ['ZavierLyu'],
+      id          : 'feb266ecdd2433d5b2201bb51ce3640f',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+    </div>
+</body>
+</html>
