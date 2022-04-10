@@ -20,20 +20,20 @@
     var CONFIG = {"hostname":"zavierlyu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":2,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="5. 最长回文子串这题能在面试中做出来的有三种方法  暴力 $O(n^3)$ 动态规划 $O(n^2)$ 中心扩展 $O(n^2)$">
+  <meta name="description" content="记录一下【树状数组】的个人模版。 BinaryIndexedTree主要功能是提供动态的O(logn)时间复杂度内计算前缀和。树状数组和线段树是不同的实现方法，树状数组的设计目的是为了更高效地计算前缀和，而线段树的设计目的是更高效的计算区间和，二者在如“和”这种简单计算上可以互相替代，毕竟计算前缀和就能计算区间和，计算区间和就包括计算前缀和。但实际上，线段树面向的不仅是区间和的高效计算，它的分治法">
 <meta property="og:type" content="article">
-<meta property="og:title" content="动态规划问题集">
-<meta property="og:url" content="http://zavierlyu.github.io/2020/06/02/DP/index.html">
+<meta property="og:title" content="BinaryIndexedTree">
+<meta property="og:url" content="http://zavierlyu.github.io/2022/04/10/BinaryIndexedTree/index.html">
 <meta property="og:site_name" content="Garden of Sinners">
-<meta property="og:description" content="5. 最长回文子串这题能在面试中做出来的有三种方法  暴力 $O(n^3)$ 动态规划 $O(n^2)$ 中心扩展 $O(n^2)$">
+<meta property="og:description" content="记录一下【树状数组】的个人模版。 BinaryIndexedTree主要功能是提供动态的O(logn)时间复杂度内计算前缀和。树状数组和线段树是不同的实现方法，树状数组的设计目的是为了更高效地计算前缀和，而线段树的设计目的是更高效的计算区间和，二者在如“和”这种简单计算上可以互相替代，毕竟计算前缀和就能计算区间和，计算区间和就包括计算前缀和。但实际上，线段树面向的不仅是区间和的高效计算，它的分治法">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-06-02T14:09:50.000Z">
-<meta property="article:modified_time" content="2020-06-02T14:44:34.535Z">
+<meta property="article:published_time" content="2022-04-10T14:32:23.000Z">
+<meta property="article:modified_time" content="2022-04-10T14:47:17.517Z">
 <meta property="article:author" content="Zhewen Lyu">
-<meta property="article:tag" content="dynamic programming">
+<meta property="article:tag" content="BinaryIndexedTree">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://zavierlyu.github.io/2020/06/02/DP/">
+<link rel="canonical" href="http://zavierlyu.github.io/2022/04/10/BinaryIndexedTree/">
 
 
 <script id="page-configurations">
@@ -46,7 +46,7 @@
   };
 </script>
 
-  <title>动态规划问题集 | Garden of Sinners</title>
+  <title>BinaryIndexedTree | Garden of Sinners</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-8GLBKVQMHY"></script>
     <script data-pjax>
@@ -209,7 +209,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://zavierlyu.github.io/2020/06/02/DP/">
+    <link itemprop="mainEntityOfPage" href="http://zavierlyu.github.io/2022/04/10/BinaryIndexedTree/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -222,7 +222,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          动态规划问题集
+          BinaryIndexedTree
         </h1>
 
         <div class="post-meta">
@@ -233,7 +233,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-06-02 22:09:50 / Modified: 22:44:34" itemprop="dateCreated datePublished" datetime="2020-06-02T22:09:50+08:00">2020-06-02</time>
+              <time title="Created: 2022-04-10 22:32:23 / Modified: 22:47:17" itemprop="dateCreated datePublished" datetime="2022-04-10T22:32:23+08:00">2022-04-10</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -263,27 +263,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <!-- # 动态规划 -->
-<h4 id="5-最长回文子串"><a href="#5-最长回文子串" class="headerlink" title="5. 最长回文子串"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-palindromic-substring/">5. 最长回文子串</a></h4><p>这题能在面试中做出来的有三种方法<br></p>
-<ol>
-<li>暴力 $O(n^3)$</li>
-<li>动态规划 $O(n^2)$</li>
-<li>中心扩展 $O(n^2)$<span id="more"></span></li>
-</ol>
-<h5 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">longestPalindrome</span>(<span class="params">self, s: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span></span><br><span class="line">        n = <span class="built_in">len</span>(s)</span><br><span class="line">        ret = <span class="string">&#x27;&#x27;</span></span><br><span class="line">        dp = [[<span class="number">0</span>] * n <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line">        length = <span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span> length &lt;= n:</span><br><span class="line">            i = <span class="number">0</span></span><br><span class="line">            <span class="keyword">while</span> i &lt; n:</span><br><span class="line">                j = i + length - <span class="number">1</span></span><br><span class="line">                <span class="keyword">if</span> j &gt;= n:</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">                <span class="keyword">if</span> length == <span class="number">1</span>:</span><br><span class="line">                    dp[i][j] = <span class="number">1</span></span><br><span class="line">                <span class="keyword">elif</span> length == <span class="number">2</span>:</span><br><span class="line">                    dp[i][j] = <span class="built_in">int</span>(s[i] == s[j])</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    dp[i][j] = <span class="built_in">int</span>(dp[i+<span class="number">1</span>][j-<span class="number">1</span>] <span class="keyword">and</span> s[i] == s[j])</span><br><span class="line">                <span class="keyword">if</span> dp[i][j] <span class="keyword">and</span> length &gt; <span class="built_in">len</span>(ret):</span><br><span class="line">                    ret = s[i:j+<span class="number">1</span>]</span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">            length += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure>
+        <p>记录一下【树状数组】的个人模版。</p>
+<p>BinaryIndexedTree主要功能是提供动态的<code>O(logn)</code>时间复杂度内计算前缀和。树状数组和线段树是不同的实现方法，树状数组的设计目的是为了更高效地计算前缀和，而线段树的设计目的是更高效的计算区间和，二者在如“和”这种简单计算上可以互相替代，毕竟计算前缀和就能计算区间和，计算区间和就包括计算前缀和。但实际上，线段树面向的不仅是区间和的高效计算，它的分治法可以处理任何允许分治的计算；而树状数组更多的是利用了加法和二进制的某些特性。</p>
+<p>有人也许会问，什么时候需要用到这些高级数据结构。如果只是计算前缀和，当然不需要引入这些；但是如果想要动态地去进行计算，数组中的元素发生更改时能够在<code>O(logn)</code>内计算出新的结果，那么这些高级数据结构便是必要的。</p>
+<span id="more"></span>
+<h2 id="模版"><a href="#模版" class="headerlink" title="模版"></a>模版</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BinaryIndexedTree</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span>[] bits;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BinaryIndexedTree</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        bits = <span class="keyword">new</span> <span class="keyword">int</span>[n+<span class="number">1</span>];</span><br><span class="line">        System.arraycopy(nums, <span class="number">0</span>, bits, <span class="number">1</span>, n);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> nxt = i + (i &amp; (-i));</span><br><span class="line">            <span class="keyword">if</span> (nxt &lt;= n)</span><br><span class="line">                bits[nxt] += bits[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(<span class="keyword">int</span> index, <span class="keyword">int</span> delta)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> i = index + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span> (i &lt; bits.length) &#123;</span><br><span class="line">            bits[i] += delta;</span><br><span class="line">            i += (i &amp; -i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [0, index)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">prefixSum</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> i = index;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (i &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            res += bits[i];</span><br><span class="line">            i -= (i &amp; -i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [fromIndex, toIndex)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">rangeSum</span><span class="params">(<span class="keyword">int</span> fromIndex, <span class="keyword">int</span> toIndex)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> prefixSum(toIndex) - prefixSum(fromIndex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>状态定义:</p>
-<p>dp[i][j]表示字符串从i到j，包括j，是否为回文字符串</p>
-<p>状态转移方程：<br>$$<br>dp[i][j]=<br>\begin{cases}<br>1 &amp; dp[i+1][j-1] == 1\ and \ s[i]==s[j] \<br>0 &amp; \ otherwise<br>\end{cases}<br>$$<br>难点1：如何遍历dp二维数组比较恰当。这里我们用子字符串长度$length$来表示$j$, $j=i+length-1$, 由此我们可以实现二维数组对角线遍历而不会重复。</p>
-<p>边界点1：$s$为空字符，我们在设置返回项时应该设置空字符（如果不提前规避的话）表示最长的回文字符串为空，长度为1。</p>
-<p>边界点2：单字符，双字符，皆为该dp的边界点。我们应该首先计算出这些边界点的状态。可以在遍历大遍历之前小遍历初始化，也可以在整个遍历里设置单独条件计算这些边界点的状态。</p>
-<p>边界点3：$j$越界，只要保证$j$不越界，那么$i+1$肯定也不越界。</p>
-<h5 id="中心扩展"><a href="#中心扩展" class="headerlink" title="中心扩展"></a>中心扩展</h5><p>其实个人觉得，比起dp，中心扩展法更少边界值，更容易上手。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">longestPalindrome</span>(<span class="params">self, s: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span></span><br><span class="line">        left, right = <span class="number">0</span>,<span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(s)):</span><br><span class="line">            left1, right1 = self.centerExpand(s, i, i)</span><br><span class="line">            left2, right2 = self.centerExpand(s, i, i+<span class="number">1</span>)</span><br><span class="line">            l, r = (left1, right1) <span class="keyword">if</span> right1-left1 &gt; right2-left2 <span class="keyword">else</span> (left2, right2)</span><br><span class="line">            left, right = (left, right) <span class="keyword">if</span> right-left &gt; r-l <span class="keyword">else</span> (l, r)</span><br><span class="line">        <span class="keyword">return</span> s[left:right+<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">centerExpand</span>(<span class="params">self, s, i, j</span>):</span></span><br><span class="line">        <span class="keyword">while</span> <span class="number">0</span> &lt;= i <span class="keyword">and</span> j &lt; <span class="built_in">len</span>(s) <span class="keyword">and</span> s[i]==s[j]:</span><br><span class="line">            i -= <span class="number">1</span></span><br><span class="line">            j += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> i+<span class="number">1</span>, j-<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<p>中心扩展法其实就是利用边界点（单字符和双字符）去扩展得到所有的回文子串。</p>
-<p>难点1：中心扩展函数的写法。一开始我用递归，有点麻烦，容易出错。后来看官方答案，这玩意要啥递归，while loop就完事了。</p>
-<p>边界点：其实只要中心扩展函数写得好，基本不用考虑边界点。像上方官答，双字符是不相等和第二个字符越界的条件都不用考虑。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/Yaokai_AssultMaster/article/details/79492190">树状数组（Binary Indexed Tree），看这一篇就够了</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=v_wj_mOAlig">Youtube 教学</a></li>
+</ul>
 
     </div>
 
@@ -293,7 +282,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/dynamic-programming/" rel="tag"># dynamic programming</a>
+              <a href="/tags/BinaryIndexedTree/" rel="tag"># BinaryIndexedTree</a>
           </div>
 
         
@@ -302,13 +291,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/06/02/PrefixSum/" rel="prev" title="前缀和问题集">
-      <i class="fa fa-chevron-left"></i> 前缀和问题集
+    <a href="/2022/04/03/reentrancy/" rel="prev" title="线程安全和可重入性">
+      <i class="fa fa-chevron-left"></i> 线程安全和可重入性
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/06/02/jsdom4/" rel="next" title="《JavaScript DOM编程艺术》第四章读书笔记">
-      《JavaScript DOM编程艺术》第四章读书笔记 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -368,7 +354,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E6%9C%80%E9%95%BF%E5%9B%9E%E6%96%87%E5%AD%90%E4%B8%B2"><span class="nav-number">1.</span> <span class="nav-text">5. 最长回文子串</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92"><span class="nav-number">1.1.</span> <span class="nav-text">动态规划</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%AD%E5%BF%83%E6%89%A9%E5%B1%95"><span class="nav-number">1.2.</span> <span class="nav-text">中心扩展</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E7%89%88"><span class="nav-number">1.</span> <span class="nav-text">模版</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">2.</span> <span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -659,7 +645,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'blog-comments',
       owner       : 'ZavierLyu',
       admin       : ['ZavierLyu'],
-      id          : 'aca3f83f75332a2329d583a5ee72fcd0',
+      id          : '2ee73f43714d75c595263c936f94afc4',
         language: 'zh-CN',
       distractionFreeMode: true
     });
