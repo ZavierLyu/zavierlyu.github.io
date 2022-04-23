@@ -138,12 +138,12 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">11</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">13</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">23</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">24</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -203,6 +203,85 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://zavierlyu.github.io/2022/04/23/Bigtable/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Zhewen Lyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Garden of Sinners">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/23/Bigtable/" class="post-title-link" itemprop="url">浅析Google Bigtable</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-04-23 22:51:50 / Modified: 23:38:58" itemprop="dateCreated datePublished" datetime="2022-04-23T22:51:50+08:00">2022-04-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/BigData/" itemprop="url" rel="index"><span itemprop="name">BigData</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/BigData/Bigtable/" itemprop="url" rel="index"><span itemprop="name">Bigtable</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>作为Google大数据时代三架马车之一的<a target="_blank" rel="noopener" href="https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf">Bigtable: A Distributed Storage System for Structured Data</a>，其中的理念，模型和设计思想依然影响着许多当下大型数据库的设计。不过，作为一个经受过无数业务考验的大数据产品，其背后细致入微的工程细节是无法完全在论文、博客中得以体现的。笔者作为一个刚入门大数据领域不久的新人，在工作当中时常会接触到HBase（Bigtable的开源实现），便想读一读这篇经典的论文，记录下阅读和查找资料过程当中的思考，尚不曾仔细地研究过一些开源项目，希望未来能在参与一点相关的工作过后能有更深刻的理解。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/23/Bigtable/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://zavierlyu.github.io/2022/04/10/BinaryIndexedTree/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -228,7 +307,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-04-10 22:32:23 / Modified: 22:47:17" itemprop="dateCreated datePublished" datetime="2022-04-10T22:32:23+08:00">2022-04-10</time>
+              <time title="Created: 2022-04-10 22:32:23 / Modified: 22:58:15" itemprop="dateCreated datePublished" datetime="2022-04-10T22:32:23+08:00">2022-04-10</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -252,8 +331,8 @@
 
       
           <p>记录一下【树状数组】的个人模版。</p>
-<p>BinaryIndexedTree主要功能是提供动态的<code>O(logn)</code>时间复杂度内计算前缀和。树状数组和线段树是不同的实现方法，树状数组的设计目的是为了更高效地计算前缀和，而线段树的设计目的是更高效的计算区间和，二者在如“和”这种简单计算上可以互相替代，毕竟计算前缀和就能计算区间和，计算区间和就包括计算前缀和。但实际上，线段树面向的不仅是区间和的高效计算，它的分治法可以处理任何允许分治的计算；而树状数组更多的是利用了加法和二进制的某些特性。</p>
-<p>有人也许会问，什么时候需要用到这些高级数据结构。如果只是计算前缀和，当然不需要引入这些；但是如果想要动态地去进行计算，数组中的元素发生更改时能够在<code>O(logn)</code>内计算出新的结果，那么这些高级数据结构便是必要的。</p>
+<p>BinaryIndexedTree主要功能是提供动态的<code>O(logn)</code>时间复杂度内计算前缀和。树状数组和线段树是不同的实现方法，树状数组的设计目的是为了更高效地计算前缀和，而线段树的设计目的是更高效的计算区间和，二者在如“和”这种简单计算上可以互相替代，毕竟计算前缀和就能计算区间和，计算区间和就包括计算前缀和。但实际上，线段树面向的不仅是区间和的高效计算，它的分治法可以处理任何具有二段性的计算；而树状数组更多的是利用了加法和二进制的某些特性。</p>
+<p>有人也许会问，什么时候需要用到这些高级数据结构。如果只是计算静态的前缀和，当然不需要引入这些；但是如果想要动态地去进行计算，数组中的元素发生更改时能够在<code>O(logn)</code>内计算出新的结果，那么这些高级数据结构便是必要的。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2022/04/10/BinaryIndexedTree/#more" rel="contents">
@@ -390,21 +469,27 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2022-01-30 00:20:33 / Modified: 00:36:46" itemprop="dateCreated datePublished" datetime="2022-01-30T00:20:33+08:00">2022-01-30</time>
+              <time title="Created: 2022-01-30 00:20:33" itemprop="dateCreated datePublished" datetime="2022-01-30T00:20:33+08:00">2022-01-30</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-04-23 23:38:29" itemprop="dateModified" datetime="2022-04-23T23:38:29+08:00">2022-04-23</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Backend/" itemprop="url" rel="index"><span itemprop="name">Backend</span></a>
+                  <a href="/categories/BigData/" itemprop="url" rel="index"><span itemprop="name">BigData</span></a>
                 </span>
                   , 
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Backend/Kafka/" itemprop="url" rel="index"><span itemprop="name">Kafka</span></a>
+                  <a href="/categories/BigData/Kafka/" itemprop="url" rel="index"><span itemprop="name">Kafka</span></a>
                 </span>
             </span>
 
@@ -477,7 +562,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-01-30 00:31:52" itemprop="dateModified" datetime="2022-01-30T00:31:52+08:00">2022-01-30</time>
+                <time title="Modified: 2022-04-23 23:38:40" itemprop="dateModified" datetime="2022-04-23T23:38:40+08:00">2022-04-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -485,11 +570,11 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Backend/" itemprop="url" rel="index"><span itemprop="name">Backend</span></a>
+                  <a href="/categories/BigData/" itemprop="url" rel="index"><span itemprop="name">BigData</span></a>
                 </span>
                   , 
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Backend/Kafka/" itemprop="url" rel="index"><span itemprop="name">Kafka</span></a>
+                  <a href="/categories/BigData/Kafka/" itemprop="url" rel="index"><span itemprop="name">Kafka</span></a>
                 </span>
             </span>
 
@@ -908,91 +993,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://zavierlyu.github.io/2021/01/27/javacore1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Zhewen Lyu">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Garden of Sinners">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/27/javacore1/" class="post-title-link" itemprop="url">《Java核心技术 卷1》笔记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-01-27 17:28:46" itemprop="dateCreated datePublished" datetime="2021-01-27T17:28:46+08:00">2021-01-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-01-30 00:38:55" itemprop="dateModified" datetime="2022-01-30T00:38:55+08:00">2022-01-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Language/" itemprop="url" rel="index"><span itemprop="name">Language</span></a>
-                </span>
-                  , 
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Language/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><em>语言只是实现目标的工具，而不是目标本身。</em></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/01/27/javacore1/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1064,14 +1064,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-count">24</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
