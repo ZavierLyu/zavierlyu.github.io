@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"zavierlyu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":2,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="作为Google大数据时代三架马车之一的Bigtable: A Distributed Storage System for Structured Data，其中的理念，模型和设计思想依然影响着许多当下大型数据库的设计。不过，作为一个经受过无数业务考验的大数据产品，其背后细致入微的工程细节是无法完全在论文、博客中得以体现的。笔者作为一个刚入门大数据领域不久的新人，在工作当中时常会接触到HBase（">
+  <meta name="description" content="作为Google大数据时代三架马车之一的Bigtable: A Distributed Storage System for Structured Data，其中的理念，模型和设计思想依然影响着许多当下大型数据库的设计。不过，作为一个经受过无数业务考验的大数据产品，其背后细致入微的工程设计是无法完全在论文、博客中得以体现的。笔者作为一个刚入门大数据领域不久的新人，在工作当中时常会接触到HBase（">
 <meta property="og:type" content="article">
 <meta property="og:title" content="浅析Google Bigtable">
 <meta property="og:url" content="http://zavierlyu.github.io/2022/04/23/Bigtable/index.html">
 <meta property="og:site_name" content="Garden of Sinners">
-<meta property="og:description" content="作为Google大数据时代三架马车之一的Bigtable: A Distributed Storage System for Structured Data，其中的理念，模型和设计思想依然影响着许多当下大型数据库的设计。不过，作为一个经受过无数业务考验的大数据产品，其背后细致入微的工程细节是无法完全在论文、博客中得以体现的。笔者作为一个刚入门大数据领域不久的新人，在工作当中时常会接触到HBase（">
+<meta property="og:description" content="作为Google大数据时代三架马车之一的Bigtable: A Distributed Storage System for Structured Data，其中的理念，模型和设计思想依然影响着许多当下大型数据库的设计。不过，作为一个经受过无数业务考验的大数据产品，其背后细致入微的工程设计是无法完全在论文、博客中得以体现的。笔者作为一个刚入门大数据领域不久的新人，在工作当中时常会接触到HBase（">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://zavierlyu.github.io/2022/04/23/Bigtable/image-20220423215131975.png">
 <meta property="og:image" content="http://zavierlyu.github.io/2022/04/23/Bigtable/image-20220423215440288.png">
@@ -38,7 +38,7 @@
 <meta property="og:image" content="http://zavierlyu.github.io/2022/04/23/Bigtable/image-20220423222807255.png">
 <meta property="og:image" content="http://zavierlyu.github.io/2022/04/23/Bigtable/image-20220423223022401.png">
 <meta property="article:published_time" content="2022-04-23T14:51:50.000Z">
-<meta property="article:modified_time" content="2022-04-23T16:50:29.199Z">
+<meta property="article:modified_time" content="2022-04-23T16:55:25.084Z">
 <meta property="article:author" content="Zhewen Lyu">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://zavierlyu.github.io/2022/04/23/Bigtable/image-20220423215131975.png">
@@ -249,7 +249,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-04-24 00:50:29" itemprop="dateModified" datetime="2022-04-24T00:50:29+08:00">2022-04-24</time>
+                <time title="Modified: 2022-04-24 00:55:25" itemprop="dateModified" datetime="2022-04-24T00:55:25+08:00">2022-04-24</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -283,7 +283,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>作为Google大数据时代三架马车之一的<a target="_blank" rel="noopener" href="https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf">Bigtable: A Distributed Storage System for Structured Data</a>，其中的理念，模型和设计思想依然影响着许多当下大型数据库的设计。不过，作为一个经受过无数业务考验的大数据产品，其背后细致入微的工程细节是无法完全在论文、博客中得以体现的。笔者作为一个刚入门大数据领域不久的新人，在工作当中时常会接触到HBase（Bigtable的开源实现），便想读一读这篇经典的论文，记录下阅读和查找资料过程当中的思考，尚不曾仔细地研究过一些开源项目，希望未来能在参与一点相关的工作过后能有更深刻的理解。</p>
+        <p>作为Google大数据时代三架马车之一的<a target="_blank" rel="noopener" href="https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf">Bigtable: A Distributed Storage System for Structured Data</a>，其中的理念，模型和设计思想依然影响着许多当下大型数据库的设计。不过，作为一个经受过无数业务考验的大数据产品，其背后细致入微的工程设计是无法完全在论文、博客中得以体现的。笔者作为一个刚入门大数据领域不久的新人，在工作当中时常会接触到HBase（Bigtable的开源实现），便想读一读这篇经典的论文，记录下阅读和查找资料过程当中的思考，尚不曾仔细地研究过一些开源项目。希望未来能在参与一点相关的工作过后能有更深刻的理解。</p>
 <span id="more"></span>
 <h2 id="Bigtable的适用场景"><a href="#Bigtable的适用场景" class="headerlink" title="Bigtable的适用场景"></a>Bigtable的适用场景</h2><ul>
 <li><strong>写密集型应用</strong>：写入量大但是随机读的量相对较小</li>
