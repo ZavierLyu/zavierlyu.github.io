@@ -38,7 +38,7 @@
 <meta property="og:image" content="http://zavierlyu.github.io/2022/04/23/Bigtable/image-20220423222807255.png">
 <meta property="og:image" content="http://zavierlyu.github.io/2022/04/23/Bigtable/image-20220423223022401.png">
 <meta property="article:published_time" content="2022-04-23T14:51:50.000Z">
-<meta property="article:modified_time" content="2022-04-23T15:38:58.579Z">
+<meta property="article:modified_time" content="2022-04-23T16:50:29.199Z">
 <meta property="article:author" content="Zhewen Lyu">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://zavierlyu.github.io/2022/04/23/Bigtable/image-20220423215131975.png">
@@ -241,10 +241,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2022-04-23 22:51:50 / Modified: 23:38:58" itemprop="dateCreated datePublished" datetime="2022-04-23T22:51:50+08:00">2022-04-23</time>
+              <time title="Created: 2022-04-23 22:51:50" itemprop="dateCreated datePublished" datetime="2022-04-23T22:51:50+08:00">2022-04-23</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-04-24 00:50:29" itemprop="dateModified" datetime="2022-04-24T00:50:29+08:00">2022-04-24</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -279,7 +285,6 @@
       
         <p>作为Google大数据时代三架马车之一的<a target="_blank" rel="noopener" href="https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf">Bigtable: A Distributed Storage System for Structured Data</a>，其中的理念，模型和设计思想依然影响着许多当下大型数据库的设计。不过，作为一个经受过无数业务考验的大数据产品，其背后细致入微的工程细节是无法完全在论文、博客中得以体现的。笔者作为一个刚入门大数据领域不久的新人，在工作当中时常会接触到HBase（Bigtable的开源实现），便想读一读这篇经典的论文，记录下阅读和查找资料过程当中的思考，尚不曾仔细地研究过一些开源项目，希望未来能在参与一点相关的工作过后能有更深刻的理解。</p>
 <span id="more"></span>
-
 <h2 id="Bigtable的适用场景"><a href="#Bigtable的适用场景" class="headerlink" title="Bigtable的适用场景"></a>Bigtable的适用场景</h2><ul>
 <li><strong>写密集型应用</strong>：写入量大但是随机读的量相对较小</li>
 <li><strong>海量数据的持久化</strong>：网页搜索引擎需要存储大量的网页信息，并且这些信息在持续不断地更新，所以Bigtable不仅要及时存储当前的消息还需要保证历史信息的持久化</li>
