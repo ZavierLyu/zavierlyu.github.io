@@ -86,9 +86,6 @@
   </style>
 </noscript>
 
-  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
-  <script src="/live2d-widget/autoload.js"></script>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -257,33 +254,44 @@
         <p>腾讯PCG QQ 后台开发</p>
 <p>Pre留学生实习 一面</p>
 <span id="more"></span>
-
 <ol>
-<li><p>问了一些情况，比如实习时间，是否在深圳，未来打算之类的</p>
+<li>
+<p>问了一些情况，比如实习时间，是否在深圳，未来打算之类的</p>
 </li>
-<li><p>介绍一下部门的技术栈C++和Golang</p>
+<li>
+<p>介绍一下部门的技术栈C++和Golang</p>
 </li>
-<li><p>问项目，问在做的过程中有什么比较深刻的发现</p>
+<li>
+<p>问项目，问在做的过程中有什么比较深刻的发现</p>
 </li>
 </ol>
 <blockquote>
 <p>用了并行计算课上的一些作业，MPI，Pthread之类的，感觉面试官不是很满意，应该是项目太toy了不够开发级</p>
 </blockquote>
 <ol start="4">
-<li>问线程和进程的区别</li>
-</ol>
-<ol start="5">
-<li>进程的通信方式</li>
+<li>
+<p>问线程和进程的区别</p>
+</li>
+<li>
+<p>进程的通信方式</p>
+</li>
 </ol>
 <blockquote>
 <ul>
-<li>管道(pipe)：<br>管道是一种半双工的通信方式，数据只能单向流动，而且只能在具有亲缘关系的进程间使用。进程的亲缘关系通常是指父子进程关系。</li>
-<li>有名管道 (namedpipe) ：<br>有名管道也是半双工的通信方式，但是它允许无亲缘关系进程间的通信，严格遵循先进先出(first in first out)。</li>
-<li>信号量(semaphore)：<br>信号量是一个计数器，可以用来控制多个进程对共享资源的访问。它常作为一种锁机制，防止某进程正在访问共享资源时，其他进程也访问该资源。因此，主要作为进程间以及同一进程内不同线程之间的同步手段。</li>
-<li>消息队列(message queuing)：<br>消息队列是消息的链表,具有特定的格式，存放在内存中并由消息队列标识符标识。管道和消息队列的通信数据都是先进先出的原则。与管道(无名管道:只存在于内存中的文件;命名管道:存在于实际的磁盘介质或者文件系统)不同的是消息队列存放在内核中，只有在内核重启(即，操作系统重启)或者显示地删除一个消息队列时，该消息队列才会被真正的删除。消息队列可以实现消息的随机查询，消息不一定要以先进先出的次序读取，也可以按消息的类型读取。比 FIFO 更有优势。消息队列克服了信号承载信息量少，管道只能承载无格式字节流以及缓冲区大小受限等缺。</li>
-<li>信号 (signal)：<br>信号是一种比较复杂的通信方式，用于通知接收进程某个事件已经发生。</li>
-<li>共享内存(shared memory)：<br>共享内存就是映射一段能被其他进程所访问的内存，这段共享内存由一个进程创建，但多个进程都可以访问。共享内存是最快的 IPC 方式，它是针对其他进程间通信方式运行效率低而专门设计的。它往往与其他通信机制，如信号量和互斥锁，配合使用，来实现进程间的同步和通信。</li>
-<li>套接字(socket)：<br>此方法主要用于在客户端和服务器之间通过网络进行通信。套接字是支持TCP/IP的网络通信的基本操作单元，可以看做是不同主机之间的进程进行双向通信的端点，简单的说就是通信的两方的一种约定，用套接字中的相关函数来完成通信过程。</li>
+<li>管道(pipe)：<br />
+管道是一种半双工的通信方式，数据只能单向流动，而且只能在具有亲缘关系的进程间使用。进程的亲缘关系通常是指父子进程关系。</li>
+<li>有名管道 (namedpipe) ：<br />
+有名管道也是半双工的通信方式，但是它允许无亲缘关系进程间的通信，严格遵循先进先出(first in first out)。</li>
+<li>信号量(semaphore)：<br />
+信号量是一个计数器，可以用来控制多个进程对共享资源的访问。它常作为一种锁机制，防止某进程正在访问共享资源时，其他进程也访问该资源。因此，主要作为进程间以及同一进程内不同线程之间的同步手段。</li>
+<li>消息队列(message queuing)：<br />
+消息队列是消息的链表,具有特定的格式，存放在内存中并由消息队列标识符标识。管道和消息队列的通信数据都是先进先出的原则。与管道(无名管道:只存在于内存中的文件;命名管道:存在于实际的磁盘介质或者文件系统)不同的是消息队列存放在内核中，只有在内核重启(即，操作系统重启)或者显示地删除一个消息队列时，该消息队列才会被真正的删除。消息队列可以实现消息的随机查询，消息不一定要以先进先出的次序读取，也可以按消息的类型读取。比 FIFO 更有优势。消息队列克服了信号承载信息量少，管道只能承载无格式字节流以及缓冲区大小受限等缺。</li>
+<li>信号 (signal)：<br />
+信号是一种比较复杂的通信方式，用于通知接收进程某个事件已经发生。</li>
+<li>共享内存(shared memory)：<br />
+共享内存就是映射一段能被其他进程所访问的内存，这段共享内存由一个进程创建，但多个进程都可以访问。共享内存是最快的 IPC 方式，它是针对其他进程间通信方式运行效率低而专门设计的。它往往与其他通信机制，如信号量和互斥锁，配合使用，来实现进程间的同步和通信。</li>
+<li>套接字(socket)：<br />
+此方法主要用于在客户端和服务器之间通过网络进行通信。套接字是支持TCP/IP的网络通信的基本操作单元，可以看做是不同主机之间的进程进行双向通信的端点，简单的说就是通信的两方的一种约定，用套接字中的相关函数来完成通信过程。</li>
 </ul>
 </blockquote>
 <ol start="5">
@@ -299,13 +307,17 @@
 <p>没有，我校至今未开网络课呢</p>
 </blockquote>
 <ol start="7">
-<li><p>知不知道乐观锁和悲观锁</p>
+<li>
+<p>知不知道乐观锁和悲观锁</p>
 </li>
-<li><p>会不会redis</p>
+<li>
+<p>会不会redis</p>
 </li>
-<li><p>用没用过数据库，比如mysql，做了什么优化</p>
+<li>
+<p>用没用过数据库，比如mysql，做了什么优化</p>
 </li>
-<li><p><a target="_blank" rel="noopener" href="https://www.nowcoder.com/questionTerminal/f46135ecf26a45b3b964239ebc745aac">[编程题]数组中子数组的最大累乘积</a></p>
+<li>
+<p><a target="_blank" rel="noopener" href="https://www.nowcoder.com/questionTerminal/f46135ecf26a45b3b964239ebc745aac">[编程题]数组中子数组的最大累乘积</a></p>
 </li>
 </ol>
 <blockquote>
@@ -619,58 +631,10 @@ if (document.querySelectorAll('pre.mermaid').length) {
 
   
       
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+  <script src="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.css">
 
-<script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
-        }
-      }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
-</script>
-
-    
 
   
 

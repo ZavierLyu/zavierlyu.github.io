@@ -89,9 +89,6 @@
   </style>
 </noscript>
 
-  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
-  <script src="/live2d-widget/autoload.js"></script>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -278,53 +275,49 @@
       
         <p>动态创建标记</p>
 <span id="more"></span>
-
-<h2 id="DOM方法"><a href="#DOM方法" class="headerlink" title="DOM方法"></a>DOM方法</h2><h3 id="createElement"><a href="#createElement" class="headerlink" title="createElement"></a>createElement</h3><p>目标：将一段文本插入如下testdiv元素</p>
+<h2 id="dom方法"><a class="markdownIt-Anchor" href="#dom方法"></a> DOM方法</h2>
+<h3 id="createelement"><a class="markdownIt-Anchor" href="#createelement"></a> createElement</h3>
+<p>目标：将一段文本插入如下testdiv元素</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;testdiv&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
 <ol>
 <li>创建一个新的元素；</li>
 <li>把这个新元素插入节点树。</li>
 </ol>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> para = <span class="built_in">document</span>.createElement(<span class="string">&#x27;p&#x27;</span>); <span class="comment">// 文档碎片</span></span><br><span class="line"><span class="keyword">var</span> testdiv = <span class="built_in">document</span>.getElementById(<span class="string">&quot;testdiv&quot;</span>);</span><br><span class="line">testdiv.appendChild(para);</span><br></pre></td></tr></table></figure>
-
-<h3 id="createTextNode"><a href="#createTextNode" class="headerlink" title="createTextNode"></a>createTextNode</h3><p>注意<code>createElement</code>和<code>createTextNode</code>的区别。</p>
+<h3 id="createtextnode"><a class="markdownIt-Anchor" href="#createtextnode"></a> createTextNode</h3>
+<p>注意<code>createElement</code>和<code>createTextNode</code>的区别。</p>
 <p>创建文本节点：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.createTextNode(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> txt = <span class="built_in">document</span>.createTextNode(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">para.appendChild(txt);</span><br></pre></td></tr></table></figure>
-
-<h4 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h4><p>插入一个简单的元素</p>
+<h4 id="例子"><a class="markdownIt-Anchor" href="#例子"></a> 例子</h4>
+<p>插入一个简单的元素</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>This is <span class="tag">&lt;<span class="name">em</span>&gt;</span>my<span class="tag">&lt;/<span class="name">em</span>&gt;</span> content.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>节点树：</p>
 <img src="/2020/06/21/jsdom7/image-20200607171033679.png" class="">
-
-
 <p>代码：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> para = <span class="built_in">document</span>.createElement(<span class="string">&#x27;p&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> txt1 = <span class="built_in">document</span>.createTextNode(<span class="string">&quot;This is &quot;</span>);</span><br><span class="line"><span class="keyword">var</span> em = <span class="built_in">document</span>.createElement(<span class="string">&#x27;em&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> em_txt = <span class="built_in">document</span>.createTextNode(<span class="string">&quot;my&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> txt2 = <span class="built_in">document</span>.createTextNode(<span class="string">&quot; content.&quot;</span>);</span><br><span class="line">para.appendChild(txt1);</span><br><span class="line">em.appendChild(em_txt);</span><br><span class="line">para.appendChild(txt3);</span><br><span class="line"><span class="keyword">var</span> testdiv = <span class="built_in">document</span>.getElementById(<span class="string">&quot;testdiv&quot;</span>);</span><br><span class="line">testdiv.appendChild(para);</span><br></pre></td></tr></table></figure>
-
-<h3 id="在已有元素前插入一个新元素"><a href="#在已有元素前插入一个新元素" class="headerlink" title="在已有元素前插入一个新元素"></a>在已有元素前插入一个新元素</h3><p>DOM提供了名为insertBefore()方法，这个方法将把一个新元素插入到一个现有元素的前面。</p>
+<h3 id="在已有元素前插入一个新元素"><a class="markdownIt-Anchor" href="#在已有元素前插入一个新元素"></a> 在已有元素前插入一个新元素</h3>
+<p>DOM提供了名为insertBefore()方法，这个方法将把一个新元素插入到一个现有元素的前面。</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parentElement.insertBefore(newElement,targetElement);</span><br></pre></td></tr></table></figure>
-
 <ol>
 <li>新元素：你想插入的元素(newElement)</li>
 <li>目标元素：你想把这个新元素插入到哪个元素(targetElement)之前</li>
 <li>父元素：目标元素的父元素(parentElement)</li>
 </ol>
 <p>我们可以通过targetEleent元素的parentNode来找到parentElement</p>
-<h3 id="在现有方法后插入一个新元素"><a href="#在现有方法后插入一个新元素" class="headerlink" title="在现有方法后插入一个新元素"></a>在现有方法后插入一个新元素</h3><h4 id="编写insertAfter函数"><a href="#编写insertAfter函数" class="headerlink" title="编写insertAfter函数"></a>编写insertAfter函数</h4><p>实用已知的方法来编写一个insertAfter函数：</p>
+<h3 id="在现有方法后插入一个新元素"><a class="markdownIt-Anchor" href="#在现有方法后插入一个新元素"></a> 在现有方法后插入一个新元素</h3>
+<h4 id="编写insertafter函数"><a class="markdownIt-Anchor" href="#编写insertafter函数"></a> 编写insertAfter函数</h4>
+<p>实用已知的方法来编写一个insertAfter函数：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">insertAfter</span>(<span class="params">newElement, targetElement</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> parent = targetElement.parentNode;</span><br><span class="line">    <span class="keyword">if</span> (parent.lastChild == targetElement) &#123;</span><br><span class="line">        parent.appendChild(newElement);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       parent.insertBefore(newElement,targetElement.nextSibling);</span><br><span class="line">    &#125;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Ajax"><a href="#Ajax" class="headerlink" title="Ajax"></a>Ajax</h2><p>实用Ajax可以做到只更新页面中的一小部分。其他内容——标志、导航、头部、脚部，都不用重新加载。用户仍然像往常一样点击链接，但这一次，已经加载的页面中只有一小部分区域会更新，而不必再次加载整个页面了。</p>
+<h2 id="ajax"><a class="markdownIt-Anchor" href="#ajax"></a> Ajax</h2>
+<p>实用Ajax可以做到只更新页面中的一小部分。其他内容——标志、导航、头部、脚部，都不用重新加载。用户仍然像往常一样点击链接，但这一次，已经加载的页面中只有一小部分区域会更新，而不必再次加载整个页面了。</p>
 <p>Ajax的主要优势就是对页面的请求以异步方式发送到服务器。而服务器不会用整个页面来响应请求，它会在后台处理请求，与此同时用户还能继续浏览页面并与页面交互。你的脚本则可以按需加载和创建页面内容，而不会打断用户的浏览体验。</p>
 <p>Ajax的核心是XMLHttpRequest对象。JS可以通过这个对象发送请求，然后自己处理响应。<strong>不同浏览器实现XMLHttpRequest</strong>的方式不太一样，为了保证跨浏览器，不得不为同样的事情写不同的分支。</p>
 <p>这是我们的html页面：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Ajax<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;new&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;scripts/addLoadEvent.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;scripts/getHttpObject.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;scripts/getNewContent.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
 <p>为了兼容所有浏览器（包括IE），<code>getHttpObject.js</code>中的<code>getHTTPObject</code>需要这么写：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getHTTPObject</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> XMLHttpRequest == <span class="string">&quot;undefined&quot;</span>) &#123;</span><br><span class="line">        XMLHttpRequest = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123; <span class="keyword">return</span> <span class="keyword">new</span> ActiveXObject(<span class="string">&quot;Msxml2.XMLHTTP.6.0&quot;</span>); &#125;</span><br><span class="line">                <span class="keyword">catch</span> (e) &#123;&#125;</span><br><span class="line">            <span class="keyword">try</span> &#123; <span class="keyword">return</span> <span class="keyword">new</span> ActiveXObject(<span class="string">&quot;Msxml2.XMLHTTP.3.0&quot;</span>); &#125;</span><br><span class="line">                <span class="keyword">catch</span> (e) &#123;&#125;</span><br><span class="line">            <span class="keyword">try</span> &#123; <span class="keyword">return</span> <span class="keyword">new</span> ActiveXObject(<span class="string">&quot;Msxml2.XMLHTTP&quot;</span>); &#125;</span><br><span class="line">                <span class="keyword">catch</span> (e) &#123;&#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>现在我们来写一个Ajax的HTTP请求。XMLHttpReuqest的open方法可以用来指定服务器上将要访问的文件，指定请求类型：GET，POST或SEND。这个方法的第三个参数用于指定亲贵是否以异步的方式就发送和处理：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getNewContent</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> request = getHTTPObject();</span><br><span class="line">    <span class="keyword">if</span> (request) &#123;</span><br><span class="line">        request.open(<span class="string">&quot;GET&quot;</span>, <span class="string">&quot;example.txt&quot;</span>, <span class="literal">true</span>);</span><br><span class="line">        request.onreadystatechange = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (request.readyState == <span class="number">4</span>) &#123;</span><br><span class="line">                <span class="keyword">var</span> para = <span class="built_in">document</span>.createElement(<span class="string">&quot;p&quot;</span>);</span><br><span class="line">                <span class="keyword">var</span> txt = <span class="built_in">document</span>.createTextNode(request.responseText);</span><br><span class="line">                para.appendChild(txt);</span><br><span class="line">                <span class="built_in">document</span>.getElementById(<span class="string">&#x27;new&#x27;</span>).appendChild(para);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        request.send(<span class="literal">null</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        alert(<span class="string">&quot;Sorry, your browser does not support XMLHttpRequest&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">addLoadEvent(getNewContent);</span><br></pre></td></tr></table></figure>
-
 <p><code>onreadystatechange</code>是一个事件处理函数，它会在服务器给XMLHttpRequest对象送回响应的时候被触发执行。在这个处理函数中，可以更具服务区的具体响应做出相应处理。</p>
 <p>在指定了请求的目标，也明确了如何处理响应后，就可以用send方法来发送请求了：<code>request.send(null);</code></p>
 <p>服务器在像XMLHttpRequest对象时，该对象有许多属性可用，浏览器会在不同阶段更新readyState属性的值，它有5个可能的值：</p>
@@ -335,11 +328,12 @@
 <li>3表示正在交互</li>
 <li>4表示完成</li>
 </ul>
-<p>只要readState属性的值编程了4，就可以访问服务器发送回来的数据了。返回的数据主要有两个属性。一个是<code>responseText</code>，用于保存文本字符串形式的数据；另一个是<code>responseXML</code>用于保存Content-Type头部中指定为”text/xml”的数据，其实是一个DocumentFragment（文档碎片）对象。</p>
+<p>只要readState属性的值编程了4，就可以访问服务器发送回来的数据了。返回的数据主要有两个属性。一个是<code>responseText</code>，用于保存文本字符串形式的数据；另一个是<code>responseXML</code>用于保存Content-Type头部中指定为&quot;text/xml&quot;的数据，其实是一个DocumentFragment（文档碎片）对象。</p>
 <blockquote>
 <p>异步请求有一个容易被忽略的问题就是异步性，就是脚本在发送XMLHttpRequest亲求后，仍然会继续执行，不会等待响应返回。</p>
 </blockquote>
-<h4 id="Hijax"><a href="#Hijax" class="headerlink" title="Hijax"></a>Hijax</h4><p>拦截用户操作触发的默认请求，然后使用Ajax操作。在做到平稳退化的基础之上利用Ajax渐进增强。</p>
+<h4 id="hijax"><a class="markdownIt-Anchor" href="#hijax"></a> Hijax</h4>
+<p>拦截用户操作触发的默认请求，然后使用Ajax操作。在做到平稳退化的基础之上利用Ajax渐进增强。</p>
 
     </div>
 
@@ -425,7 +419,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#DOM%E6%96%B9%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">DOM方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#createElement"><span class="nav-number">1.1.</span> <span class="nav-text">createElement</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#createTextNode"><span class="nav-number">1.2.</span> <span class="nav-text">createTextNode</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">1.2.1.</span> <span class="nav-text">例子</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E5%B7%B2%E6%9C%89%E5%85%83%E7%B4%A0%E5%89%8D%E6%8F%92%E5%85%A5%E4%B8%80%E4%B8%AA%E6%96%B0%E5%85%83%E7%B4%A0"><span class="nav-number">1.3.</span> <span class="nav-text">在已有元素前插入一个新元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E7%8E%B0%E6%9C%89%E6%96%B9%E6%B3%95%E5%90%8E%E6%8F%92%E5%85%A5%E4%B8%80%E4%B8%AA%E6%96%B0%E5%85%83%E7%B4%A0"><span class="nav-number">1.4.</span> <span class="nav-text">在现有方法后插入一个新元素</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E5%86%99insertAfter%E5%87%BD%E6%95%B0"><span class="nav-number">1.4.1.</span> <span class="nav-text">编写insertAfter函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ajax"><span class="nav-number">2.</span> <span class="nav-text">Ajax</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Hijax"><span class="nav-number">2.0.1.</span> <span class="nav-text">Hijax</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#dom%E6%96%B9%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text"> DOM方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#createelement"><span class="nav-number">1.1.</span> <span class="nav-text"> createElement</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#createtextnode"><span class="nav-number">1.2.</span> <span class="nav-text"> createTextNode</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">1.2.1.</span> <span class="nav-text"> 例子</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E5%B7%B2%E6%9C%89%E5%85%83%E7%B4%A0%E5%89%8D%E6%8F%92%E5%85%A5%E4%B8%80%E4%B8%AA%E6%96%B0%E5%85%83%E7%B4%A0"><span class="nav-number">1.3.</span> <span class="nav-text"> 在已有元素前插入一个新元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E7%8E%B0%E6%9C%89%E6%96%B9%E6%B3%95%E5%90%8E%E6%8F%92%E5%85%A5%E4%B8%80%E4%B8%AA%E6%96%B0%E5%85%83%E7%B4%A0"><span class="nav-number">1.4.</span> <span class="nav-text"> 在现有方法后插入一个新元素</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E5%86%99insertafter%E5%87%BD%E6%95%B0"><span class="nav-number">1.4.1.</span> <span class="nav-text"> 编写insertAfter函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ajax"><span class="nav-number">2.</span> <span class="nav-text"> Ajax</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#hijax"><span class="nav-number">2.0.1.</span> <span class="nav-text"> Hijax</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -650,58 +644,10 @@ if (document.querySelectorAll('pre.mermaid').length) {
 
   
       
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+  <script src="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.css">
 
-<script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
-        }
-      }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
-</script>
-
-    
 
   
 

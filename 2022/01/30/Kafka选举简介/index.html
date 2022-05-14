@@ -90,9 +90,6 @@
   </style>
 </noscript>
 
-  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
-  <script src="/live2d-widget/autoload.js"></script>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -279,43 +276,53 @@
       
         <p>为了应对面试官的提问：Kafka如何选举啊😣</p>
 <span id="more"></span>
-<h2 id="控制器选举"><a href="#控制器选举" class="headerlink" title="控制器选举"></a>控制器选举</h2><h3 id="控制器作用"><a href="#控制器作用" class="headerlink" title="控制器作用"></a>控制器作用</h3><p>本质就是一个broker，负责和ZK进行主要交互，管理整个集群中所有分区和副本的状态。当某个分区的leader副本出现故障时，由控制器负责为该分区选举新的leader副本。当检测到某个分区的ISR(in-sync replicas)集合发生变化时，由控制器负责通知所有broker更新其元数据信息。</p>
+<h2 id="控制器选举"><a class="markdownIt-Anchor" href="#控制器选举"></a> 控制器选举</h2>
+<h3 id="控制器作用"><a class="markdownIt-Anchor" href="#控制器作用"></a> 控制器作用</h3>
+<p>本质就是一个broker，负责和ZK进行主要交互，管理整个集群中所有分区和副本的状态。当某个分区的leader副本出现故障时，由控制器负责为该分区选举新的leader副本。当检测到某个分区的ISR(in-sync replicas)集合发生变化时，由控制器负责通知所有broker更新其元数据信息。</p>
 <ol>
 <li>主题管理（创建、删除、增加分区）</li>
 <li>分区重分配</li>
 <li>首选Leader选举</li>
-<li>集群成员管理<br>依赖ZK自动检测新增 Broker、Broker 主动关闭及被动宕机</li>
-<li>数据服务<br>保存了最全的集群元数据信息，其他所有 Broker 会定期接收控制器发来的元数据更新请求，从而更新各自内存中的缓存数据。从ZK中读取元数据但是不保存状态。<img src="/2022/01/30/Kafka%E9%80%89%E4%B8%BE%E7%AE%80%E4%BB%8B/controller.png" class=""> </li>
+<li>集群成员管理<br />
+依赖ZK自动检测新增 Broker、Broker 主动关闭及被动宕机</li>
+<li>数据服务<br />
+保存了最全的集群元数据信息，其他所有 Broker 会定期接收控制器发来的元数据更新请求，从而更新各自内存中的缓存数据。从ZK中读取元数据但是不保存状态。</li>
 </ol>
-<h3 id="选举方式"><a href="#选举方式" class="headerlink" title="选举方式"></a>选举方式</h3><p>冷启动：集群中第一个启动的Broker会通过在Zookeeper中创建临时节点/controller来让自己成为控制器，其他Broker启动时也会在zookeeper中创建临时节点，但是发现节点已经存在，所以它们会收到一个异常，意识到控制器已经存在，那么就会在Zookeeper中创建watch对象，便于它们收到控制器变更的通知。</p>
+<img src="/2022/01/30/Kafka%E9%80%89%E4%B8%BE%E7%AE%80%E4%BB%8B/controller.png" class=""> 
+<h3 id="选举方式"><a class="markdownIt-Anchor" href="#选举方式"></a> 选举方式</h3>
+<p>冷启动：集群中第一个启动的Broker会通过在Zookeeper中创建临时节点/controller来让自己成为控制器，其他Broker启动时也会在zookeeper中创建临时节点，但是发现节点已经存在，所以它们会收到一个异常，意识到控制器已经存在，那么就会在Zookeeper中创建watch对象，便于它们收到控制器变更的通知。</p>
 <p>首领异常：如果控制器被关闭或者与ZK段龛链接，ZK上的临时节点就会小时。集群里的其他Broker通过watch对象得到控制节点消失的通知，然后它们会尝试创建一个新的临时节点使自己成为控制器。同样的，这些broker中第一个成为新控制器的就会使得其他broker收到“节点已存在”的异常，其他broker就会再在这个新的控制器上创建watch对象。</p>
 <p>防止脑裂：如果控制器所在broker挂掉了或者Full GC停顿时间太长超过ZK的会话时间出现假死，Kafka集群必须选举出新的控制器，但如果之前被取代的控制器又恢复正常了，它依旧是控制器身份，这样集群就会出现两个控制器，就会控制器脑裂问题。为了解决脑裂问题，ZK中还有一个与Controller有关的持久节点/controller_epoch，存放的是一个整形值的epoch number，集群中每选举一次控制器，就会通过Zookeeper创建一个数值更大的epoch number，类似于generation，如果有broker收到比这个epoch数值小的数据，就会忽略消息。</p>
 
-
-<h2 id="分区副本Leader选举"><a href="#分区副本Leader选举" class="headerlink" title="分区副本Leader选举"></a>分区副本Leader选举</h2><p>选举过程：当控制器发现一个broker离开集群，知悉失去首领的分区需要一个新首领</p>
+<h2 id="分区副本leader选举"><a class="markdownIt-Anchor" href="#分区副本leader选举"></a> 分区副本Leader选举</h2>
+<p>选举过程：当控制器发现一个broker离开集群，知悉失去首领的分区需要一个新首领</p>
 <ol>
-<li><p>从Zookeeper中读取当前分区的所有ISR(in-sync replicas)集合。</p>
+<li>
+<p>从Zookeeper中读取当前分区的所有ISR(in-sync replicas)集合。</p>
 </li>
-<li><p>调用配置的分区选择算法在ISR中选择分区的leader。</p>
+<li>
+<p>调用配置的分区选择算法在ISR中选择分区的leader。</p>
 </li>
 </ol>
 <img src="/2022/01/30/Kafka%E9%80%89%E4%B8%BE%E7%AE%80%E4%BB%8B/repelica_election.png" class="">
-
 <p>（尚未仔细了解，后续再研究一下这些算法的不同○|￣|_)</p>
 <ol start="3">
 <li>向所有包含新Leader或现有Follower的broker发送请求，表明谁是新Leader谁是Follower</li>
 </ol>
 <p>Follower如何同步Leader：Follower主动请求消息向Leader获取数据，等价于消费者获取消息的请求，拿到的偏移量是有序的。一般来讲，如果Follower在10s内没有请求任何消息，或者没有请求最新的消息，那么它就会被认为不同步的。</p>
 <p>脏选举：Kafka broker端提供了一个参数<code>unclean.leader.election.enable</code>，用于控制是否允许非同步副本参与leader选举；如果开启，则当ISR为空时就会从这些非同步的副本中选举新的leader。</p>
-<h2 id="首选首领（Preferred-Leader）选举"><a href="#首选首领（Preferred-Leader）选举" class="headerlink" title="首选首领（Preferred Leader）选举"></a>首选首领（Preferred Leader）选举</h2><p>目的：使得各broker在动态的变化中尽量保持均衡<br>首选首领：创建主题时选定每个分区的首领。在创建分区的时候，会在broker之间均衡首领使得broker间的负载得到均衡，也就是使得首领和副本尽量不在同一个broker上。</p>
-<p>配置：<code>auto.leader.rebalance.enable</code> </p>
+<h2 id="首选首领preferred-leader选举"><a class="markdownIt-Anchor" href="#首选首领preferred-leader选举"></a> 首选首领（Preferred Leader）选举</h2>
+<p>目的：使得各broker在动态的变化中尽量保持均衡<br />
+首选首领：创建主题时选定每个分区的首领。在创建分区的时候，会在broker之间均衡首领使得broker间的负载得到均衡，也就是使得首领和副本尽量不在同一个broker上。</p>
+<p>配置：<code>auto.leader.rebalance.enable</code></p>
 <p>选举过程：控制器会检查首选首领是不是当前首领，如果不是，并且该副本（首选首领的副本）是同步的，就会触发首选首领选举，让首选首领成为当前首领。</p>
-<h2 id="消费组Leader选举"><a href="#消费组Leader选举" class="headerlink" title="消费组Leader选举"></a>消费组Leader选举</h2><p>在Kafka的消费端，会有一个消费者协调器以及消费组，组协调器（Group Coordinator）需要为消费组内的消费者选举出一个消费组的leader。</p>
+<h2 id="消费组leader选举"><a class="markdownIt-Anchor" href="#消费组leader选举"></a> 消费组Leader选举</h2>
+<p>在Kafka的消费端，会有一个消费者协调器以及消费组，组协调器（Group Coordinator）需要为消费组内的消费者选举出一个消费组的leader。</p>
 <p>如果消费组内还没有leader，那么第一个加入消费组的消费者即为消费组的leader，如果某一个时刻leader消费者由于某些原因退出了消费组，那么就会重新选举leader，选举方式如下：</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> members = <span class="keyword">new</span> mutable.<span class="type">HashMap</span>[<span class="type">String</span>, <span class="type">MemberMetadata</span>]</span><br><span class="line">leaderId = members.keys.headOption</span><br></pre></td></tr></table></figure>
-
 <p>在组协调器中消费者的信息是以HashMap的形式存储的，其中key为消费者的member_id，而value是消费者相关的元数据信息。而leader的取值为HashMap中的第一个键值对的key（等同于随机）。</p>
-<h3 id="消费者协调器（ConsumerCoordinator）"><a href="#消费者协调器（ConsumerCoordinator）" class="headerlink" title="消费者协调器（ConsumerCoordinator）"></a>消费者协调器（ConsumerCoordinator）</h3><p>Consumer一个私有成员变量，不同消费者之间不可见。</p>
+<h3 id="消费者协调器consumercoordinator"><a class="markdownIt-Anchor" href="#消费者协调器consumercoordinator"></a> 消费者协调器（ConsumerCoordinator）</h3>
+<p>Consumer一个私有成员变量，不同消费者之间不可见。</p>
 <p>作用：</p>
 <ul>
 <li>处理更新消费者缓存的 Metadata 请求</li>
@@ -325,7 +332,8 @@
 <li>通过一个定时的心跳检测任务来让组协调器感知自己的运行状态</li>
 <li>Leader消费者的Consumer</li>
 </ul>
-<h3 id="组协调器（GroupCoordinator）"><a href="#组协调器（GroupCoordinator）" class="headerlink" title="组协调器（GroupCoordinator）"></a>组协调器（GroupCoordinator）</h3><p>服务端实例，每个Broker启动时都会创建一个组协调器实例，负责监控这个消费组里的所有消费者的心跳以及判断是否宕机然后组织Rebalance。</p>
+<h3 id="组协调器groupcoordinator"><a class="markdownIt-Anchor" href="#组协调器groupcoordinator"></a> 组协调器（GroupCoordinator）</h3>
+<p>服务端实例，每个Broker启动时都会创建一个组协调器实例，负责监控这个消费组里的所有消费者的心跳以及判断是否宕机然后组织Rebalance。</p>
 <p>作用:</p>
 <ul>
 <li>负责对其管理的组员(消费者)提交的相关请求进行处理</li>
@@ -335,13 +343,15 @@
 <li>通过心跳检测消费者与自己的连接状态</li>
 <li>启动组协调器的时候创建一个定时任务，用于清理过期的消费组元数据以及过去的消费偏移量信息</li>
 </ul>
-<h3 id="Rebalance"><a href="#Rebalance" class="headerlink" title="Rebalance"></a>Rebalance</h3><ol>
-<li><p>Join。所有成员都向Group Coordinator发送JoinGroup请求，请求加入消费组。一旦所有成员都发送了JoinGroup请求，Coordinator会从中选择一个Consumer担任消费组Leader的角色，并把组成员信息以及订阅信息发给消费组Leader。leader负责消费分配方案的制定。</p>
-<img src="/2022/01/30/Kafka%E9%80%89%E4%B8%BE%E7%AE%80%E4%BB%8B/1.png" class=""></li>
-<li><p>Sync。这一步leader开始分配消费方案，即哪个Consumer负责消费哪些topic的哪些partition。一旦完成分配，leader会将这个方案封装进SyncGroup请求中发给GroupCoordinator，非消费组Leader也会发SyncGroup请求，只是内容为空。GroupCoordinator接收到分配方案之后会把方案塞进SyncGroup的response中发给各个Consumer。这样组内的所有成员就都知道自己应该消费哪些分区了。</p>
-<img src="/2022/01/30/Kafka%E9%80%89%E4%B8%BE%E7%AE%80%E4%BB%8B/2.png" class=""></li>
+<h3 id="rebalance"><a class="markdownIt-Anchor" href="#rebalance"></a> Rebalance</h3>
+<ol>
+<li>Join。所有成员都向Group Coordinator发送JoinGroup请求，请求加入消费组。一旦所有成员都发送了JoinGroup请求，Coordinator会从中选择一个Consumer担任消费组Leader的角色，并把组成员信息以及订阅信息发给消费组Leader。leader负责消费分配方案的制定。</li>
 </ol>
-
+<img src="/2022/01/30/Kafka%E9%80%89%E4%B8%BE%E7%AE%80%E4%BB%8B/1.png" class="">
+<ol start="2">
+<li>Sync。这一步leader开始分配消费方案，即哪个Consumer负责消费哪些topic的哪些partition。一旦完成分配，leader会将这个方案封装进SyncGroup请求中发给GroupCoordinator，非消费组Leader也会发SyncGroup请求，只是内容为空。GroupCoordinator接收到分配方案之后会把方案塞进SyncGroup的response中发给各个Consumer。这样组内的所有成员就都知道自己应该消费哪些分区了。</li>
+</ol>
+<img src="/2022/01/30/Kafka%E9%80%89%E4%B8%BE%E7%AE%80%E4%BB%8B/2.png" class="">
     </div>
 
     
@@ -422,7 +432,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%99%A8%E9%80%89%E4%B8%BE"><span class="nav-number">1.</span> <span class="nav-text">控制器选举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%99%A8%E4%BD%9C%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">控制器作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E4%B8%BE%E6%96%B9%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">选举方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E5%89%AF%E6%9C%ACLeader%E9%80%89%E4%B8%BE"><span class="nav-number">2.</span> <span class="nav-text">分区副本Leader选举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A6%96%E9%80%89%E9%A6%96%E9%A2%86%EF%BC%88Preferred-Leader%EF%BC%89%E9%80%89%E4%B8%BE"><span class="nav-number">3.</span> <span class="nav-text">首选首领（Preferred Leader）选举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%88%E8%B4%B9%E7%BB%84Leader%E9%80%89%E4%B8%BE"><span class="nav-number">4.</span> <span class="nav-text">消费组Leader选举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E8%B4%B9%E8%80%85%E5%8D%8F%E8%B0%83%E5%99%A8%EF%BC%88ConsumerCoordinator%EF%BC%89"><span class="nav-number">4.1.</span> <span class="nav-text">消费者协调器（ConsumerCoordinator）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%8D%8F%E8%B0%83%E5%99%A8%EF%BC%88GroupCoordinator%EF%BC%89"><span class="nav-number">4.2.</span> <span class="nav-text">组协调器（GroupCoordinator）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Rebalance"><span class="nav-number">4.3.</span> <span class="nav-text">Rebalance</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%99%A8%E9%80%89%E4%B8%BE"><span class="nav-number">1.</span> <span class="nav-text"> 控制器选举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%99%A8%E4%BD%9C%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text"> 控制器作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E4%B8%BE%E6%96%B9%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text"> 选举方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E5%89%AF%E6%9C%ACleader%E9%80%89%E4%B8%BE"><span class="nav-number">2.</span> <span class="nav-text"> 分区副本Leader选举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A6%96%E9%80%89%E9%A6%96%E9%A2%86preferred-leader%E9%80%89%E4%B8%BE"><span class="nav-number">3.</span> <span class="nav-text"> 首选首领（Preferred Leader）选举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%88%E8%B4%B9%E7%BB%84leader%E9%80%89%E4%B8%BE"><span class="nav-number">4.</span> <span class="nav-text"> 消费组Leader选举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E8%B4%B9%E8%80%85%E5%8D%8F%E8%B0%83%E5%99%A8consumercoordinator"><span class="nav-number">4.1.</span> <span class="nav-text"> 消费者协调器（ConsumerCoordinator）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%8D%8F%E8%B0%83%E5%99%A8groupcoordinator"><span class="nav-number">4.2.</span> <span class="nav-text"> 组协调器（GroupCoordinator）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rebalance"><span class="nav-number">4.3.</span> <span class="nav-text"> Rebalance</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -647,58 +657,10 @@ if (document.querySelectorAll('pre.mermaid').length) {
 
   
       
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+  <script src="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.css">
 
-<script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
-        }
-      }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
-</script>
-
-    
 
   
 

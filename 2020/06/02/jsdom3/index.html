@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"zavierlyu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":2,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="DOM解释 D: 网页文档 O：对象，自足的数据集合。JS里的对象可以分为三种类型 用户定义对象(user-defined object): 由程序员自行创建的对象 内建对象(native object): 内建的js对象，如Array，Math 宿主对象(host object): 由浏览器提供的对象   M： (X)HTML所代表的节点树模型">
+  <meta name="description" content="DOM解释  D: 网页文档 O：对象，自足的数据集合。JS里的对象可以分为三种类型  用户定义对象(user-defined object): 由程序员自行创建的对象 内建对象(native object): 内建的js对象，如Array，Math 宿主对象(host object): 由浏览器提供的对象   M： (X)HTML所代表的节点树模型">
 <meta property="og:type" content="article">
 <meta property="og:title" content="《JavaScript DOM编程艺术》第三章读书笔记">
 <meta property="og:url" content="http://zavierlyu.github.io/2020/06/02/jsdom3/index.html">
 <meta property="og:site_name" content="Garden of Sinners">
-<meta property="og:description" content="DOM解释 D: 网页文档 O：对象，自足的数据集合。JS里的对象可以分为三种类型 用户定义对象(user-defined object): 由程序员自行创建的对象 内建对象(native object): 内建的js对象，如Array，Math 宿主对象(host object): 由浏览器提供的对象   M： (X)HTML所代表的节点树模型">
+<meta property="og:description" content="DOM解释  D: 网页文档 O：对象，自足的数据集合。JS里的对象可以分为三种类型  用户定义对象(user-defined object): 由程序员自行创建的对象 内建对象(native object): 内建的js对象，如Array，Math 宿主对象(host object): 由浏览器提供的对象   M： (X)HTML所代表的节点树模型">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-06-02T14:07:50.000Z">
 <meta property="article:modified_time" content="2020-06-27T16:24:52.116Z">
@@ -87,9 +87,6 @@
   </style>
 </noscript>
 
-  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
-  <script src="/live2d-widget/autoload.js"></script>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -274,25 +271,45 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="DOM解释"><a href="#DOM解释" class="headerlink" title="DOM解释"></a>DOM解释</h2><ul>
+        <h2 id="dom解释"><a class="markdownIt-Anchor" href="#dom解释"></a> DOM解释</h2>
+<ul>
 <li>D: 网页文档</li>
-<li>O：对象，自足的数据集合。JS里的对象可以分为三种类型<ol>
+<li>O：对象，自足的数据集合。JS里的对象可以分为三种类型
+<ol>
 <li>用户定义对象(user-defined object): 由程序员自行创建的对象</li>
 <li>内建对象(native object): 内建的js对象，如Array，Math</li>
 <li>宿主对象(host object): 由浏览器提供的对象</li>
 </ol>
 </li>
-<li>M： (X)HTML所代表的节点树模型<span id="more"></span>
-<h2 id="元素节点"><a href="#元素节点" class="headerlink" title="元素节点"></a>元素节点</h2>元素节点时DOM中的原子，其包含文本节点和属性节点。<code>&lt;P&gt;</code>为元素节点，<code>&lt;p&gt;xxx&lt;/p&gt;</code>包含的xxx为文本节点，<code>&lt;p title=&#39;x&#39;&gt;&lt;/p&gt;</code>中的title为属性节点</li>
+<li>M： (X)HTML所代表的节点树模型</li>
 </ul>
-<h2 id="获取元素节点"><a href="#获取元素节点" class="headerlink" title="获取元素节点"></a>获取元素节点</h2><ol>
-<li>getElementById<br><code>document.getElementById(&quot;&lt;id&gt;&quot;)</code></li>
-<li>getElementsByTagName<br>返回一个<code>对象数组</code>，每个对象分别对应这文档里给定标签的一个元素。<br><code>document.getElementsByTagName(&quot;li&quot;)</code><br>如果你想知道某份文档里共有多少个元素节点，可以使用通配符<br><code>document.getElementsByTagName(&quot;*&quot;).length</code><br>话可以将<code>getElementById</code>和<code>getElementsByTagName</code>结合起来，<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> shopping = <span class="built_in">document</span>.getElementById(<span class="string">&quot;purchases&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> items = shopping.getElementsByTagName(<span class="string">&quot;*&quot;</span>);</span><br></pre></td></tr></table></figure></li>
-<li>getElementsByClassName<br>返回一个具有相同类名的元素的数组。<br><code>document.getElementsByClassName(&quot;sale);</code></li>
+<span id="more"></span>
+<h2 id="元素节点"><a class="markdownIt-Anchor" href="#元素节点"></a> 元素节点</h2>
+<p>元素节点时DOM中的原子，其包含文本节点和属性节点。<code>&lt;P&gt;</code>为元素节点，<code>&lt;p&gt;xxx&lt;/p&gt;</code>包含的xxx为文本节点，<code>&lt;p title='x'&gt;&lt;/p&gt;</code>中的title为属性节点</p>
+<h2 id="获取元素节点"><a class="markdownIt-Anchor" href="#获取元素节点"></a> 获取元素节点</h2>
+<ol>
+<li>getElementById<br />
+<code>document.getElementById(&quot;&lt;id&gt;&quot;)</code></li>
+<li>getElementsByTagName<br />
+返回一个<code>对象数组</code>，每个对象分别对应这文档里给定标签的一个元素。<br />
+<code>document.getElementsByTagName(&quot;li&quot;)</code><br />
+如果你想知道某份文档里共有多少个元素节点，可以使用通配符<br />
+<code>document.getElementsByTagName(&quot;*&quot;).length</code><br />
+话可以将<code>getElementById</code>和<code>getElementsByTagName</code>结合起来，</li>
 </ol>
-<h2 id="获取和设置属性"><a href="#获取和设置属性" class="headerlink" title="获取和设置属性"></a>获取和设置属性</h2><ol>
-<li>getAttribute<br>该方法不属于<code>document</code>对象，所以不能通过其调用，它只能通过元素节点对象吊桶。<br><code>object.get.Attribute(attribute);</code></li>
-<li>setAttribute<br><code>object.setAttribute(attribute, value);</code></li>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> shopping = <span class="built_in">document</span>.getElementById(<span class="string">&quot;purchases&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> items = shopping.getElementsByTagName(<span class="string">&quot;*&quot;</span>);</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>getElementsByClassName<br />
+返回一个具有相同类名的元素的数组。<br />
+<code>document.getElementsByClassName(&quot;sale);</code></li>
+</ol>
+<h2 id="获取和设置属性"><a class="markdownIt-Anchor" href="#获取和设置属性"></a> 获取和设置属性</h2>
+<ol>
+<li>getAttribute<br />
+该方法不属于<code>document</code>对象，所以不能通过其调用，它只能通过元素节点对象吊桶。<br />
+<code>object.get.Attribute(attribute);</code></li>
+<li>setAttribute<br />
+<code>object.setAttribute(attribute, value);</code></li>
 </ol>
 <p><strong>通过setAttribute()方法对文档作出的改变，但这张改变并未反映到源代码中，也就是说，源代码中属性值仍旧是原来的属性值。这种“表里不一”的现象缘于DOM的工作模式：先加载文档的静态内容，再以动态方式对它们进行刷新，动态刷新不改变文档的静态内容，而对页面内容的刷新，不需要用户在他们的浏览器里执行刷新操作就可以实现。</strong></p>
 <p>个人对这句话的理解时，你在console中运行setAttribute的DOM操作不会影响静态的html源代码，但是浏览器已经将你的修改运行到了渲染中。比如你在console中修改attribute <code>href</code>, 源代码不会改变，但是你点击的那个超链接已经发生了改变。</p>
@@ -378,7 +395,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#DOM%E8%A7%A3%E9%87%8A"><span class="nav-number">1.</span> <span class="nav-text">DOM解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%83%E7%B4%A0%E8%8A%82%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">元素节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%85%83%E7%B4%A0%E8%8A%82%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text">获取元素节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%92%8C%E8%AE%BE%E7%BD%AE%E5%B1%9E%E6%80%A7"><span class="nav-number">4.</span> <span class="nav-text">获取和设置属性</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#dom%E8%A7%A3%E9%87%8A"><span class="nav-number">1.</span> <span class="nav-text"> DOM解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%83%E7%B4%A0%E8%8A%82%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text"> 元素节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%85%83%E7%B4%A0%E8%8A%82%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text"> 获取元素节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%92%8C%E8%AE%BE%E7%BD%AE%E5%B1%9E%E6%80%A7"><span class="nav-number">4.</span> <span class="nav-text"> 获取和设置属性</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -603,58 +620,10 @@ if (document.querySelectorAll('pre.mermaid').length) {
 
   
       
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+  <script src="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.css">
 
-<script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
-        }
-      }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
-</script>
-
-    
 
   
 

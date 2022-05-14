@@ -81,9 +81,6 @@
   </style>
 </noscript>
 
-  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
-  <script src="/live2d-widget/autoload.js"></script>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -252,7 +249,8 @@
 
       
           <p>记录一下【线段树】的个人模版。</p>
-<p>记录一些好用的线段树的模版。线段树不仅能处理区域和还能处理区域积、区域最大值、区域最小值等一切可以用分治法计算的问题。<br>相较于树状数组更据灵活性，因为树状数组只能处理区域和（通过前缀和解决）。而同时线段树的所要求的时间复杂度也更大，树状数组是O(n)，线段树是最小O(2n)，一般为了方便找到子节点用O(4n)。</p>
+<p>记录一些好用的线段树的模版。线段树不仅能处理区域和还能处理区域积、区域最大值、区域最小值等一切可以用分治法计算的问题。<br />
+相较于树状数组更据灵活性，因为树状数组只能处理区域和（通过前缀和解决）。而同时线段树的所要求的时间复杂度也更大，树状数组是O(n)，线段树是最小O(2n)，一般为了方便找到子节点用O(4n)。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2022/05/04/SegmentTree/#more" rel="contents">
@@ -500,8 +498,7 @@
 
       
           <img src="/2022/04/03/reentrancy/2022-03-30-22-23-36-image.png" class="">
-
-<p>在百度搜索关键词”可重入和线程安全”跳出来的第一篇被抄来抄去的博客堂而皇之地写道“可重入函数一定是线程安全的”，还煞有介事地画了一张图。但实际上，Wikipedia的词条<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Reentrancy_(computing)">Reentrancy(computing)</a>上非常清楚地说明了二者不存在任何充分必要条件。</p>
+<p>在百度搜索关键词&quot;可重入和线程安全&quot;跳出来的第一篇被抄来抄去的博客堂而皇之地写道“可重入函数一定是线程安全的”，还煞有介事地画了一张图。但实际上，Wikipedia的词条<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Reentrancy_(computing)">Reentrancy(computing)</a>上非常清楚地说明了二者不存在任何充分必要条件。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2022/04/03/reentrancy/#more" rel="contents">
@@ -843,8 +840,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="负载均衡简介"><a href="#负载均衡简介" class="headerlink" title="负载均衡简介"></a>负载均衡简介</h2><p>大型网站都要面对庞大的用户量，高并发，海量数据等挑战。为了提升系统整体的性能，可以采用垂直扩展和水平扩展两种方式。</p>
-<p><strong>垂直扩展</strong>：通过增加单机硬件的处理能力，比如cpu处理能力，内存容量，磁盘大小等<br><strong>水平扩展</strong>：通过集群来分担流量。集群中的应用服务器被设计成无状态，用户可以请求仍和一个节点，这些节点共同承担访问压力。<br><strong>负载均衡</strong>：就是在水平扩展中尽力将网络流量平均分发到多个服务器上，以提高系统整体的相应速度和可用性。</p>
+          <h2 id="负载均衡简介"><a class="markdownIt-Anchor" href="#负载均衡简介"></a> 负载均衡简介</h2>
+<p>大型网站都要面对庞大的用户量，高并发，海量数据等挑战。为了提升系统整体的性能，可以采用垂直扩展和水平扩展两种方式。</p>
+<p><strong>垂直扩展</strong>：通过增加单机硬件的处理能力，比如cpu处理能力，内存容量，磁盘大小等<br />
+<strong>水平扩展</strong>：通过集群来分担流量。集群中的应用服务器被设计成无状态，用户可以请求仍和一个节点，这些节点共同承担访问压力。<br />
+<strong>负载均衡</strong>：就是在水平扩展中尽力将网络流量平均分发到多个服务器上，以提高系统整体的相应速度和可用性。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/11/27/Dubbo%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%AE%97%E6%B3%95/#more" rel="contents">
@@ -1288,58 +1288,10 @@ if (document.querySelectorAll('pre.mermaid').length) {
 
   
       
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+  <script src="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.css">
 
-<script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
-        }
-      }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
-</script>
-
-    
 
   
 

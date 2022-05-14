@@ -92,9 +92,6 @@
   </style>
 </noscript>
 
-  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
-  <script src="/live2d-widget/autoload.js"></script>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -283,7 +280,8 @@
 <p>例子：支付订单在30分钟内如果没有完成就应该取消；Kafka中在acks=all的情况下处理生产者请求，在一定时间内如果没能达成所有的同步副本写入消息就返回异常；Dubbo中调用失败，延时重试等</p>
 <p>需求：设计一个合理的数据结构存储这些等待中的请求，使得整个系统能够高效地插入、检查、清理和执行这些任务</p>
 <span id="more"></span>
-<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><table>
+<h2 id="算法"><a class="markdownIt-Anchor" href="#算法"></a> 算法</h2>
+<table>
 <thead>
 <tr>
 <th></th>
@@ -293,7 +291,8 @@
 <th>哈希分层时间轮</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>插入Timeout</td>
 <td>O(log n)</td>
 <td>O(1)</td>
@@ -321,8 +320,10 @@
 <td>统一时间槽内的Timeout数量</td>
 <td>m 为分层数量</td>
 </tr>
-</tbody></table>
-<h3 id="简单时间轮"><a href="#简单时间轮" class="headerlink" title="简单时间轮"></a>简单时间轮</h3><p>时间轮：本质是环形的数组</p>
+</tbody>
+</table>
+<h3 id="简单时间轮"><a class="markdownIt-Anchor" href="#简单时间轮"></a> 简单时间轮</h3>
+<p>时间轮：本质是环形的数组</p>
 <p>时间槽(bucket)：数组中的元素，本质是双向链表</p>
 <p>双向链表中的节点：定时的任务Timeout</p>
 <p>时间单位(每个时间槽的时间跨度) tickTime：1s (kafka里1ms，netty/dubbo里1ns)</p>
@@ -331,10 +332,8 @@
 <p><strong>检查超时任务</strong>：当tick走到下一个时间槽时，就把这个时间槽下的双向链表里的<strong>所有</strong>定时任务进行超时处理</p>
 <p><strong>定时任务的最大延时</strong>：时间轮的时间跨度，20s</p>
 <img src="/2021/12/13/TimingWheel/v2-598b34649422af1de1a720e95d37a9b3_b.webp" class="">
-
 <p>复用走过的时间槽，使得任何时间插入的Timeout定时任务的延时都可以在一个时间轮的时间跨度内任意定义。</p>
 <img src="/2021/12/13/TimingWheel/v2-480d1f3a2ddea9a5ccbc87235accc5d0_b.webp" class="">
-
 <p>复杂度分析：</p>
 <ul>
 <li>插入O(1)：插入时只需 延时时间+当前时间 找到对应的时间槽插入即可</li>
@@ -344,13 +343,13 @@
 </ul>
 <p>优点：复杂度低，所有操作都是O(1)</p>
 <p>缺点：时间轮的空间复杂度过高/定时任务时延受限。如果我要插入一个延时为1000s的定时任务，我必须创建一个至少有1000个时间槽的时间轮，即使我只是为了跑这一个任务却要浪费剩下999个时间槽；并且时间轮的指针要遍历这999个时间槽才执行到这个任务。</p>
-<h3 id="哈希时间轮"><a href="#哈希时间轮" class="headerlink" title="哈希时间轮"></a>哈希时间轮</h3><p><strong>解决的问题</strong>：简单时间轮中的定时任务时延受限，空间复杂度过高</p>
+<h3 id="哈希时间轮"><a class="markdownIt-Anchor" href="#哈希时间轮"></a> 哈希时间轮</h3>
+<p><strong>解决的问题</strong>：简单时间轮中的定时任务时延受限，空间复杂度过高</p>
 <p>比如此时定义这个时间轮的时间跨度为8s，那么所有的定时任务都会被存储在这8个时间槽中</p>
 <p><strong>插入定时任务</strong>：定时任务定义延时为11s后完成，插入时根据当前时间计算出过期时间，将过期时间对时间轮的时间跨度取余（11 % 8 = 3），因此该任务便会被插入到第3s的时间槽中的队列后面</p>
 <p><strong>检查超时任务</strong>：当指针推进到下一个时间槽时，就遍历时间槽下的双向链表里的所有定时任务进行超时检查并删除</p>
 <p><strong>定时任务的最大延时</strong>：任意</p>
 <img src="/2021/12/13/TimingWheel/image-20211210005152798.png" class="">
-
 <p>复杂度分析：</p>
 <ul>
 <li>插入O(1)：插入时只需 延时时间+当前时间 找到对应的时间槽的链表末尾插入即可</li>
@@ -360,41 +359,61 @@
 </ul>
 <p>优点：空间复杂度为常量；定时任务延时不受限制</p>
 <p>缺点：如果有频繁的哈希冲突就会使得超时检查的复杂度上升，变得和使用队列的方式没有区别</p>
-<h3 id="哈希分层时间轮"><a href="#哈希分层时间轮" class="headerlink" title="哈希分层时间轮"></a>哈希分层时间轮</h3><p>从某种角度讲，哈希分层时间轮是多级哈希表的变种。对于哈希时间轮来说，如果时间轮的时间跨度较小，load factor过大，哈希冲突变多，增删改查的操作的复杂度就会上升，所以我们希望再牺牲一些空间复杂度来使得更多定时任务的增删改查能够在O(1)复杂度内完成。</p>
+<h3 id="哈希分层时间轮"><a class="markdownIt-Anchor" href="#哈希分层时间轮"></a> 哈希分层时间轮</h3>
+<p>从某种角度讲，哈希分层时间轮是多级哈希表的变种。对于哈希时间轮来说，如果时间轮的时间跨度较小，load factor过大，哈希冲突变多，增删改查的操作的复杂度就会上升，所以我们希望再牺牲一些空间复杂度来使得更多定时任务的增删改查能够在O(1)复杂度内完成。</p>
 <p>比如我们此时增加一个时间轮，每个时间槽的时间跨度为20s，整个时间轮的时间跨度就有400s。第二层的时间轮的指针只有在第一层的指针绕完一圈之后才会走一格，就像水表一样。</p>
 <img src="/2021/12/13/TimingWheel/v2-f649b5f166c55a3c6b340cdd670b5229_b.webp" class="">
-
-<p><strong>插入定时任务：</strong>当前时间为第2s，插入一个延时22s的定时任务，根据第一个时间轮的指针位置计算出过期时间点为第24s，发现在第一个时间轮里无法装下；转换到第2个时间轮，根据第2个时间轮的指针位置计算出定时时间应该被放在[20,39]的时间槽里，于是将该定时任务插入到第二个时间轮的[20,39]时间槽的双向链表后。</p>
+<p>**插入定时任务：**当前时间为第2s，插入一个延时22s的定时任务，根据第一个时间轮的指针位置计算出过期时间点为第24s，发现在第一个时间轮里无法装下；转换到第2个时间轮，根据第2个时间轮的指针位置计算出定时时间应该被放在[20,39]的时间槽里，于是将该定时任务插入到第二个时间轮的[20,39]时间槽的双向链表后。</p>
 <p><strong>检查超时任务</strong>：第一个时间轮的指针每走过一个周期，第二个时间轮走一个时间槽。第二个时间轮每走1个时间槽，会把这个时间槽下所有的定时任务去除重新放入第一个时间轮中。比如，我们有一个在第24s超时的任务，当前时间为第20s，第一个时间轮已经走完一个周期，第二个时间轮的指针来到了[20,39]的时间槽上把里面所有在[20,39]范围内的定时任务取出对第一个时间轮的时间跨度取余插入相应的槽中。第一个时间轮的指针再继续遍历，和前面的哈希时间轮一样去将遍历到的时间槽里的定时任务进行超时处理。</p>
 <p><strong>定时任务的最大延时</strong>：任意。在kafka中，通过动态地创建时间轮能够避免掉延时溢出地问题。比如现在我们有2层时间轮，我在第2s插入一个延时为500s的定时任务，我们发现这个延时超过了我们这个两层时间轮系统的时间跨度(400s)，就会以这个时间跨度(400s)作为时间单位创建下一层时间轮，这样就有了3层时间轮，整个系统的时间跨度也到了8000s。</p>
 <img src="/2021/12/13/TimingWheel/v2-32981874757256e8b1bff6841f60a2cf_b.webp" class="">
-
 <p>复杂度分析：</p>
 <ul>
 <li>插入O(m)：虽然插入定时任务是从最外层的时间轮开始的，但是最后都是要插入到时间跨度最小的时间轮，所以需要O(m)，m为时间轮层级</li>
 <li>删除O(1)：在双向链表中删除Timeout节点即可</li>
 <li>超时检查O(1)：对于时间跨度最效的时间轮，也就是第一层的时间轮，它走过的每个时间槽都标志着这个时间槽内的所有定时任务超时不用一一检查</li>
-<li>空间复杂度$O(\sum_{i=1}^{m}{u_i})$：$u_i$表示第$i$​​层时间轮的时间槽个数</li>
+<li>空间复杂度<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>m</mi></msubsup><msub><mi>u</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(\sum_{i=1}^{m}{u_i})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.104002em;vertical-align:-0.29971000000000003em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.804292em;"><span style="top:-2.40029em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.29971000000000003em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord"><span class="mord mathdefault">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>：<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>u</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">u_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>表示第<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>​​层时间轮的时间槽个数</li>
 </ul>
 <img src="/2021/12/13/TimingWheel/v2-4ee2f4769d584a342b4d52641ea649f8_720w.jpg" class="">
-
 <p>优点：更高的空间利用率；两层时间轮只用了40个数组元素，却可以承载[0-399s]的定时任务，而三层时间轮用60个数组元素，就可以承载[0-7999s]的定时任务，相比于简单时间轮更加高效</p>
-<p>缺点：时间轮指针的空推进问题依然没有解决(稀疏时间轮)；比如说, 插入一个延时时间400s的任务, 指针就要执行399次”空推进”, 这其实是对CPU资源的浪费</p>
-<h3 id="Kafka-关于”空推进”的优化"><a href="#Kafka-关于”空推进”的优化" class="headerlink" title="Kafka 关于”空推进”的优化"></a>Kafka 关于”空推进”的优化</h3><p>Kafka通过使用DelayQueue来解决空推进的问题。</p>
+<p>缺点：时间轮指针的空推进问题依然没有解决(稀疏时间轮)；比如说, 插入一个延时时间400s的任务, 指针就要执行399次&quot;空推进&quot;, 这其实是对CPU资源的浪费</p>
+<h3 id="kafka-关于空推进的优化"><a class="markdownIt-Anchor" href="#kafka-关于空推进的优化"></a> Kafka 关于&quot;空推进&quot;的优化</h3>
+<p>Kafka通过使用DelayQueue来解决空推进的问题。</p>
 <p>DelayQueue被用来存储时间槽也就是bucket也就是双向链表。</p>
 <p>Kafka首先解耦了检查超时任务和时间轮指针推进的操作。我每10s检查有没有超时任务，但是如果检查完后发现没有超时的任务，那么时间轮的指针也不会向前推进；如果有超时任务，时间轮的指针只会推进到超时任务所在的时间槽。</p>
 <p>Kafka在Timer(可以看作时间轮类的管理类，入口，依赖TimingWheel)的设计中将指针推进(advanceClock)这个操作开放出来，也就是在这里业务方可以指定一次超时检查的最大耗时为多久，而这就是由DelayQueue实现的。DelayQueue通过<code>poll(long timeout, TimeUnit unit)</code>来获取过期的bucket，如果在timeout内没有取到就放弃获取；如果获取到的bucket不为空，就将bucket里的定时任务进行过期处理，并且在此时才会触发时间轮内的指针按照bucket的过期时间转动。</p>
 <blockquote>
 <p>可能有人会问这样和直接用DelayQueue来实现Timer有什么区别呢？区别其实就在于如果直接基于DelayQueue实现，它存的其实是一个定时任务Timeout；而在Kafka这里存的是有定时任务的时间槽bucket。bucket的数量是小于等于Timeout的数量，并且依赖于多层时间轮，层级越高的时间轮的bucket的时间跨度越大就能存越多的Timeout，所以会有一定的优化。</p>
 </blockquote>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p><strong>线程模型</strong></p>
+<h2 id="实现"><a class="markdownIt-Anchor" href="#实现"></a> 实现</h2>
+<p><strong>线程模型</strong></p>
 <ul>
 <li>用户线程：负责定时任务的注册</li>
 <li>定时任务队列轮询线程：负责扫描任务队列上符合要求的任务，如果任务的时间戳达到规定的时刻，首先从队列中取走此任务，然后将其交给异步线程池来处理</li>
-<li>异步线程池：负责定时任务的执行</li>
+<li>异步线程池：负责定时任务的执行<br />
+<strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/Timer.html">java.util.Timer</a></strong><br />
+数据结构：优先队列<br />
+单线程执行，未解耦超时检查和任务执行；未对任务的异常进行处理，单个任务异常会导致后面的任务无法执行<br />
+适用场景：不推荐使用<br />
+<strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledThreadPoolExecutor.html">java.util.concurrent.ScheduledThreadPoolExecutor</a></strong><br />
+数据结构：优先队列<br />
+多线程执行，不会单线程阻塞；线程池模型处理异常，单任务出错不影响后续任务<br />
+适用场景：大多数场景都适用<br />
+<strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/DelayQueue.html">java.util.concurrent.DelayQueue</a></strong><br />
+数据结构：优先队列<br />
+单纯的容器；无线程模型；线程安全；容器里的元素只有到时后才能被取出<br />
+适用场景：作为定时器服务的数据结构来被维护<br />
+<strong><a target="_blank" rel="noopener" href="https://netty.io/4.0/api/io/netty/util/HashedWheelTimer.html">io.netty.util.HashedWheelTimer</a></strong><br />
+数据结构：哈希时间轮<br />
+多线程执行；通过位运算提高哈希效率；更低复杂度的插入和过期检查<br />
+适用场景：高吞吐的定时系统<br />
+<strong><a target="_blank" rel="noopener" href="https://github.com/apache/kafka/tree/trunk/core/src/main/scala/kafka/utils/timer">kafka.utils.timer</a></strong><br />
+数据结构：哈希分层时间轮<br />
+无线程模型；Timer入口线程安全，TimingWheel线程不安全；通过指针连接各层时间轮；DelayQueue解决空推进<br />
+使用场景：高吞吐的定时系统</li>
 </ul>
-<p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/Timer.html">java.util.Timer</a></strong><br>数据结构：优先队列<br>单线程执行，未解耦超时检查和任务执行；未对任务的异常进行处理，单个任务异常会导致后面的任务无法执行<br>适用场景：不推荐使用<br><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledThreadPoolExecutor.html">java.util.concurrent.ScheduledThreadPoolExecutor</a></strong><br>数据结构：优先队列<br>多线程执行，不会单线程阻塞；线程池模型处理异常，单任务出错不影响后续任务<br>适用场景：大多数场景都适用<br><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/DelayQueue.html">java.util.concurrent.DelayQueue</a></strong><br>数据结构：优先队列<br>单纯的容器；无线程模型；线程安全；容器里的元素只有到时后才能被取出<br>适用场景：作为定时器服务的数据结构来被维护<br><strong><a target="_blank" rel="noopener" href="https://netty.io/4.0/api/io/netty/util/HashedWheelTimer.html">io.netty.util.HashedWheelTimer</a></strong><br>数据结构：哈希时间轮<br>多线程执行；通过位运算提高哈希效率；更低复杂度的插入和过期检查<br>适用场景：高吞吐的定时系统<br><strong><a target="_blank" rel="noopener" href="https://github.com/apache/kafka/tree/trunk/core/src/main/scala/kafka/utils/timer">kafka.utils.timer</a></strong><br>数据结构：哈希分层时间轮<br>无线程模型；Timer入口线程安全，TimingWheel线程不安全；通过指针连接各层时间轮；DelayQueue解决空推进<br>使用场景：高吞吐的定时系统</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
 <li><a target="_blank" rel="noopener" href="http://www.cs.columbia.edu/~nahum/w6998/papers/ton97-timing-wheels.pdf">Hierarchical Timing Wheels</a></li>
 <li><a target="_blank" rel="noopener" href="https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/HashedWheelTimer.java">Netty Hashed Wheel Timer源码</a></li>
 <li><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844904110399946766">一张图理解Kafka时间轮</a></li>
@@ -483,7 +502,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E6%97%B6%E9%97%B4%E8%BD%AE"><span class="nav-number">1.1.</span> <span class="nav-text">简单时间轮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%97%B6%E9%97%B4%E8%BD%AE"><span class="nav-number">1.2.</span> <span class="nav-text">哈希时间轮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E5%88%86%E5%B1%82%E6%97%B6%E9%97%B4%E8%BD%AE"><span class="nav-number">1.3.</span> <span class="nav-text">哈希分层时间轮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka-%E5%85%B3%E4%BA%8E%E2%80%9D%E7%A9%BA%E6%8E%A8%E8%BF%9B%E2%80%9D%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">1.4.</span> <span class="nav-text">Kafka 关于”空推进”的优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text"> 算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E6%97%B6%E9%97%B4%E8%BD%AE"><span class="nav-number">1.1.</span> <span class="nav-text"> 简单时间轮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%97%B6%E9%97%B4%E8%BD%AE"><span class="nav-number">1.2.</span> <span class="nav-text"> 哈希时间轮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E5%88%86%E5%B1%82%E6%97%B6%E9%97%B4%E8%BD%AE"><span class="nav-number">1.3.</span> <span class="nav-text"> 哈希分层时间轮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kafka-%E5%85%B3%E4%BA%8E%E7%A9%BA%E6%8E%A8%E8%BF%9B%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">1.4.</span> <span class="nav-text"> Kafka 关于&quot;空推进&quot;的优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text"> 实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -708,58 +727,10 @@ if (document.querySelectorAll('pre.mermaid').length) {
 
   
       
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+  <script src="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.css">
 
-<script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
-        }
-      }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
-</script>
-
-    
 
   
 

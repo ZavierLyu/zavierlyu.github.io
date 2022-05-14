@@ -81,9 +81,6 @@
   </style>
 </noscript>
 
-  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
-  <script src="/live2d-widget/autoload.js"></script>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -487,7 +484,8 @@
 
       
           <p>《C++ Primer（第五版）》第二章笔记</p>
-<h2 id="基本内置类型"><a href="#基本内置类型" class="headerlink" title="基本内置类型"></a>基本内置类型</h2><table>
+<h2 id="基本内置类型"><a class="markdownIt-Anchor" href="#基本内置类型"></a> 基本内置类型</h2>
+<table>
 <thead>
 <tr>
 <th>类型</th>
@@ -495,7 +493,8 @@
 <th>最小尺寸</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>bool</td>
 <td>布尔类型</td>
 <td>未定义</td>
@@ -555,7 +554,8 @@
 <td>扩展精度浮点数</td>
 <td>10位有效数字</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
 <p>可寻址最小内存块称为字节(Byte)，存储的基本单元称为字(Word)。在一台32位的计算机上，32位即字长。</p>
           <!--noindex-->
             <div class="post-button">
@@ -720,7 +720,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="分离JS和HTML"><a href="#分离JS和HTML" class="headerlink" title="分离JS和HTML"></a>分离JS和HTML</h3><p>作为一条原则，如果想用JavaScript给某哥网页添加一些行为，就不应该让JavaScript代码对这个网页的结构有任何依赖。</p>
+          <h3 id="分离js和html"><a class="markdownIt-Anchor" href="#分离js和html"></a> 分离JS和HTML</h3>
+<p>作为一条原则，如果想用JavaScript给某哥网页添加一些行为，就不应该让JavaScript代码对这个网页的结构有任何依赖。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/06/21/jsdom6/#more" rel="contents">
@@ -805,9 +806,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="39-n-39-与-std-endl-的区别"><a href="#39-n-39-与-std-endl-的区别" class="headerlink" title="&#39;\n\&#39; 与 std::endl 的区别"></a><code>&#39;\n\&#39;</code> 与 <code>std::endl</code> 的区别</h3><ul>
-<li>‘\n’表示内容为一个回车符的字符。 </li>
-<li>std::endl 是流操纵符(manipulator)，输出的作用和输出’\n’类似，其效果是结束当前行，并将与设备关联的缓冲区(buffer)中的内容冲刷(flush)到设备中。缓冲刷新操作可以保证到目前为止程序所产生的所有输出都真正写入输出流中，而不是仅停留在内存中等待写入流。
+          <h3 id="n-与-stdendl-的区别"><a class="markdownIt-Anchor" href="#n-与-stdendl-的区别"></a> <code>'\n\'</code> 与 <code>std::endl</code> 的区别</h3>
+<ul>
+<li>'\n’表示内容为一个回车符的字符。</li>
+<li>std::endl 是流操纵符(manipulator)，输出的作用和输出’\n’类似，其效果是结束当前行，并将与设备关联的缓冲区(buffer)中的内容冲刷(flush)到设备中。缓冲刷新操作可以保证到目前为止程序所产生的所有输出都真正写入输出流中，而不是仅停留在内存中等待写入流。</li>
+</ul>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/06/21/Cpp-Problems-Collection/#more" rel="contents">
@@ -940,7 +943,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-02-21 14:40:12" itemprop="dateModified" datetime="2021-02-21T14:40:12+08:00">2021-02-21</time>
+                <time title="Modified: 2022-05-14 18:15:53" itemprop="dateModified" datetime="2022-05-14T18:15:53+08:00">2022-05-14</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -963,9 +966,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>此博客根据<a target="_blank" rel="noopener" href="https://github.com/tianyicui/pack/blob/master/V2.pdf">背包九讲</a>1-3章整理编写而成，记录学习总结。<br>一句话：01逆序，完全正序</p>
-<h2 id="0-1背包问题"><a href="#0-1背包问题" class="headerlink" title="0-1背包问题"></a>0-1背包问题</h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><p>有 $N$ 件物品和一个容量为 $V$ 的背包。放入第 $i$ 件物品耗费的费用是 $C_i$ 价值是 $W_i$。求解将哪些物品装入背包可使价值总和最大。</p>
-<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>定义子问题状态: $F[i,v]$为前$i$件物品放入一个容量为$v$的背包可以获得的最大价值。这里的前$i$件物品包括第$i$件物品。<br>状态转移方程：<br>$$<br>F[i,v]=\max{F[i-1,v], F[i-1,v-C_i]+W_i}<br>$$</p>
+          <p>此博客根据<a target="_blank" rel="noopener" href="https://github.com/tianyicui/pack/blob/master/V2.pdf">背包九讲</a>1-3章整理编写而成，记录学习总结。<br />
+一句话：01逆序，完全正序</p>
+<h2 id="0-1背包问题"><a class="markdownIt-Anchor" href="#0-1背包问题"></a> 0-1背包问题</h2>
+<h3 id="题目"><a class="markdownIt-Anchor" href="#题目"></a> 题目</h3>
+<p>有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span></span> 件物品和一个容量为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span></span></span></span> 的背包。放入第 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span> 件物品耗费的费用是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>C</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">C_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 价值是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>W</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">W_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>。求解将哪些物品装入背包可使价值总和最大。</p>
+<h3 id="思路"><a class="markdownIt-Anchor" href="#思路"></a> 思路</h3>
+<p>定义子问题状态: <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi><mo stretchy="false">[</mo><mi>i</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">F[i,v]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">[</span><span class="mord mathdefault">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">v</span><span class="mclose">]</span></span></span></span>为前<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>件物品放入一个容量为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>v</mi></mrow><annotation encoding="application/x-tex">v</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">v</span></span></span></span>的背包可以获得的最大价值。这里的前<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>件物品包括第<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>件物品。<br />
+状态转移方程：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi><mo stretchy="false">[</mo><mi>i</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">]</mo><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">{</mo><mi>F</mi><mo stretchy="false">[</mo><mi>i</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">]</mo><mo separator="true">,</mo><mi>F</mi><mo stretchy="false">[</mo><mi>i</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mi>v</mi><mo>−</mo><msub><mi>C</mi><mi>i</mi></msub><mo stretchy="false">]</mo><mo>+</mo><msub><mi>W</mi><mi>i</mi></msub><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">F[i,v]=\max\{F[i-1,v], F[i-1,v-C_i]+W_i\}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">[</span><span class="mord mathdefault">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">v</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">max</span><span class="mopen">{</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">[</span><span class="mord mathdefault">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">v</span><span class="mclose">]</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">[</span><span class="mord mathdefault">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">v</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">}</span></span></span></span></span></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/06/02/Knapsack1/#more" rel="contents">
@@ -1353,58 +1363,10 @@ if (document.querySelectorAll('pre.mermaid').length) {
 
   
       
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+  <script src="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.css">
 
-<script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
-        }
-      }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
-</script>
-
-    
 
   
 
