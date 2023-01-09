@@ -38,7 +38,7 @@
 <meta property="og:image" content="http://zavierlyu.github.io/2022/04/23/Bigtable/image-20220423222807255.png">
 <meta property="og:image" content="http://zavierlyu.github.io/2022/04/23/Bigtable/image-20220423223022401.png">
 <meta property="article:published_time" content="2022-04-24T03:51:50.000Z">
-<meta property="article:modified_time" content="2022-04-23T16:55:25.084Z">
+<meta property="article:modified_time" content="2022-10-28T16:10:44.135Z">
 <meta property="article:author" content="Zhewen Lyu">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://zavierlyu.github.io/2022/04/23/Bigtable/image-20220423215131975.png">
@@ -155,7 +155,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">25</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">26</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -238,10 +238,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2022-04-23 22:51:50 / Modified: 11:55:25" itemprop="dateCreated datePublished" datetime="2022-04-23T22:51:50-05:00">2022-04-23</time>
+              <time title="Created: 2022-04-23 22:51:50" itemprop="dateCreated datePublished" datetime="2022-04-23T22:51:50-05:00">2022-04-23</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-10-28 11:10:44" itemprop="dateModified" datetime="2022-10-28T11:10:44-05:00">2022-10-28</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -348,7 +354,7 @@
 <h2 id="compaction"><a class="markdownIt-Anchor" href="#compaction"></a> Compaction</h2>
 <p><strong>Minor Compaction</strong>: 当MemTable占用的内存超过一定阈值时，内存中的MemTable会被冻结，切换为只读状态，转换为Immutable MemTable，同时创建一个新的MemTable，新的数据写入请求会写入到新的MemTable中，只读的MemTable会被转换为SSTable并最终写入GFS中。其目的在于减小tablet server的内存使用以及减小服务器宕机恢复时对WAL的读取。<br />
 <strong>Merging Compaction</strong>: 每次Minor Compaction都会产生新的SSTable，为了限制住SSTable的数量，后台会定期合并部分SSTable和MemTable，生成一个新的SSTable。<br />
-<strong>Major Compaction</strong>: 将所有的SSTable合并写入同一个SSTable。定期执行Major Compaction，清除旧SSTable中的删除信息（只有在Major Compaction中旧SSTable的删除信息才会被去掉）。</p>
+<strong>Major Compaction</strong>: 将所有的SSTable按照column family分别合并写入一个SSTable。定期执行Major Compaction，清除旧SSTable中的删除信息（只有在Major Compaction中旧SSTable的删除信息才会被去掉）。</p>
 <img src="/2022/04/23/Bigtable/image-20220423223022401.png" class="">
 <h2 id="refinements"><a class="markdownIt-Anchor" href="#refinements"></a> Refinements</h2>
 <p><strong>Locality Group</strong>: 用户可以将多个column family归为同一个locality group。一个单独的SSTable是按照locality group来划分的。没有较大依赖的column families可以放在不同的locality group里，省去了不必要的读操作。比如：网页表中的网页元数据（语言，校验和）与网页内容两个column family可以放在不同的locality group里，这样在读某一行的网页元数据的时候就不会将网页内容column family的数据一起读出来。<br />
@@ -546,7 +552,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -594,7 +600,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
