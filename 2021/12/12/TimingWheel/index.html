@@ -23,7 +23,7 @@
   <meta name="description" content="背景：大规模延时任务、周期性任务、定时任务的存储和处理 例子：支付订单在30分钟内如果没有完成就应该取消；Kafka中在acks&#x3D;all的情况下处理生产者请求，在一定时间内如果没能达成所有的同步副本写入消息就返回异常；Dubbo中调用失败，延时重试等 需求：设计一个合理的数据结构存储这些等待中的请求，使得整个系统能够高效地插入、检查、清理和执行这些任务">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Timing Wheels时间轮详解">
-<meta property="og:url" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/index.html">
+<meta property="og:url" content="http://zavierlyu.github.io/2021/12/12/TimingWheel/index.html">
 <meta property="og:site_name" content="Garden of Sinners">
 <meta property="og:description" content="背景：大规模延时任务、周期性任务、定时任务的存储和处理 例子：支付订单在30分钟内如果没有完成就应该取消；Kafka中在acks&#x3D;all的情况下处理生产者请求，在一定时间内如果没能达成所有的同步副本写入消息就返回异常；Dubbo中调用失败，延时重试等 需求：设计一个合理的数据结构存储这些等待中的请求，使得整个系统能够高效地插入、检查、清理和执行这些任务">
 <meta property="og:locale" content="en_US">
@@ -39,7 +39,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://zavierlyu.github.io/2021/12/13/TimingWheel/v2-598b34649422af1de1a720e95d37a9b3_b.webp">
 
-<link rel="canonical" href="http://zavierlyu.github.io/2021/12/13/TimingWheel/">
+<link rel="canonical" href="http://zavierlyu.github.io/2021/12/12/TimingWheel/">
 
 
 <script id="page-configurations">
@@ -136,7 +136,7 @@
   </li>
         <li class="menu-item menu-item-cv">
 
-    <a href="/cv/ZhewenLyu-Resume.pdf" rel="section"><i class="fa fa-user fa-fw"></i>cv</a>
+    <a href="/cv/" rel="section"><i class="fa fa-user fa-fw"></i>cv</a>
 
   </li>
         <li class="menu-item menu-item-tags">
@@ -212,7 +212,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://zavierlyu.github.io/2021/12/13/TimingWheel/">
+    <link itemprop="mainEntityOfPage" href="http://zavierlyu.github.io/2021/12/12/TimingWheel/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -235,14 +235,14 @@
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2021-12-13 00:16:21" itemprop="dateCreated datePublished" datetime="2021-12-13T00:16:21-06:00">2021-12-13</time>
+              <time title="Created: 2021-12-12 22:16:21" itemprop="dateCreated datePublished" datetime="2021-12-12T22:16:21-08:00">2021-12-12</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-04-23 10:38:40" itemprop="dateModified" datetime="2022-04-23T10:38:40-05:00">2022-04-23</time>
+                <time title="Modified: 2022-04-23 08:38:40" itemprop="dateModified" datetime="2022-04-23T08:38:40-07:00">2022-04-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -436,11 +436,11 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/12/06/TypeReference/" rel="prev" title="泛型、反射、匿名内部类与TypeReference、TypeToken">
+    <a href="/2021/12/05/TypeReference/" rel="prev" title="泛型、反射、匿名内部类与TypeReference、TypeToken">
       <i class="fa fa-chevron-left"></i> 泛型、反射、匿名内部类与TypeReference、TypeToken
     </a></div>
       <div class="post-nav-item">
-    <a href="/2022/01/30/Kafka%E9%80%89%E4%B8%BE%E7%AE%80%E4%BB%8B/" rel="next" title="Kafka选举简介">
+    <a href="/2022/01/29/Kafka%E9%80%89%E4%B8%BE%E7%AE%80%E4%BB%8B/" rel="next" title="Kafka选举简介">
       Kafka选举简介 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
@@ -566,7 +566,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -745,7 +745,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'blog-comments',
       owner       : 'ZavierLyu',
       admin       : ['ZavierLyu'],
-      id          : '053894794563422d5c476ebf22cb40f2',
+      id          : '1742817a936f8c6626211531657204e3',
         language: 'zh-CN',
       distractionFreeMode: true
     });
